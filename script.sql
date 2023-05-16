@@ -87,7 +87,7 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- -----------------------------------------------------
 -- Table `poodle_box`.`courses`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `poodle_box`.`contents` (
+CREATE TABLE IF NOT EXISTS `poodle_box`.`content` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(45) NOT NULL,
   `description` LONGTEXT NOT NULL,
