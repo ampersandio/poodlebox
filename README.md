@@ -2,12 +2,10 @@
 <h1 align="center">
   <br>
   <a href=""><img src="/assets/poodlebox.png" alt="Markdownify" width="200"></a>
-  <br>
-  PoodleBox
-  <br>
+
 </h1>
 
-<h4 align="center">E-Learning Portal of the Future<a href="" target="_blank">PoodleBox</a>.</h4>
+<h4 align="center">E-Learning Portal of the Future<a href="" target="_blank"></a>.</h4>
 
 <p align="center">
   <a href="https://badge.fury.io/js/electron-markdownify">
