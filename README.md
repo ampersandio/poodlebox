@@ -3,11 +3,11 @@
   <br>
   <a href=""><img src="/assets/poodlebox.png" alt="Markdownify" width="200"></a>
   <br>
-  Markdownify
+  PoodleBox
   <br>
 </h1>
 
-<h4 align="center">A minimal Markdown Editor desktop app built on top of <a href="http://electron.atom.io" target="_blank">Electron</a>.</h4>
+<h4 align="center">E-Learning Portal of the Future<a href="" target="_blank">PoodleBox</a>.</h4>
 
 <p align="center">
   <a href="https://badge.fury.io/js/electron-markdownify">
