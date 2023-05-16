@@ -90,7 +90,7 @@ DEFAULT CHARACTER SET = utf8mb4;
 CREATE TABLE IF NOT EXISTS `poodle_box`.`content` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(45) NOT NULL,
-  `description` LONGTEXT NOT NULL,
+  `description` LONGTEXT,
   `type` VARCHAR(4) NOT NULL,
   `sections_id` INT(11) not null,
   PRIMARY KEY (`id`),
