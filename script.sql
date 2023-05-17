@@ -18,6 +18,38 @@ CREATE SCHEMA IF NOT EXISTS `poodle_box` DEFAULT CHARACTER SET utf8mb4 ;
 USE `poodle_box` ;
 
 -- -----------------------------------------------------
+-- Table `poodle_box`.`roles`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `poodle_box`.`roles` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `type` VARCHAR(45) NOT NULL,
+    PRIMARY KEY (`id`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8mb4;
+
+-- -----------------------------------------------------
+-- Table `poodle_box`.`content_types`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `poodle_box`.`content_types` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `type` VARCHAR(45) NOT NULL,
+    PRIMARY KEY (`id`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8mb4;
+-- -----------------------------------------------------
+-- Table `poodle_box`.`subscriptions`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `poodle_box`.`subscriptions` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `type` VARCHAR(45) NOT NULL,
+    PRIMARY KEY (`id`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8mb4;
+
+-- -----------------------------------------------------
 -- Table `poodle_box`.`users`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `poodle_box`.`users` (
@@ -29,11 +61,19 @@ CREATE TABLE IF NOT EXISTS `poodle_box`.`users` (
   `phone_number` VARCHAR(45),
   `date_of_birth` DATE NOT NULL,
   `verified` TINYINT(4) NOT NULL,
-  `role` VARCHAR(45) NOT NULL,
+  `role` INT(11) NOT NULL,
   `linked_in_profile` VARCHAR(200),
   `disabled` TINYINT(4) NOT NULL,
+  `profile_picture` VARCHAR(200),
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `email_UNIQUE` (`email` ASC) )
+  INDEX `fk_users_roles1_idx` (`role` ASC) ,
+  CONSTRAINT `fk_users_roles1`
+    FOREIGN KEY (`role`)
+    REFERENCES `poodle_box`.`roles` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC))
+  
 ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8mb4;
@@ -46,10 +86,12 @@ CREATE TABLE IF NOT EXISTS `poodle_box`.`courses` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(45) NOT NULL,
   `description` LONGTEXT NOT NULL,
+  `objectives` LONGTEXT NOT NULL,
   `premium` TINYINT(4) NOT NULL,
-  `rating` FLOAT(53),
-  `locked` TINYINT(4) NOT NULL,
+  `active` TINYINT(4) NOT NULL,
   `owner` INT(11) NOT NULL,
+  `price` FLOAT(11),
+  `course_picture` VARCHAR(200),
   PRIMARY KEY (`id`),
   INDEX `fk_courses_users1_idx` (`owner` ASC) ,
   CONSTRAINT `fk_courses_users1`
@@ -70,13 +112,11 @@ CREATE TABLE IF NOT EXISTS `poodle_box`.`sections` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(45) NOT NULL,
   `courses_id` INT(11) NOT NULL,
-  `information_link` VARCHAR(200),
-  `locked` TINYINT(4) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_sections_courses1_idx` (`courses_id` ASC) ,
   CONSTRAINT `fk_sections_courses1`
     FOREIGN KEY (`courses_id`)
-    REFERENCES `poodle_box`.`tags` (`id`)
+    REFERENCES `poodle_box`.`courses` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   UNIQUE INDEX `title_UNIQUE` (`title` ASC) )  
@@ -85,19 +125,25 @@ AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8mb4;
 
 -- -----------------------------------------------------
--- Table `poodle_box`.`courses`
+-- Table `poodle_box`.`content`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `poodle_box`.`content` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(45) NOT NULL,
   `description` LONGTEXT,
-  `type` VARCHAR(4) NOT NULL,
-  `sections_id` INT(11) not null,
+  `content_types_id` INT(11) NOT NULL,
+  `sections_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_content_sections1_idx` (`sections_id` ASC) ,
   CONSTRAINT `fk_content_sections1`
     FOREIGN KEY (`sections_id`)
-    REFERENCES `poddle_box`.`sections` (`id`)
+    REFERENCES `poodle_box`.`sections` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  INDEX `fk_content_content_types1_idx` (`content_types_id` ASC) ,
+  CONSTRAINT `fk_content_content_types_id1`
+    FOREIGN KEY (`content_types_id`)
+    REFERENCES `poodle_box`.`content_types` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -144,18 +190,6 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8mb4;
 
--- -----------------------------------------------------
--- Table `poodle_box`.`objectives`
--- -----------------------------------------------------
-
-CREATE TABLE IF NOT EXISTS `poodle_box`.`objectives` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC) )
-ENGINE = InnoDB
-AUTO_INCREMENT = 1
-DEFAULT CHARACTER SET = utf8mb4;
 
 
 -- -----------------------------------------------------
@@ -182,27 +216,55 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
 
 -- -----------------------------------------------------
--- Table `poodle_box`.`objectives_has_courses`
+-- Table `poodle_box`.`interests`
 -- -----------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `poodle_box`.`objectives_has_courses` (
-  `courses_id` INT(11) NOT NULL,
-  `objectives_id` INT(11) NOT NULL,
-  PRIMARY KEY (`courses_id`, `objectives_id`),
-  INDEX `fk_objectives_has_courses_courses1_idx` (`courses_id` ASC) ,
-  INDEX `fk_objectives_has_courses_objectives1_idx` (`objectives_id` ASC) ,
-  CONSTRAINT `fk_objectives_has_courses_courses1`
-    FOREIGN KEY (`courses_id`)
-    REFERENCES `poodle_box`.`courses` (`id`)
+CREATE TABLE IF NOT EXISTS `poodle_box`.`interests` (
+  `users_id` INT(11) NOT NULL,
+  `tags_id` INT(11) NOT NULL,
+  `relevance` INT(11) NOT NULL,
+  PRIMARY KEY (`users_id`, `tags_id`),
+  INDEX `fk_interests_courses1_idx` (`users_id` ASC) ,
+  INDEX `fk_interests_tags1_idx` (`tags_id` ASC) ,
+  CONSTRAINT `fk_interests_tags1`
+    FOREIGN KEY (`tags_id`)
+    REFERENCES `poodle_box`.`tags` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_objectives_has_courses_objectives1`
-    FOREIGN KEY (`objectives_id`)
-    REFERENCES `poodle_box`.`objectives` (`id`)
+  CONSTRAINT `fk_interests_courses1`
+    FOREIGN KEY (`users_id`)
+    REFERENCES `poodle_box`.`users` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
+-- -----------------------------------------------------
+-- Table `poodle_box`.`reviews`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `poodle_box`.`reviews` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `users_id` INT(11) NOT NULL,
+  `courses_id` INT(11) NOT NULL,
+  `rating` DOUBLE NOT NULL,
+  `description` LONGTEXT ,
+  PRIMARY KEY (`id`),
+  INDEX `fk_reviews_courses1_idx` (`courses_id` ASC) ,
+  INDEX `fk_reviews_users1_idx` (`users_id` ASC) ,
+  CONSTRAINT `fk_reviews_courses1`
+    FOREIGN KEY (`courses_id`)
+    REFERENCES `poodle_box`.`courses` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_reviews_users1`
+    FOREIGN KEY (`users_id`)
+    REFERENCES `poodle_box`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8mb4;
+
 
 -- -----------------------------------------------------
 -- Table `poodle_box`.`users_has_courses`
@@ -211,15 +273,45 @@ DEFAULT CHARACTER SET = utf8mb4;
 CREATE TABLE IF NOT EXISTS `poodle_box`.`users_has_courses` (
   `users_id` INT(11) NOT NULL,
   `courses_id` INT(11) NOT NULL,
-  PRIMARY KEY (`courses_id`, `users_id`),
+  `subscriptions_id` INT(4) NOT NULL,
+  PRIMARY KEY (`courses_id`, `users_id`,`subscriptions_id`),
   INDEX `fk_users_has_courses_courses1_idx` (`courses_id` ASC) ,
   INDEX `fk_users_has_courses_users1_idx` (`users_id` ASC) ,
+  INDEX `fk_users_has_courses_subscriptions1_idx` (`subscriptions_id` ASC) ,
   CONSTRAINT `fk_users_has_courses_courses1`
     FOREIGN KEY (`courses_id`)
     REFERENCES `poodle_box`.`courses` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_users_has_courses_objectives1`
+  CONSTRAINT `fk_users_has_courses_users1`
+    FOREIGN KEY (`users_id`)
+    REFERENCES `poodle_box`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_users_has_courses_subscriptions1`
+    FOREIGN KEY (`subscriptions_id`)
+    REFERENCES `poodle_box`.`subscriptions` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4;
+
+-- -----------------------------------------------------
+-- Table `poodle_box`.`users_has_sections`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `poodle_box`.`users_has_sections` (
+  `users_id` INT(11) NOT NULL,
+  `sections_id` INT(11) NOT NULL,
+  PRIMARY KEY (`users_id`, `sections_id`),
+  INDEX `fk_users_has_courses_sections1_idx` (`sections_id` ASC) ,
+  INDEX `fk_users_has_courses_users1_idx` (`users_id` ASC) ,
+  CONSTRAINT `fk_users_has_sections_sections1`
+    FOREIGN KEY (`sections_id`)
+    REFERENCES `poodle_box`.`sections` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_users_has_sections1`
     FOREIGN KEY (`users_id`)
     REFERENCES `poodle_box`.`users` (`id`)
     ON DELETE NO ACTION
