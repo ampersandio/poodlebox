@@ -94,8 +94,8 @@ CREATE TABLE IF NOT EXISTS `poodle_box`.`content` (
   `type` VARCHAR(4) NOT NULL,
   `sections_id` INT(11) not null,
   PRIMARY KEY (`id`),
-  INDEX `fk_contents_sections1_idx` (`sections_id` ASC) ,
-  CONSTRAINT `fk_contents_sections1`
+  INDEX `fk_content_sections1_idx` (`sections_id` ASC) ,
+  CONSTRAINT `fk_content_sections1`
     FOREIGN KEY (`sections_id`)
     REFERENCES `poddle_box`.`sections` (`id`)
     ON DELETE NO ACTION
