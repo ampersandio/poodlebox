@@ -6,9 +6,9 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from data.models import StudentRegistration, TeacherRegistration
-import services.authorization as authorization_services
-import services.users as user_services
+from api.data.models import StudentRegistration, TeacherRegistration
+import api.services.authorization as authorization_services
+import api.services.users as user_services
 
 
 authorization_router = APIRouter(prefix='/authorization')
@@ -38,6 +38,7 @@ def register_student(information: StudentRegistration) -> JSONResponse:
     authorization_services.validate_password(information.password)
 
     information.password = authorization_services.hash_password(information.password)
+    #information.date_of_birth = date.fromisoformat(information.date_of_birth)
 
     user_services.register_student(information)
 

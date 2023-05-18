@@ -7,8 +7,9 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from config import Settings
-from data.models import User, TokenData
-from services.users import get_user
+from api.data.models import User, TokenData
+from api.services.users import get_user
+
 
 
 PASSWORD_REQUIRED_LENGTH = 5
@@ -59,13 +60,13 @@ def validate_email(email: str) -> None:
         raise HTTPException(status_code=400, detail='Email needs to contain "@" and "."')
     
 
-def authenticate_user(email: str, password: str) -> User | False:
+def authenticate_user(email: str, password: str) -> User | None:
     user = get_user(email)
-    
+
     if not user:
-        return False
+        return None
     if not verify_password(password, user.hashed_password):
-        return False
+        return None
     
     return user
 
