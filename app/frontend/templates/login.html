@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-md">
+    <form action = "/api/authorization/login", method="POST">
+       <h3>Login</h3>
+       <div class="form-group mb-3">
+          <label for="username">Username</label>
+          <input type="text" class="form-control" id="username" name="username"  placeholder="Username">
+       </div>
+       <div class="form-group mb-3">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+       </div>
+       <div class="d-flex justify-content-between">
+          <p>Don't have an account? <a href="/signup">Register here</a></p>
+          <button type="submit" class="btn btn-primary">Submit</button>
+       </div>
+    </form>
+  </div>
+
+{% endblock content %}
