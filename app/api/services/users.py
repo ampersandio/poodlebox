@@ -1,5 +1,5 @@
-from data.database import read_query, insert_query
-from data.models import User, StudentRegistration, TeacherRegistration
+from api.data.database import read_query, insert_query
+from api.data.models import User, StudentRegistration, TeacherRegistration
 
 
 def get_user(email: str) -> User | None:

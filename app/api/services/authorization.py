@@ -7,8 +7,9 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from config import Settings
-from data.models import User, TokenData
-from services.users import get_user
+from api.data.models import User, TokenData
+from api.services.users import get_user
+
 
 
 PASSWORD_REQUIRED_LENGTH = 5
