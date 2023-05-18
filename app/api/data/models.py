@@ -8,13 +8,13 @@ class User(BaseModel):
     first_name: str
     last_name: str
     hashed_password: str
-    phone_number: str
+    phone_number: str | None
     date_of_birth: date
     verified: bool
     role: int
-    linked_in_profile: str
+    linked_in_profile: str | None
     disabled: bool
-    profile_picture: str
+    profile_picture: str | None
 
     @classmethod
     def from_query(
@@ -23,7 +23,7 @@ class User(BaseModel):
         email: str,
         first_name: str,
         last_name: str,
-        password: str,
+        hashed_password: str,
         phone_number: str,
         date_of_birth: date,
         verified: bool,
@@ -38,7 +38,7 @@ class User(BaseModel):
             email=email,
             first_name=first_name,
             last_name=last_name,
-            password=password,
+            hashed_password=hashed_password,
             phone_number=phone_number,
             date_of_birth=date_of_birth,
             verified=verified,

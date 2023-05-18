@@ -49,7 +49,6 @@ def update_query(sql: str, sql_params: tuple = ()) -> list:
         connection.commit()
 
     
-
 def delete_query(sql: str, sql_params: tuple = ()) -> list:
     with _get_connection() as connection:
         cursor = connection.cursor()
