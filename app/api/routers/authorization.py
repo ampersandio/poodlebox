@@ -1,22 +1,16 @@
 from typing import Annotated
-from functools import lru_cache
-from config import Settings
+from config import settings
 from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from api.data.models import StudentRegistration, TeacherRegistration
+from api.data.models import StudentRegistration, TeacherRegistration, Token, User
 import api.services.authorization as authorization_services
 import api.services.users as user_services
 
 
 authorization_router = APIRouter(prefix='/authorization')
-
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
-settings = get_settings()
 
 
 @authorization_router.post('/registration/students', tags=['Authentication'])
@@ -90,3 +84,8 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> d
             'token': access_token,
             'token_type': 'bearer'
     }
+
+
+@authorization_router.post('/token', tags=['Authentication'])
+def get_user(token: Token) -> User:
+    return authorization_services.get_current_user(token.access_token)

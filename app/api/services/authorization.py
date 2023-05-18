@@ -1,24 +1,17 @@
 from datetime import datetime, timedelta
 from typing import Annotated
-from functools import lru_cache
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from config import Settings
 from api.data.models import User, TokenData
 from api.services.users import get_user
-
+from config import settings
 
 
 PASSWORD_REQUIRED_LENGTH = 5
 PASSWORD_SPECIAL_SYMBOLS = '!@#$%^&*()_+-=,./<>?"'
-
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
-settings = get_settings()
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
@@ -84,7 +77,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
     credentials_exception = HTTPException(status_code=401, detail='Could not validate credentials')
 
     try: 

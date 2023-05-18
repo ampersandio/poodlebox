@@ -1,13 +1,7 @@
 from mariadb import connect
 from mariadb.connections import Connection
-from functools import lru_cache
-from config import Settings
+from config import settings
 
-
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
-settings = get_settings()
 
 DATABASE = settings.db_name
 USER = settings.db_user

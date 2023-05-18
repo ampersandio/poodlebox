@@ -10,7 +10,8 @@ class User(BaseModel):
     hashed_password: str
     phone_number: str | None
     date_of_birth: date
-    verified: bool
+    verified_email: bool
+    approved: bool | None
     role: int
     linked_in_profile: str | None
     disabled: bool
@@ -24,13 +25,14 @@ class User(BaseModel):
         first_name: str,
         last_name: str,
         hashed_password: str,
-        phone_number: str,
+        phone_number: str | None,
         date_of_birth: date,
-        verified: bool,
+        verified_email: bool,
+        approved: bool | None,
         role: int,
-        linked_in_profile: str,
+        linked_in_profile: str | None,
         disabled: bool,
-        profile_picture: str
+        profile_picture: str | None
     ):
         
         return cls(
@@ -41,7 +43,8 @@ class User(BaseModel):
             hashed_password=hashed_password,
             phone_number=phone_number,
             date_of_birth=date_of_birth,
-            verified=verified,
+            verified_email=verified_email,
+            approved=approved,
             role=role,
             linked_in_profile=linked_in_profile,
             disabled=disabled,
