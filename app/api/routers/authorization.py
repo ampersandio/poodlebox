@@ -73,7 +73,7 @@ def register_teacher(information: TeacherRegistration) -> JSONResponse:
 
     user_services.register_teacher(information)
 
-    return JSONResponse(status_code=201, content={'msg': 'Student registered successfully'})
+    return JSONResponse(status_code=201, content={'msg': 'Teacher registered successfully'})
 
 
 @authorization_router.post('/login', tags=['Authentication'])
