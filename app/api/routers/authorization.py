@@ -1,6 +1,5 @@
 from typing import Annotated
-from functools import lru_cache
-from config import Settings
+from config import settings
 from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -12,11 +11,6 @@ import api.services.users as user_services
 
 
 authorization_router = APIRouter(prefix='/authorization')
-
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
-settings = get_settings()
 
 
 @authorization_router.post('/registration/students', tags=['Authentication'])
