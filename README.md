@@ -1,7 +1,7 @@
 
 <h1 align="center">
   <br>
-  <a href=""><img src="/assets/poodlebox.png" alt="Markdownify" width="200"></a>
+  <a href=""><img src="app/api/assets/poodlebox.png" alt="Markdownify" width="200"></a>
 
 </h1>
 
