@@ -157,12 +157,19 @@ class CoursesShowStudent(BaseModel):
     rating:float|None=None
     price:float|None=None
     tags:list[str]
+    progress:int
+    subscripton_status:str
     teacher:TeacherShow|None=None
     sections:list[Section]|None=None
-    progress:int
     
     @classmethod
-    def read_from_query_result(cls,id,title,description,objectives,premium,rating,price,tags,teacher,sections,progress):
+    def read_from_query_result(cls,id,title,description,objectives,premium,rating,price,tags,teacher,sections,progress,subscription_status):
+        if subscription_status==1:
+            return "Pending"
+        elif subscription_status==2:
+            return "Active"
+        elif subscription_status==3:
+            return "Expired"
         if tags is not None:
             tags=[x for x in tags.split(",")]
         premium=bool(premium)

@@ -43,3 +43,37 @@ def get_course_by_id(course_id):
     course=(CourseShowId.read_from_query_result(*data_course[0][:8],teacher=owner,sections=list_sections))
 
     return course
+
+def get_students_courses(student_id):
+    courses=read_query("select group_concat(distinct courses_id) from users_has_courses where users_id=? group by users_id",(student_id,))
+    list_courses=[]
+    if courses==[]:
+        return []
+    for x in courses[0]:
+        data_sections=read_query("select id,title from sections where courses_id=?",(x,))
+        list_sections=[Section.read_from_query_result(*row,content=None) for row in data_sections]
+        for j in list_sections:
+          data_content=read_query("select c.id,c.title,c.description,c.content_types_id from content c join sections s on s.id=c.sections_id where s.title=?",(j.title,))
+          list_content=[Content.read_from_query_result(*row) for row in data_content]
+          j.content=list_content
+        data_course=read_query("select c.id,c.title,c.description,c.objectives,c.premium,round(sum(r.rating)/count(r.id),2) as rating,c.price,group_concat(distinct t.name) as tags,ifnull(round((count(distinct us.sections_id)/count(distinct s.id))*100),0) as progress,uc.subscriptions_id,u.id,u.first_name,u.last_name,u.phone_number,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id left join sections s on s.courses_id=c.id left join sections se on se.courses_id=c.id left join users_has_sections us on us.sections_id=se.id left join users_has_courses uc on uc.courses_id=c.id where us.users_id=?  and uc.users_id=? and c.id=? group by c.id",(student_id,student_id,x))
+        owner=(TeacherShow.read_from_query_result(*data_course[0][11:]))
+        course=(CourseShowId.read_from_query_result(*data_course[0][:11],teacher=owner,sections=list_sections))
+        list_courses.append(course)
+
+    return list_courses
+
+def get_student_course_by_id(student_id,course_id):
+    data_sections=read_query("select id,title from sections where courses_id=?",(course_id,))
+    list_sections=[Section.read_from_query_result(*row,content=None) for row in data_sections]
+    for x in list_sections:
+        data_content=read_query("select c.id,c.title,c.description,c.content_types_id from content c join sections s on s.id=c.sections_id where s.title=?",(x.title,))
+        list_content=[Content.read_from_query_result(*row) for row in data_content]
+        x.content=list_content
+    data_course=read_query("select c.id,c.title,c.description,c.objectives,c.premium,round(sum(r.rating)/count(r.id),2) as rating,c.price,group_concat(distinct t.name) as tags,ifnull(round((count(distinct us.sections_id)/count(distinct s.id))*100),0) as progress,uc.subscriptions_id,u.id,u.first_name,u.last_name,u.phone_number,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id left join sections s on s.courses_id=c.id left join sections se on se.courses_id=c.id left join users_has_sections us on us.sections_id=se.id left join users_has_courses uc on uc.courses_id=c.id where us.users_id=?  and uc.users_id=? and c.id=? group by c.id",(student_id,student_id,x))
+    if data_course==[]:
+        return "Not found"
+    owner=(TeacherShow.read_from_query_result(*data_course[0][11:]))
+    course=(CourseShowId.read_from_query_result(*data_course[0][:11],teacher=owner,sections=list_sections))
+
+    return course
