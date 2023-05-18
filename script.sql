@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS `poodle_box`.`courses` (
   INDEX `fk_courses_users1_idx` (`owner` ASC) ,
   CONSTRAINT `fk_courses_users1`
     FOREIGN KEY (`owner`)
-    REFERENCES `forum_api`.`users` (`id`)
+    REFERENCES `poodle_box`.`users` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   UNIQUE INDEX `title_UNIQUE` (`title` ASC) )
