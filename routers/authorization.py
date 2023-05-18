@@ -1,7 +1,7 @@
 from typing import Annotated
 from functools import lru_cache
 from config import Settings
-from datetime import timedelta
+from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
@@ -38,6 +38,7 @@ def register_student(information: StudentRegistration) -> JSONResponse:
     authorization_services.validate_password(information.password)
 
     information.password = authorization_services.hash_password(information.password)
+    #information.date_of_birth = date.fromisoformat(information.date_of_birth)
 
     user_services.register_student(information)
 

@@ -59,13 +59,13 @@ def validate_email(email: str) -> None:
         raise HTTPException(status_code=400, detail='Email needs to contain "@" and "."')
     
 
-def authenticate_user(email: str, password: str) -> User | False:
+def authenticate_user(email: str, password: str) -> User | None:
     user = get_user(email)
-    
+
     if not user:
-        return False
+        return None
     if not verify_password(password, user.hashed_password):
-        return False
+        return None
     
     return user
 

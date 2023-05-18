@@ -13,15 +13,16 @@ def get_user(email: str) -> User | None:
 
 
 def register_student(student_info: StudentRegistration) -> None:
-    insert_query('INSERT INTO users(email, first_name, last_name, password, date_of_birth, verified, role, disabled) VALUES(?,?,?,?,?,?,?,?)',(
+    insert_query('INSERT INTO users(email, first_name, last_name, password, date_of_birth, verified, disabled) VALUES(?,?,?,?,?,?,?);' +
+                 'INSERT INTO roles(type) VALUES(?) WHERE id=(SELECT TOP 1 id FROM users)',(
         student_info.email,
         student_info.first_name,
         student_info.last_name,
         student_info.password,
         student_info.date_of_birth,
         False,
-        1,
         False
+
         )
     )
 

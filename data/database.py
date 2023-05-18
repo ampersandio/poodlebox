@@ -9,8 +9,7 @@ def get_settings() -> Settings:
     return Settings()
 settings = get_settings()
 
-
-DATABASE = settings.database
+DATABASE = settings.db_name
 USER = settings.db_user
 PASSWORD = settings.db_password
 HOST = settings.db_host
