@@ -25,8 +25,8 @@ def get_courses_for_student(current_user:User=Depends(get_current_user),sort=Non
         elif sort_by=='progress':
           result=sorted(result, key=lambda r:r.progress,reverse=sort=="desc")           
 
-@students_router.get("courses/{course_id}")
-def get_courses_for_student(course_id,current_user:User=Depends(get_current_user)):
+@students_router.get("/courses/{course_id}")
+def get_course_for_student_by_id(course_id,current_user:User=Depends(get_current_user)):
     if get_course_by_id(course_id)=='Not found':
         raise HTTPException(status_code=404,detail="Course not found")
     result=get_student_course_by_id(current_user.id,course_id)
