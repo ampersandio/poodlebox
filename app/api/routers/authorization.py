@@ -39,7 +39,7 @@ def register_student(information: StudentRegistration) -> JSONResponse:
     return JSONResponse(status_code=201, content={'msg': 'Student registered successfully'})
 
 
-@authorization_router.post('registration/teachers', tags=['Authentication'])
+@authorization_router.post('/registration/teachers', tags=['Authentication'])
 def register_teacher(information: TeacherRegistration) -> JSONResponse:
     if user_services.get_user(information.email) is not None:
         raise HTTPException(status_code=400, detail=f'There already is a registered user with email: {information.email}')
