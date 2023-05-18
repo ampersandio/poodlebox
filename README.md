@@ -6,7 +6,7 @@
 </h1>
 
 <h4 align="center">E-Learning Portal of the Future<a href="" target="_blank"></a>.</h4>
-<!-- 
+
 <p align="center">
   <a href="https://badge.fury.io/js/electron-markdownify">
     <img src="https://badge.fury.io/js/electron-markdownify.svg"
@@ -122,4 +122,3 @@ MIT
 > [amitmerchant.com](https://www.amitmerchant.com) &nbsp;&middot;&nbsp;
 > GitHub [@amitmerchant1990](https://github.com/amitmerchant1990) &nbsp;&middot;&nbsp;
 > Twitter [@amit_merchant](https://twitter.com/amit_merchant)
- -->
