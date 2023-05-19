@@ -1,22 +1,58 @@
 {% extends "base.html" %}
 
+
 {% block content %}
 
-   <!--  <form action = "/", method="POST">
-            <h3>Login</h3>
-            <div class="form-group mb-3">
-               <label for="username">Username</label>
-               <input type="text" class="form-control" id="username" name="username"  placeholder="Username">
-            </div>
-            <div class="form-group mb-3">
-               <label for="password">Password</label>
-               <input type="password" class="form-control" id="password" name="password" placeholder="Password">
-            </div>
-            <div class="d-flex justify-content-between">
-               <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-         </form>
 
-         <a href="/protected"> protected link </a>
--->   
+<div class="card mb-3 border-0" style="max-width: 100%;">
+  <div class="row no-gutters">
+    <div class="col-md-3">
+      <a href="http://"><img src="{{ url_for('assets', path='/javascript.png') }}" alt="javascript" width="auto" height="176px"></a>
+    </div>
+    <div class="col-sm-8">
+      <div class="card-body">
+        <a href="http://"><h4 class="card-title">Javascript</h4></a>
+        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+      </div>
+    </div>
+  </div>
+</div>
+<hr>
+ <div class="card mb-3 border-0" style="max-width: 100%;">
+   <div class="row no-gutters">
+     <div class="col-md-3">
+      <a href="http://"><img src="{{ url_for('assets', path='/python.png') }}" alt="javascript" width="auto" height="176px"></a>
+     </div>
+     <div class="col-md-7">
+       <div class="card-body">
+         <a href="http://"><h4 class="card-title">Python</h4></a>
+         <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+         <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+       </div>
+     </div>
+   </div>
+ </div>
+
+<script>
+
+   $(document).ready(function() {
+      var token = localStorage.getItem('token');
+    
+      // Send the token to the FastAPI endpoint for verification
+      $.ajax({
+        url: '/api/authorization/verify/',
+        type: 'POST',
+        success: function(response) {
+          console.log('Token is valid');
+        },
+        error: function(xhr, status, error) {
+          console.log('Token is invalid');
+        }
+      });
+    });
+
+</script>
+
+
 {% endblock content %}

@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="container-md">
-    <form action = "/api/authorization/login", method="POST">
+    <form id="login-form" action = "/api/authorization/login", method="POST">
        <h3>Login</h3>
        <div class="form-group mb-3">
           <label for="username">Username</label>
@@ -19,5 +19,39 @@
        </div>
     </form>
   </div>
+
+
+<script>
+
+$(document).ready(function() {
+   $('#login-form').submit(function(event) {
+      event.preventDefault(); // Prevent the form from submitting normally
+      
+      var username = $('#username').val();
+      var password = $('#password').val();
+      
+      var formData = {
+         username: username,
+         password: password
+      };
+      
+      // Send the AJAX request
+      $.ajax({
+         type: 'POST',
+         url: '/api/authorization/login',
+         data: formData,
+         success: function(response) {
+         console.log(response)
+         window.localStorage.setItem("token",response.token);
+         },
+         error: function(xhr, status, error) {
+         // Handle errors
+         console.error(error);
+         }
+      });
+   });
+   });
+
+</script>
 
 {% endblock content %}

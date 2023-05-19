@@ -212,3 +212,11 @@ a.temperature.nav-link {
   color: rgb(66, 157, 255);
   background: rgb(79, 93, 118);
 }
+
+
+@media (min-width: 768px){
+  .col-md-3 {
+    flex: 0 0 auto;
+    width: 320px !important;
+  }
+}
