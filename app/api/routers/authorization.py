@@ -32,7 +32,6 @@ def register_student(information: StudentRegistration) -> JSONResponse:
     authorization_services.validate_password(information.password)
 
     information.password = authorization_services.hash_password(information.password)
-    #information.date_of_birth = date.fromisoformat(information.date_of_birth)
 
     user_services.register_student(information)
 
@@ -40,7 +39,10 @@ def register_student(information: StudentRegistration) -> JSONResponse:
 
 
 @authorization_router.post('/registration/teachers', tags=['Authentication'])
-def register_teacher(information: TeacherRegistration) -> JSONResponse:
+def register_teacher(information: TeacherRegistration, current_user: Annotated[User, Depends(authorization_services.get_current_user)]) -> JSONResponse:
+    if current_user.role != 3:
+        raise HTTPException(status_code=400, detail='Only an admin can register a teacher')
+
     if user_services.get_user(information.email) is not None:
         raise HTTPException(status_code=400, detail=f'There already is a registered user with email: {information.email}')
 
