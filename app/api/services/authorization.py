@@ -14,7 +14,7 @@ PASSWORD_REQUIRED_LENGTH = 5
 PASSWORD_SPECIAL_SYMBOLS = '!@#$%^&*()_+-=,./<>?"'
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/authorization/login')
 
 
 def hash_password(password: str):
