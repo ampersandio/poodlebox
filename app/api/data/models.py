@@ -12,7 +12,7 @@ class User(BaseModel):
     date_of_birth: date
     verified_email: bool
     approved: bool | None
-    role: int
+    role: str
     linked_in_profile: str | None
     disabled: bool
     profile_picture: str | None
