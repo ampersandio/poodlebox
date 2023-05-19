@@ -73,7 +73,7 @@ def register_teacher(information: TeacherRegistration, current_user: Annotated[U
 
 
 @authorization_router.post('/login', tags=['Authentication'])
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> dict:
+def login(form_data:Annotated[OAuth2PasswordRequestForm, Depends()]) -> dict:
     user = authorization_services.authenticate_user(form_data.username, form_data.password)
 
     if not user:
@@ -82,11 +82,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> d
     access_token_expires = timedelta(minutes=settings.access_token_expires_minutes)
     access_token = authorization_services.create_access_token({'sub': user.email}, expires_delta=access_token_expires)
 
-    return {'msg': 'Successfully logged in',
-            'token': access_token,
-            'token_type': 'bearer'
-    }
-
+    return {"access_token": access_token, "token_type": "bearer"}
 
 @authorization_router.post('/token', tags=['Authentication'])
 def get_user(token: Token) -> User:

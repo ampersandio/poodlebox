@@ -31,11 +31,9 @@ def get_all_courses(request:Request,title=None,tag=None,sort=None,sort_by=None):
     
     return result
         
-        
-    
 
 @courses_router.get("/{course_id}")
-def get_course_by_id(course_id,current_user:User=Depends(get_current_user)):
+def get_course_by_id(course_id,current_user: Annotated[User, Depends(get_current_user)]):
     if current_user.role=="Student" and result.id not in current_user.access and result.premium is True:
         raise  HTTPException(status_code=402,detail="You don't have access to this course")
     result=courses.get_course_by_id(course_id)
