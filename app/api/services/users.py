@@ -13,7 +13,7 @@ def get_user(email: str) -> User | None:
 
 
 def register_student(student_info: StudentRegistration) -> None:
-    insert_query('INSERT INTO users(email, first_name, last_name, password, date_of_birth, verified, role, disabled) VALUES(?,?,?,?,?,?,?,?);',(
+    insert_query('INSERT INTO users(email, first_name, last_name, password, date_of_birth, verified_email, role, disabled) VALUES(?,?,?,?,?,?,?,?);',(
         student_info.email,
         student_info.first_name,
         student_info.last_name,
@@ -27,13 +27,14 @@ def register_student(student_info: StudentRegistration) -> None:
 
 
 def register_teacher(teacher_info: TeacherRegistration) -> None:
-    insert_query('INSERT INTO users(email, first_name, last_name, password, phone_number, date_of_birth, verified, role, linked_in_profile, disabled) VALUES(?,?,?,?,?,?,?,?,?,?)', (
+    insert_query('INSERT INTO users(email, first_name, last_name, password, phone_number, date_of_birth, verified_email, approved, role, linked_in_profile, disabled) VALUES(?,?,?,?,?,?,?,?,?,?,?)', (
         teacher_info.email,
         teacher_info.first_name,
         teacher_info.last_name,
         teacher_info.password,
         teacher_info.phone_number,
         teacher_info.date_of_birth,
+        False,
         False,
         2,
         teacher_info.linked_in_profile,
