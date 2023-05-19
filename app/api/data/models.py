@@ -189,3 +189,6 @@ class CoursesShowStudent(BaseModel):
         premium=bool(premium)
         return cls(id=id,title=title,description=description,objectives=objectives,premium=premium,rating=rating,price=price,tags=tags,progress=progress,subscripton_status=subscripton_status,teacher=teacher,sections=sections)
     
+
+class Subscription(BaseModel):
+    enroll:bool
