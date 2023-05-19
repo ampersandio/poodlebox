@@ -17,6 +17,16 @@ class User(BaseModel):
     disabled: bool
     profile_picture: str | None
 
+    @staticmethod
+    def role_from_role_id(role_id: int) -> str:
+        role_ids_to_roles = {
+            1: 'student',
+            2: 'teacher',
+            3: 'admin'
+        }
+    
+        return role_ids_to_roles[role_id]
+
     @classmethod
     def from_query(
         cls,
@@ -45,7 +55,7 @@ class User(BaseModel):
             date_of_birth=date_of_birth,
             verified_email=verified_email,
             approved=approved,
-            role=role,
+            role=User.role_from_role_id(role),
             linked_in_profile=linked_in_profile,
             disabled=disabled,
             profile_picture=profile_picture
