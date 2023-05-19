@@ -34,11 +34,16 @@
                 <form class="col-12 col-lg mb-3 mb-lg-0 me-lg-5">
                   <input type="search" class="form-control form-control-dark" placeholder="Search Courses" aria-label="Search">
                 </form>
-        
+                {% if user %}
+                logged in as: {{user.email}}
+                <a href="./logout/"><button type="button" class="btn btn-warning">Log Out</button></a>
+
+                {% else %}
                 <div class="text-end">
                   <a href="./login/"><button type="button" class="btn btn-outline-light me-2">Login</button></a>
                   <a href="./register/"><button type="button" class="btn btn-warning">Sign-up</button></a>
                 </div>
+                {% endif %}
               </div>
             </div>
           </header>
@@ -48,7 +53,6 @@
         {% block content %}
         
         {% endblock content %}
-
 
     </div>
     

@@ -2,55 +2,22 @@
 
 
 {% block content %}
+<ul>
+{% for course in courses %}
 
+<li>
+    
+    <h3>{{course.title}}</h3>
+    <h2>{{course.description}}</h2>
+    by
+    <p>{{course.teacher.first_name}} {{course.teacher.last_name}}</p>
 
-<div class="card mb-3 border-0" style="max-width: 100%;">
-  <div class="row no-gutters">
-    <div class="col-md-3">
-      <a href="http://"><img src="{{ url_for('assets', path='/javascript.png') }}" alt="javascript" width="auto" height="176px"></a>
-    </div>
-    <div class="col-sm-8">
-      <div class="card-body">
-        <a href="http://"><h4 class="card-title">Javascript</h4></a>
-        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-      </div>
-    </div>
-  </div>
-</div>
-<hr>
- <div class="card mb-3 border-0" style="max-width: 100%;">
-   <div class="row no-gutters">
-     <div class="col-md-3">
-      <a href="http://"><img src="{{ url_for('assets', path='/python.png') }}" alt="javascript" width="auto" height="176px"></a>
-     </div>
-     <div class="col-md-7">
-       <div class="card-body">
-         <a href="http://"><h4 class="card-title">Python</h4></a>
-         <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-         <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-       </div>
-     </div>
-   </div>
- </div>
+</li>
+
+{% endfor %}
+</ul>
 
 <script>
-
-   $(document).ready(function() {
-      var token = localStorage.getItem('token');
-    
-      // Send the token to the FastAPI endpoint for verification
-      $.ajax({
-        url: '/api/authorization/verify/',
-        type: 'POST',
-        success: function(response) {
-          console.log('Token is valid');
-        },
-        error: function(xhr, status, error) {
-          console.log('Token is invalid');
-        }
-      });
-    });
 
 </script>
 
