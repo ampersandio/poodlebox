@@ -7,11 +7,9 @@ from api.services.authorization import get_current_user, create_access_token, au
 
 import requests
 
-
 frontend_router = APIRouter(include_in_schema=False,prefix="/poodlebox")
 
 templates = Jinja2Templates(directory="frontend/templates")
-
 
 @frontend_router.get("/")
 def index(request:Request):
@@ -22,7 +20,6 @@ def index(request:Request):
         
         courses = requests.get(f"{host}/api/courses", headers={"AuThoRizaTion": f"Bearer {cookie_header}"})
         courses = courses.json()
-
 
         return templates.TemplateResponse("index.html", {"request": request, "user":user, "courses":courses})
     
@@ -44,7 +41,7 @@ def register(request:Request):
 
 @frontend_router.post("/")
 def process_form_data(request:Request, username: str = Form(...), password: str = Form(...), ):
-    host = (request.headers["host"])
+    host = "http://"+(request.headers["host"])
 
     user = authenticate_user(username,password)
 
