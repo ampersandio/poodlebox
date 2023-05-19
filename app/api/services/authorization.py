@@ -14,7 +14,7 @@ PASSWORD_REQUIRED_LENGTH = 5
 PASSWORD_SPECIAL_SYMBOLS = '!@#$%^&*()_+-=,./<>?"'
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/authorization/login')
 
 
 def hash_password(password: str):
@@ -79,15 +79,15 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
     credentials_exception = HTTPException(status_code=401, detail='Could not validate credentials')
-
+    
     try: 
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         email = payload.get('sub')
         if email is None:
             raise credentials_exception
         token_data = TokenData(email=email)
-    except JWTError:
-        raise credentials_exception
+    except JWTError as err:
+        raise HTTPException(401)
     
     user = get_user(token_data.email)
     return user
