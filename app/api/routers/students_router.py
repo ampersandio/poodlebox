@@ -12,7 +12,7 @@ students_router = APIRouter(prefix="/students")
 
 @students_router.get("/courses")
 def get_courses_for_student(current_user:User=Depends(get_current_user),sort=None,sort_by=None,title=None,subscription=None):
-    result=get_students_courses(current_user)
+    result=get_students_courses(current_user.id)
     if title:
        result=[x for x in result if title.lower() in x.title.lower()]
     if subscription:
@@ -23,7 +23,8 @@ def get_courses_for_student(current_user:User=Depends(get_current_user),sort=Non
         elif sort_by=="rating":
           result=sorted(result, key=lambda r:r.rating,reverse=sort=="desc")
         elif sort_by=='progress':
-          result=sorted(result, key=lambda r:r.progress,reverse=sort=="desc")           
+          result=sorted(result, key=lambda r:r.progress,reverse=sort=="desc")        
+    return result   
 
 @students_router.get("/courses/{course_id}")
 def get_course_for_student_by_id(course_id,current_user:User=Depends(get_current_user)):
