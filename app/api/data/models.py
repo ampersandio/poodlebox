@@ -118,11 +118,12 @@ class TeacherShow(BaseModel):
     first_name:str
     last_name:str
     phone_number:str
+    email:str
     linked_in_profile:str
     
     @classmethod
-    def read_from_query_result(cls,id,first_name,last_name,phone_number,linked_in_profile):
-        return cls(id=id,first_name=first_name,last_name=last_name,phone_number=phone_number,linked_in_profile=linked_in_profile)
+    def read_from_query_result(cls,id,first_name,last_name,phone_number,email,linked_in_profile):
+        return cls(id=id,first_name=first_name,last_name=last_name,phone_number=phone_number,email=email,linked_in_profile=linked_in_profile)
 
 class CourseShow(BaseModel):
     id:int
@@ -176,15 +177,15 @@ class CoursesShowStudent(BaseModel):
     sections:list[Section]|None=None
     
     @classmethod
-    def read_from_query_result(cls,id,title,description,objectives,premium,rating,price,tags,teacher,sections,progress,subscription_status):
-        if subscription_status==1:
-            return "Pending"
-        elif subscription_status==2:
-            return "Active"
-        elif subscription_status==3:
-            return "Expired"
+    def read_from_query_result(cls,id,title,description,objectives,premium,rating,price,tags,progress,subscripton_status,teacher,sections):
+        if subscripton_status==2:
+            subscripton_status="Pending"
+        elif subscripton_status==1:
+            subscripton_status="Active"
+        elif subscripton_status==3:
+            subscripton_status="Expired"
         if tags is not None:
             tags=[x for x in tags.split(",")]
         premium=bool(premium)
-        return cls(id=id,title=title,description=description,objectives=objectives,premium=premium,rating=rating,price=price,tags=tags,teacher=teacher,sections=sections,progress=progress)
+        return cls(id=id,title=title,description=description,objectives=objectives,premium=premium,rating=rating,price=price,tags=tags,progress=progress,subscripton_status=subscripton_status,teacher=teacher,sections=sections)
     
