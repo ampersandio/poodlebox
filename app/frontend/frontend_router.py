@@ -15,11 +15,12 @@ templates = Jinja2Templates(directory="frontend/templates")
 
 @frontend_router.get("/")
 def index(request:Request):
-
+    host = "http://"+(request.headers["host"])
     try:
         cookie_header = request.headers.get("cookie")[6:]
         user = get_current_user(cookie_header)
-        courses = requests.get("http://localhost:8002/api/courses", headers={"AuThoRizaTion": f"Bearer {cookie_header}"})
+        
+        courses = requests.get(f"{host}/api/courses", headers={"AuThoRizaTion": f"Bearer {cookie_header}"})
         courses = courses.json()
 
 
@@ -27,7 +28,7 @@ def index(request:Request):
     
     except:
 
-        courses = requests.get("http://localhost:8002/api/courses")
+        courses = requests.get(f"{host}/api/courses")
         return templates.TemplateResponse("index.html", {"request": request, "courses":courses.json()})
 
 
@@ -43,6 +44,7 @@ def register(request:Request):
 
 @frontend_router.post("/")
 def process_form_data(request:Request, username: str = Form(...), password: str = Form(...), ):
+    host = (request.headers["host"])
 
     user = authenticate_user(username,password)
 
@@ -53,7 +55,7 @@ def process_form_data(request:Request, username: str = Form(...), password: str 
 
     if user is not None:
 
-        courses = requests.get("http://localhost:8002/api/courses", headers={"AuThoRizaTion": f"Bearer {token}"})
+        courses = requests.get(f"{host}/api/courses", headers={"AuThoRizaTion": f"Bearer {token}"})
         response = templates.TemplateResponse("index.html", {"request": request, "user": user, "courses":courses.json()})
         response.set_cookie(key="token", value=token)
 
