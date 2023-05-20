@@ -188,3 +188,37 @@ class CoursesShowStudent(BaseModel):
         premium=bool(premium)
         return cls(id=id,title=title,description=description,objectives=objectives,premium=premium,rating=rating,price=price,tags=tags,teacher=teacher,sections=sections,progress=progress)
     
+
+class UserForCourse(BaseModel):
+    id: int
+    name: str
+    role: str
+    completed: int
+    review: int | None
+
+    @classmethod
+    def from_query(
+        cls,
+        name: str,
+        role: int,
+        completed: int,
+        review: int
+    ):
+        return cls(
+            name=name,
+            role=User.role_from_role_id(role),
+            completed=completed,
+            review=review
+        )
+
+
+class CourseForTeachersReport(BaseModel):
+    id: int
+    name: str
+    rating: int
+    students: list[UserForCourse]
+
+
+class TeachersReport(BaseModel):
+    name: str
+    courses: list[CourseForTeachersReport]
