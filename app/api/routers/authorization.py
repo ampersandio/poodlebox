@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from api.data.models import StudentRegistration, TeacherRegistration, Token, User
 import api.services.authorization as authorization_services
 import api.services.users as user_services
-
+from jose import jwt
 
 authorization_router = APIRouter(prefix='/authorization')
 
@@ -84,6 +84,7 @@ def login(form_data:Annotated[OAuth2PasswordRequestForm, Depends()]) -> dict:
 
     return {"access_token": access_token, "token_type": "bearer"}
 
-@authorization_router.post('/token', tags=['Authentication'])
-def get_user(token: Token) -> User:
-    return authorization_services.get_current_user(token.access_token)
+
+@authorization_router.get('/token/{token}', tags=['Authentication'])
+def get_user(token:str):
+    user = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])

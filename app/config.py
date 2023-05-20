@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     db_password: str
     db_port: int
 
+    api_key: str
+    api_secret: str
+
     class Config:
         env_file = '../.env'
         
