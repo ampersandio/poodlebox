@@ -7,6 +7,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from api.data.models import User, TokenData
 from api.services.users import get_user
+from api.data.database import update_query
 from config import settings
 
 
@@ -92,4 +93,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
     user = get_user(token_data.email)
     return user
 
+
+def verify_mail(user:User):
+    update_query("update users set verified_email = 1 where id = ?;", (user.id,))
 

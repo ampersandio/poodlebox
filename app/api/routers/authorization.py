@@ -2,19 +2,25 @@ from typing import Annotated
 from config import settings
 from datetime import date, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from api.data.models import StudentRegistration, TeacherRegistration, Token, User
 import api.services.authorization as authorization_services
 import api.services.users as user_services
+from api.utils.utils import generate_html 
+from mailjet_rest import Client
 
+from jose import jwt
 
 authorization_router = APIRouter(prefix='/authorization')
 
+mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
 
 @authorization_router.post('/registration/students', tags=['Authentication'])
-def register_student(information: StudentRegistration) -> JSONResponse:
+def register_student(request:Request, information: StudentRegistration) -> JSONResponse:
+    host = "http://" + request.headers["host"]
+
     if user_services.get_user(information.email) is not None:
         raise HTTPException(status_code=400, detail=f'There already is a registered user with email: {information.email}')
 
@@ -30,10 +36,16 @@ def register_student(information: StudentRegistration) -> JSONResponse:
     authorization_services.validate_email(information.email)
 
     authorization_services.validate_password(information.password)
-
     information.password = authorization_services.hash_password(information.password)
 
     user_services.register_student(information)
+
+    data = generate_html(information.email,host)
+    result = mailjet.send.create(data=data)
+
+    print (result.status_code)
+    print (result.json())
+
 
     return JSONResponse(status_code=201, content={'msg': 'Student registered successfully'})
 
@@ -84,6 +96,14 @@ def login(form_data:Annotated[OAuth2PasswordRequestForm, Depends()]) -> dict:
 
     return {"access_token": access_token, "token_type": "bearer"}
 
-@authorization_router.post('/token', tags=['Authentication'])
-def get_user(token: Token) -> User:
-    return authorization_services.get_current_user(token.access_token)
+
+@authorization_router.get('/token/{token}', tags=['Authentication'])
+def get_user(token:str):
+    user = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+    user = user_services.get_user(user["sub"])
+
+    if user is not None:
+        authorization_services.verify_mail(user)
+        return JSONResponse(status_code=201, content={'msg': 'email validation successfull'})
+    else:
+        raise HTTPException(status_code=401, detail="Could not validate mail")

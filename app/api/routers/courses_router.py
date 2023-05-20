@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request
 from typing import Annotated, Optional
-from api.services import courses
+from api.services import courses, students
 from api.data.models import User
 from api.services.authorization import get_current_user
 from api.services.students import get_students_courses_id
@@ -45,3 +45,11 @@ def get_course_by_id(course_id,current_user: Annotated[User, Depends(get_current
     if current_user.role=="Student" and result.id not in get_students_courses_id(current_user.id) and result.premium is True:
         raise  HTTPException(status_code=402,detail="You don't have access to this course")
     return result
+
+@courses_router.get("/{course_id}/sections/")
+def get_course_sections(course_id, current_user: Annotated[User, Depends(get_current_user)]):  
+    course = courses.get_course_by_id(course_id)
+    if (current_user.role not in ["teacher", "admin"]) and(course.id not in students.get_students_courses_id(current_user.id)):
+        raise HTTPException(status_code=401,detail="You don't have access to this section")
+    else:
+        return course.sections

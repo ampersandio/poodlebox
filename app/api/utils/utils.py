@@ -1,7 +1,7 @@
 from api.services.authorization import create_access_token
 
-def generate_html(email):
-    token = create_access_token(email)
+def generate_html(email,host):
+    token = create_access_token({"sub":email})
     message = {'Messages': [
                     {
                             "From": {
@@ -16,7 +16,7 @@ def generate_html(email):
                             ],
                             "Subject": "Poodlebox Mail Verification",
                             "TextPart": "Dear PoodleBox User",
-                            "HTMLPart": f"<h3>Welcome to PoodleBox please click the link to verify your account <a href=\"http://localhost:8000/mail/{token}/\">Mailjet</a>!</h3><br />May the poodlebox force be with you!"
+                            "HTMLPart": f"<h3>Welcome to PoodleBox please click the link to verify your account <a href=\"{host}/api/authorization/token/{token}/\">Mailjet</a>!</h3><br />May the poodlebox force be with you!"
                     }
                 ]}
     
