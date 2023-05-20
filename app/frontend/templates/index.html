@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<ul>
+{% for course in courses %}
+
+<li>
+
+    <h3>{{course.title}}</h3>
+    <h2>{{course.description}}</h2>
+
+    <p> by {{course.teacher.first_name}} {{course.teacher.last_name}}</p>
+
+</li>
+
+{% endfor %}
+</ul>
+
+<script>
+
+</script>
+
+
+{% endblock content %}
