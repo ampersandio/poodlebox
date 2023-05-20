@@ -192,3 +192,35 @@ class CoursesShowStudent(BaseModel):
 
 class Subscription(BaseModel):
     enroll:bool
+
+class CourseCreate(BaseModel):
+    title:str
+    description:str
+    objectives:str
+    premium:bool
+    price:float|None=None
+    tags:list[str]
+    course_pic:str|None=None
+
+
+class Student(BaseModel):
+    id:int
+    first_name:str
+    last_name:str
+    email:str
+    verified_email:bool
+    date_of_birth:date
+    total_number_of_courses:int
+    number_of_pending_subscriptions:int
+    number_of_active_subscriptions:int
+    number_of_expired_subscriptions:int
+    
+    @classmethod
+    def read_from_query_result(cls,id,first_name,last_name,email,verified_email,date_of_birth,total_number_of_courses,number_of_pending_subscriptions,number_of_active_subscriptions,number_of_expired_subscriptions):
+        verified_email=bool(verified_email)
+        return cls(id=id,first_name=first_name,last_name=last_name,email=email,verified_email=verified_email,date_of_birth=date_of_birth,total_number_of_courses=total_number_of_courses,number_of_pending_subscriptions=number_of_pending_subscriptions,number_of_active_subscriptions=number_of_active_subscriptions,number_of_expired_subscriptions=number_of_expired_subscriptions)
+
+
+class StudentEdit(BaseModel):
+    new_password:str
+    confirm_new_password:str
