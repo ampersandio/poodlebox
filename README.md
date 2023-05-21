@@ -12,7 +12,7 @@ This API documentation provides details about the available endpoints and their 
 
 <h1 align="center">
   <br>
-  <a href=""><img src="app/assets/schema_diagram.png" alt="Markdownify" width="200"></a>
+  <a href=""><img src="app/assets/schema_diagram.png" alt="Markdownify" width=auto></a>
 </h1>
 
 ## Technologies Used

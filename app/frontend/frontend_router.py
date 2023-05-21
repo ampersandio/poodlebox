@@ -8,7 +8,7 @@ from mailjet_rest import Client
 
 import requests
 
-frontend_router = APIRouter(include_in_schema=False,prefix="/poodlebox")
+frontend_router = APIRouter(include_in_schema=False, prefix="/poodlebox")
 templates = Jinja2Templates(directory="frontend/templates")
 
 mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
