@@ -185,6 +185,7 @@ class CourseUserReview(BaseModel):
     course_id: int
     title: str
     total_rating: float | None
+    sections_titles: list[str] | None
     user_id: int
     email: str
     full_name: str
@@ -200,6 +201,7 @@ class CourseUserReview(BaseModel):
         course_id: int,
         title: str,
         total_rating: float | None,
+        sections_titles: str | None,
         user_id: int,
         email: str,
         full_name: str,
@@ -212,7 +214,8 @@ class CourseUserReview(BaseModel):
         return cls(
             course_id=course_id,
             title=title,
-            total_rating=total_rating,
+            total_rating=round(total_rating, 2),
+            sections_titles=sections_titles.split(','),
             user_id=user_id,
             email=email,
             full_name=full_name,
@@ -252,6 +255,7 @@ class CourseUsersReviews(BaseModel):
     course_id: int
     title: str
     total_rating: float | None
+    sections_titles: list[str] | None
     users_reviews: list[UsersReviewsForCourse]
 
 
