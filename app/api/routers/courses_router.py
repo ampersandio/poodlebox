@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request
 from fastapi.responses import JSONResponse
 from typing import Annotated, Optional
 from api.services import courses
-from api.data.models import User, CourseCreate
+from api.data.models import User, CourseCreate, SectionCreate, ContentCreate
 from api.services.authorization import get_current_user
 from api.services.students import get_students_courses_id
 
-courses_router = APIRouter(prefix="/courses")
+courses_router = APIRouter(prefix="/courses", tags=["Courses"])
 
 
 @courses_router.get("/")
@@ -70,7 +70,7 @@ def get_course_by_id(
     return result
 
 
-@courses_router.put("/")
+@courses_router.post("/")
 def create_course(course: CourseCreate, current_user: User = Depends(get_current_user)):
     if current_user.role != "teacher":
         raise HTTPException(
@@ -89,3 +89,59 @@ def create_course(course: CourseCreate, current_user: User = Depends(get_current
             status_code=400, detail=new_course
         )   
     return JSONResponse(status_code=201, content={"msg":"Course created"})
+
+
+@courses_router.get("/{course_id}/sections/")
+def get_course_sections(course_id, current_user: Annotated[User, Depends(get_current_user)]):  
+
+    course = courses.get_course_by_id(course_id)
+
+    if (current_user.role not in ["teacher", "admin"]) and(course.id not in get_students_courses_id(current_user.id)):
+        raise HTTPException(status_code=401,detail="You don't have access to this section")
+    else:
+        return course.sections
+    
+
+@courses_router.get("/{course_id}/sections/{section_id}")
+def get_section_by_id(course_id:int,section_id:int,current_user: Annotated[User, Depends(get_current_user)]):  
+    course = courses.get_course_by_id(course_id)
+    
+    if (current_user.role not in ["teacher", "admin"]) and(course.id not in get_students_courses_id(current_user.id)):
+        raise HTTPException(status_code=401,detail="You don't have access to this section")
+    
+    if course is not None:
+        section = courses.get_section_by_id(section_id)
+    else:
+        raise HTTPException(status_code=404,detail="Course with this ID does not exist")
+    
+    if section is not None:
+        return section
+    else:
+        raise HTTPException(status_code=404, detail="Section with this id does not exist")
+    
+
+@courses_router.post("/{course_id}/sections/")
+def add_section(section: SectionCreate, course_id:int, current_user: Annotated[User, Depends(get_current_user)]):
+    course = get_course_by_id(course_id, current_user)
+    if current_user.role != "teacher" or course.teacher.email != current_user.email:
+        raise HTTPException(status_code=403, detail="This user does not have permission to add sections to this course")
+    else:
+        courses.create_section(course_id,section)
+
+    return JSONResponse(status_code=201, content={"msg":"Section created"})
+
+
+@courses_router.post("/{course_id}/sections/{section_id}/content")
+def add_content_to_section(course_id:int, section_id:int, content:ContentCreate, current_user: Annotated[User, Depends(get_current_user)]):
+    course = get_course_by_id(course_id, current_user)
+    section = get_section_by_id(course_id,section_id,current_user)
+
+    if current_user.role != "teacher" or course.teacher.email != current_user.email:
+        raise HTTPException(status_code=403, detail="This user does not have permission to add sections to this course")
+    
+    elif not section:
+        raise HTTPException(status_code=404, detail="Section with this Id does not exist")
+
+    else:
+        courses.add_content(section_id,content)
+        return JSONResponse(status_code=201, content={"msg":"Content created"})

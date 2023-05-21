@@ -5,6 +5,38 @@
 
 </h1>
 
+
+## Authentication
+
+| Method | Endpoint                                 | Description            |
+|--------|------------------------------------------|------------------------|
+| POST   | `/api/authorization/registration/students` | Register Student       |
+| POST   | `/api/authorization/registration/teachers` | Register Teacher       |
+| POST   | `/api/authorization/login`                 | Login                  |
+
+## Courses
+
+| Method | Endpoint                     | Description             |
+|--------|------------------------------|-------------------------|
+| GET    | `/api/courses/`              | Get All Courses         |
+| POST   | `/api/courses/`              | Create Course           |
+| GET    | `/api/courses/{course_id}`   | Get Course By Id        |
+| GET    | `/api/courses/{course_id}/sections/`     | Get Course Sections     |
+| POST   | `/api/courses/{course_id}/sections/`     | Add Section             |
+| GET    | `/api/courses/{course_id}/sections/{section_id}`   | Get Section By Id       |
+| POST   | `/api/courses/{course_id}/sections/{section_id}`   | Add Content To Section  |
+
+## Students
+
+| Method | Endpoint                           | Description                      |
+|--------|------------------------------------|----------------------------------|
+| GET    | `/api/students/courses`             | Get Courses For Student          |
+| GET    | `/api/students/profiles`            | Get Student Profile              |
+| PUT    | `/api/students/profiles`            | Change Student Profile           |
+| GET    | `/api/students/courses/{course_id}` | Get Course For Student By Id     |
+| PUT    | `/api/students/courses/{course_id}` | Enroll Or Unenroll From Course   |
+
+<!-- 
 <h4 align="center">E-Learning Portal of the Future<a href="" target="_blank"></a>.</h4>
 
 <p align="center">
@@ -121,4 +153,4 @@ MIT
 
 > [amitmerchant.com](https://www.amitmerchant.com) &nbsp;&middot;&nbsp;
 > GitHub [@amitmerchant1990](https://github.com/amitmerchant1990) &nbsp;&middot;&nbsp;
-> Twitter [@amit_merchant](https://twitter.com/amit_merchant)
+> Twitter [@amit_merchant](https://twitter.com/amit_merchant) -->
