@@ -262,18 +262,6 @@ def add_content(section_id:int, content:ContentCreate):
     return get_content_by_id(last_content_id)
 
 
-
-
-
-
-
-
-'''
-
-class ContentCreate(BaseModel):
-    title:str
-    description:str
-    content_type:str
-'''
-
-
+def get_most_popular():
+    courses = read_query("select c.id, c.title, c.description, count(u.users_id) from courses as c join users_has_courses as u on c.id = u.courses_id group by c.id order by count(u.users_id) desc limit 3;")
+    return courses

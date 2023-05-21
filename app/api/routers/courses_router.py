@@ -51,6 +51,10 @@ def get_all_courses(
 
     return result
 
+@courses_router.get("/popular")
+def get_most_popular_courses(request: Request):
+    return courses.get_most_popular()
+
 
 @courses_router.get("/{course_id}")
 def get_course_by_id(
@@ -93,7 +97,6 @@ def create_course(course: CourseCreate, current_user: User = Depends(get_current
 
 @courses_router.get("/{course_id}/sections/")
 def get_course_sections(course_id, current_user: Annotated[User, Depends(get_current_user)]):  
-
     course = courses.get_course_by_id(course_id)
 
     if (current_user.role not in ["teacher", "admin"]) and(course.id not in get_students_courses_id(current_user.id)):
@@ -145,3 +148,4 @@ def add_content_to_section(course_id:int, section_id:int, content:ContentCreate,
     else:
         courses.add_content(section_id,content)
         return JSONResponse(status_code=201, content={"msg":"Content created"})
+
