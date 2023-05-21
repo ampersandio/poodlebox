@@ -21,7 +21,7 @@ The API is built using the following technologies:
 The authentication section handles user registration and login.
 
 | Method | Endpoint                                 | Description            |
-|--------|------------------------------------------|------------------------|
+|--------|------------------------------------------|---------------------------------|
 | POST   | `/api/authorization/registration/students` | Register Student       |
 | POST   | `/api/authorization/registration/teachers` | Register Teacher       |
 | POST   | `/api/authorization/login`                 | Login                  |
@@ -31,7 +31,7 @@ The authentication section handles user registration and login.
 The courses section provides endpoints for managing courses and their sections.
 
 | Method | Endpoint                               | Description               |
-|--------|----------------------------------------|---------------------------|
+|--------|------------------------------------------|---------------------------------|
 | GET    | `/api/courses/`                        | Get All Courses           |
 | POST   | `/api/courses/`                        | Create Course             |
 | GET    | `/api/courses/{course_id}`              | Get Course By Id          |
