@@ -19,9 +19,11 @@
 
 <h3>Most Popular Courses</h3>
 <ul>
+    {% if most_popular %}
     {% for course in most_popular %}
-    <li>{{course[1]}}</li>
+    <li>{{course}}</li>
     {% endfor %}
+    {% endif %}
 </ul>
 
 <script>

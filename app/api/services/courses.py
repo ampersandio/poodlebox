@@ -6,6 +6,7 @@ from api.data.models import (
     SectionCreate,
     Content,
     ContentCreate,
+    Course,
     CourseShowId,
     CoursesShowStudent,
     CourseCreate,
@@ -242,7 +243,7 @@ def create_section(course_id:int, section: SectionCreate):
 
 def get_content_by_id(content_id:int) -> Content:
     content_data = read_query("select id, title, description, content_types_id from content where id = ?;", (content_id,))
-    content = [Content.read_from_query_result(*row) for row in content_data]
+    content = [(Content.read_from_query_result(*row) for row in content_data)]
 
     return content
 
@@ -262,6 +263,16 @@ def add_content(section_id:int, content:ContentCreate):
     return get_content_by_id(last_content_id)
 
 
-def get_most_popular():
-    courses = read_query("select c.id, c.title, c.description, count(u.users_id) from courses as c join users_has_courses as u on c.id = u.courses_id group by c.id order by count(u.users_id) desc limit 3;")
+def get_most_popular(role:str | None = None):
+    courses = []
+    
+    if role is None:
+        courses_data = read_query("select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id where c.premium = 0 group by c.id order by count(u.users_id) desc limit 3;")
+    else:
+        courses_data = read_query("select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id group by c.id order by count(u.users_id) desc limit 3;")
+
+    for i in courses_data:
+        courses.append(Course.read_from_query_result(*i))
+
     return courses
+
