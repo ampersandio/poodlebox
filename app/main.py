@@ -1,7 +1,7 @@
 from functools import lru_cache
 from fastapi.staticfiles import StaticFiles
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from config import Settings
 from api.api_router import api_router
 from frontend.frontend_router import frontend_router

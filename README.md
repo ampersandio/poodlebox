@@ -8,6 +8,13 @@
 
 This API documentation provides details about the available endpoints and their functionalities.
 
+## Database Schema
+
+<h1 align="center">
+  <br>
+  <a href=""><img src="app/assets/schema_diagram.png" alt="Markdownify" width="200"></a>
+</h1>
+
 ## Technologies Used
 
 The API is built using the following technologies:
