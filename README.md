@@ -2,11 +2,9 @@
 <h1 align="center">
   <br>
   <a href=""><img src="app/assets/poodlebox.png" alt="Markdownify" width="200"></a>
-
 </h1>
 
-
-API Documentation
+## API Documentation
 
 This API documentation provides details about the available endpoints and their functionalities.
 
@@ -22,42 +20,40 @@ The API is built using the following technologies:
 
 The authentication section handles user registration and login.
 
-
 | Method | Endpoint                                 | Description            |
 |--------|------------------------------------------|------------------------|
 | POST   | `/api/authorization/registration/students` | Register Student       |
 | POST   | `/api/authorization/registration/teachers` | Register Teacher       |
 | POST   | `/api/authorization/login`                 | Login                  |
 
-
 ## Courses
 
 The courses section provides endpoints for managing courses and their sections.
 
-| Method | Endpoint                     | Description             |
-|--------|------------------------------|-------------------------|
-| GET    | `/api/courses/`              | Get All Courses         |
-| POST   | `/api/courses/`              | Create Course           |
-| GET    | `/api/courses/{course_id}`   | Get Course By Id        |
-| GET    | `/api/courses/{course_id}/sections/`     | Get Course Sections     |
-| POST   | `/api/courses/{course_id}/sections/`     | Add Section             |
-| GET    | `/api/courses/{course_id}/sections/{section_id}`   | Get Section By Id       |
-| POST   | `/api/courses/{course_id}/sections/{section_id}`   | Add Content To Section  |
-
+| Method | Endpoint                               | Description               |
+|--------|----------------------------------------|---------------------------|
+| GET    | `/api/courses/`                        | Get All Courses           |
+| POST   | `/api/courses/`                        | Create Course             |
+| GET    | `/api/courses/{course_id}`              | Get Course By Id          |
+| GET    | `/api/courses/{course_id}/sections/`    | Get Course Sections       |
+| POST   | `/api/courses/{course_id}/sections/`    | Add Section               |
+| GET    | `/api/courses/{course_id}/sections/{section_id}` | Get Section By Id |
+| POST   | `/api/courses/{course_id}/sections/{section_id}` | Add Content To Section |
 
 ## Students
 
 The students section includes endpoints related to student profiles and course enrollment.
 
-| Method | Endpoint                           | Description                      |
-|--------|------------------------------------|----------------------------------|
-| GET    | `/api/students/courses`             | Get Courses For Student          |
-| GET    | `/api/students/profiles`            | Get Student Profile              |
-| PUT    | `/api/students/profiles`            | Change Student Profile           |
-| GET    | `/api/students/courses/{course_id}` | Get Course For Student By Id     |
-| PUT    | `/api/students/courses/{course_id}` | Enroll Or Unenroll From Course   |
+| Method | Endpoint                                 | Description                     |
+|--------|------------------------------------------|---------------------------------|
+| GET    | `/api/students/courses`                   | Get Courses For Student         |
+| GET    | `/api/students/profiles`                  | Get Student Profile             |
+| PUT    | `/api/students/profiles`                  | Change Student Profile          |
+| GET    | `/api/students/courses/{course_id}`       | Get Course For Student By Id    |
+| PUT    | `/api/students/courses/{course_id}`       | Enroll Or Unenroll From Course  |
 
 Please refer to the API documentation for specific details about each endpoint.
+
 
 
 <!-- 
