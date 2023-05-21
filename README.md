@@ -6,7 +6,22 @@
 </h1>
 
 
+API Documentation
+
+This API documentation provides details about the available endpoints and their functionalities.
+
+## Technologies Used
+
+The API is built using the following technologies:
+
+- Framework: FastAPI
+- Database: SQLite
+- Authentication: JWT (JSON Web Tokens)
+
 ## Authentication
+
+The authentication section handles user registration and login.
+
 
 | Method | Endpoint                                 | Description            |
 |--------|------------------------------------------|------------------------|
@@ -14,7 +29,10 @@
 | POST   | `/api/authorization/registration/teachers` | Register Teacher       |
 | POST   | `/api/authorization/login`                 | Login                  |
 
+
 ## Courses
+
+The courses section provides endpoints for managing courses and their sections.
 
 | Method | Endpoint                     | Description             |
 |--------|------------------------------|-------------------------|
@@ -26,7 +44,10 @@
 | GET    | `/api/courses/{course_id}/sections/{section_id}`   | Get Section By Id       |
 | POST   | `/api/courses/{course_id}/sections/{section_id}`   | Add Content To Section  |
 
+
 ## Students
+
+The students section includes endpoints related to student profiles and course enrollment.
 
 | Method | Endpoint                           | Description                      |
 |--------|------------------------------------|----------------------------------|
@@ -35,6 +56,9 @@
 | PUT    | `/api/students/profiles`            | Change Student Profile           |
 | GET    | `/api/students/courses/{course_id}` | Get Course For Student By Id     |
 | PUT    | `/api/students/courses/{course_id}` | Enroll Or Unenroll From Course   |
+
+Please refer to the API documentation for specific details about each endpoint.
+
 
 <!-- 
 <h4 align="center">E-Learning Portal of the Future<a href="" target="_blank"></a>.</h4>
