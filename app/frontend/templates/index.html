@@ -7,7 +7,7 @@
 
 <li>
 
-    <h3>{{course.title}}</h3>
+    <a><h3>{{course.title}}</h3></a>
     <h2>{{course.description}}</h2>
 
     <p> by {{course.teacher.first_name}} {{course.teacher.last_name}}</p>
@@ -15,6 +15,13 @@
 </li>
 
 {% endfor %}
+</ul>
+
+<h3>Most Popular Courses</h3>
+<ul>
+    {% for course in most_popular %}
+    <li>{{course[1]}}</li>
+    {% endfor %}
 </ul>
 
 <script>

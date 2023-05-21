@@ -13,7 +13,7 @@ from api.services.authorization import hash_password
 from fastapi.responses import JSONResponse
 
 
-students_router = APIRouter(prefix="/students")
+students_router = APIRouter(prefix="/students", tags=["Students"])
 
 
 @students_router.get("/courses")

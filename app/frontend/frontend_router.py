@@ -8,7 +8,7 @@ from mailjet_rest import Client
 
 import requests
 
-frontend_router = APIRouter(include_in_schema=False,prefix="/poodlebox")
+frontend_router = APIRouter(include_in_schema=False, prefix="/poodlebox")
 templates = Jinja2Templates(directory="frontend/templates")
 
 mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
@@ -27,6 +27,7 @@ def get_courses(request: Request, token: str = None):
 
 @frontend_router.get("/")
 def index(request: Request):
+    host = "http://" + request.headers["host"]
     try:
         token = request.headers.get("cookie")[6:]
         user = get_current_user(token)
@@ -36,7 +37,9 @@ def index(request: Request):
         user = None
         courses = get_courses(request)
 
-    return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses})
+    popular_courses = requests.get(f"{host}/api/courses/popular")
+    print(popular_courses.json())
+    return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses, "most_popular":popular_courses.json()})
 
 @frontend_router.get("/search")
 def search(request: Request, search_query: str):
