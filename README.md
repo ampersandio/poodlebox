@@ -13,14 +13,27 @@ This API documentation provides details about the available endpoints and their 
 The API is built using the following technologies:
 
 - Framework: FastAPI
-- Database: SQLite
+- Database: MariaDB
 - Authentication: JWT (JSON Web Tokens)
+- Mail Client: MailJet API
+
+## Authentication
+
+
+The authentication section handles user registration and login. The authentication service includes the following components:
+
+- **Password Hashing**: Passwords are hashed using the bcrypt algorithm to securely store them in the database.
+- **Password Validation**: Passwords are validated to ensure they meet the required length and complexity criteria.
+- **Token-based Authentication**: JWT (JSON Web Tokens) are used for token-based authentication. When a user logs in successfully, an access token is generated and returned. This access token must be included in the `Authorization` header of subsequent requests to authenticate the user.
+- **Access Token Expiration**: Access tokens have an expiration time, typically set to 360 minutes (6 hours) by default. Users need to obtain a new access token after it expires.
+- **User Verification**: Users can be marked as verified by updating their profile. This verification can be used to control access to certain endpoints or features.
+
 
 ## Authentication
 
 The authentication section handles user registration and login.
 
-| Method | Endpoint                                 | Description            |
+| Method | Endpoint                                 | Description                     |
 |--------|------------------------------------------|---------------------------------|
 | POST   | `/api/authorization/registration/students` | Register Student       |
 | POST   | `/api/authorization/registration/teachers` | Register Teacher       |
@@ -30,7 +43,7 @@ The authentication section handles user registration and login.
 
 The courses section provides endpoints for managing courses and their sections.
 
-| Method | Endpoint                               | Description               |
+| Method | Endpoint                                 | Description                     |
 |--------|------------------------------------------|---------------------------------|
 | GET    | `/api/courses/`                        | Get All Courses           |
 | POST   | `/api/courses/`                        | Create Course             |
