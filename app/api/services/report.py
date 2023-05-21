@@ -1,22 +1,49 @@
-from data.database import read_query
-from data.models import (
-    UserForCourse,
-    CourseForTeachersReport,
+from api.data.database import read_query
+from api.data.models import (
+    User,
+    CourseUserReview,
+    CourseUsersReviews,
+    UsersReviewsForCourse,
     TeachersReport
 )
 
-#     id: int
-#     name: str
-#     role: str
-#     completed: int
-#     review: int | None
 
+def get_teachers_report(teacher: User) -> TeachersReport | None:
+    data = read_query(
+        'SELECT c.course_id, c.title, cr.total_rating, cu.id as user_id, CONCAT(cu.first_name, " ", cu.last_name) as full_name, cu.email, cu.subscriptions_id, cu.role, IFNULL(com.completed_sections, 0)/t.sections as completed_sections, r.rating, r.description AS review FROM (SELECT c.id course_id, c.title FROM courses c JOIN users u ON c.owner = u.id WHERE u.id = ?) AS c '+
+        'JOIN (SELECT uhc.subscriptions_id, uhc.courses_id, u.id, u.first_name, u.last_name, u.email, u.role FROM users_has_courses uhc JOIN users u ON u.id = uhc.users_id WHERE subscriptions_id != 2) AS cu ON cu.courses_id = c.course_id '+
+        'LEFT JOIN (SELECT u.id user_id, r.rating, r.courses_id, r.description FROM users u JOIN reviews r ON u.id = r.users_id) as r ON r.courses_id = c.course_id AND r.user_id = cu.id '+
+        'JOIN (SELECT c.id course_id, COUNT(s.id) sections FROM sections s JOIN courses c ON s.courses_id = c.id '+
+        'GROUP BY c.id) as t ON t.course_id = c.course_id '+
+        'LEFT JOIN (SELECT c.id course_id, uhs.users_id, COUNT(uhs.sections_id) completed_sections FROM users_has_sections uhs JOIN sections s ON uhs.sections_id = s.id JOIN courses c ON s.courses_id = c.id '+
+        'GROUP BY uhs.users_id, c.id) as com ON com.course_id = c.course_id AND com.users_id = cu.id '+
+        'JOIN (SELECT r.courses_id, SUM(r.rating)/(COUNT(r.rating)*10) total_rating FROM reviews r GROUP BY r.courses_id) as cr ON cr.courses_id = c.course_id',
+        (teacher.id,)
+    )
 
-def get_users_for_course(course_id: int) -> list[UserForCourse] | None:
-    data = read_query('SELECT u.id, CONCAT(u.first_name, " ", u.last_name), u.role, COUNT(com_s.com_id)/COUNT(cou_s.sec_id), r.rating '+
-                      'FROM users u JOIN users_has_courses uhc ON u.id = uhc.users_id WHERE uhc.courses_id = ? '+
-                      'JOIN (SELECT uhs.sections_id, uhs.users_id AS com_id FROM users_has_sections uhs JOIN users u ON uhs.users_id = u.id WHERE uhs.sections_id IN (SELECT s.id FROM sections s WHERE s.courses_id = ?)) AS com_s ON com_s.users_id = u.id '+
-                      'JOIN (SELECT s.id, AS sec_id, uhs.id AS u_id FROM sections s JOIN courses c ON s.courses_id = c.id WHERE c.id = ? JOIN users_has_sections uhs ON s.id = uhs.sections_id) AS cou_s ON cou_s.u_id = u.id '+
-                      'JOIN (SELECT r.rating, r.users_id FROM reviews r JOIN courses c ON c.id = r.courses_id WHERE c.id = ?) AS r ON r.users_id = u.id '+
-                      'GROUP BY u.id, com_s.com_id, cou_s.sec_id'
-                      )
+    if not data:
+        return None
+    
+    courses_users_reviews = [CourseUserReview.from_query(*row) for row in data]
+    courses_ids = []
+    teachers_report = TeachersReport(
+        teacher_id=teacher.id,
+        teacher_name=teacher.first_name + teacher.last_name,
+        courses_users_reviews=[]
+    )
+    course_users_reviews = None
+    for course_user_review in courses_users_reviews:
+        if course_user_review.course_id not in courses_ids:
+            courses_ids.append(course_user_review.course_id)
+            course_users_reviews = CourseUsersReviews(
+                course_id=course_user_review.course_id,
+                title=course_user_review.title,
+                total_rating=course_user_review.total_rating,
+                users_reviews=[]
+                )
+            teachers_report.courses_users_reviews.append(course_users_reviews)
+        course_users_reviews.users_reviews.append(UsersReviewsForCourse.from_CourseUserReview(course_user_review))
+
+    return teachers_report
+   
+    
