@@ -40,8 +40,8 @@ def get_courses_teacher():
 
 def get_courses_student(student_id):
     data_courses = read_query(
-        "select c.id from courses c join users_has_courses uc on uc.courses_id=c.id where uc.users_id=? and (uc.subscriptions_id=? or uc.subscriptions_id=?)",
-        (student_id, 2, 3),
+        "select c.id from courses c join users_has_courses uc on uc.courses_id=c.id where uc.users_id=?",
+        (student_id,),
     )
     if data_courses == []:
         return get_courses_teacher()
