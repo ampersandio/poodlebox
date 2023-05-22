@@ -233,7 +233,7 @@ class UsersReviewsViewForCourse(BaseModel):
     email: str
     subscription: str
     role: str
-    completed_sections: float
+    completed: float
     rating: float | None
     review: str | None
 
@@ -245,7 +245,7 @@ class UsersReviewsViewForCourse(BaseModel):
             email=course_user_review.email,
             subscription=course_user_review.subscription,
             role=course_user_review.role,
-            completed_sections=course_user_review.completed_sections,
+            completed=course_user_review.completed_sections,
             rating=course_user_review.rating,
             review=course_user_review.review
         )

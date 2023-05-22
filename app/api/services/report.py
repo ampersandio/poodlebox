@@ -26,16 +26,19 @@ def get_teachers_report(teacher: User) -> TeachersReport | None:
         return None
     
     courses_users_reviews = [CourseUserReview.from_query(*row) for row in data]
-    courses_ids = []
     teachers_report = TeachersReport(
         teacher_id=teacher.id,
         teacher_name=teacher.first_name + teacher.last_name,
         courses_users_reviews=[]
     )
+
+    courses_ids = []
     course_views = None
+
     for course_user_review in courses_users_reviews:
         if course_user_review.course_id not in courses_ids:
             courses_ids.append(course_user_review.course_id)
+
             course_views = CourseViewForReport(
                 course_id=course_user_review.course_id,
                 title=course_user_review.title,
@@ -44,6 +47,7 @@ def get_teachers_report(teacher: User) -> TeachersReport | None:
                 users_reviews=[]
                 )
             teachers_report.courses_users_reviews.append(course_views)
+            
         course_views.users_reviews.append(UsersReviewsViewForCourse.from_CourseUserReview(course_user_review))
 
     return teachers_report
