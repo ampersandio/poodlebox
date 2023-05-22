@@ -2,8 +2,8 @@ from api.data.database import read_query
 from api.data.models import (
     User,
     CourseUserReview,
-    CourseUsersReviews,
-    UsersReviewsForCourse,
+    CourseViewForReport,
+    UsersReviewsViewForCourse,
     TeachersReport
 )
 
@@ -32,19 +32,19 @@ def get_teachers_report(teacher: User) -> TeachersReport | None:
         teacher_name=teacher.first_name + teacher.last_name,
         courses_users_reviews=[]
     )
-    course_users_reviews = None
+    course_views = None
     for course_user_review in courses_users_reviews:
         if course_user_review.course_id not in courses_ids:
             courses_ids.append(course_user_review.course_id)
-            course_users_reviews = CourseUsersReviews(
+            course_views = CourseViewForReport(
                 course_id=course_user_review.course_id,
                 title=course_user_review.title,
                 total_rating=course_user_review.total_rating,
                 sections_titles=course_user_review.sections_titles,
                 users_reviews=[]
                 )
-            teachers_report.courses_users_reviews.append(course_users_reviews)
-        course_users_reviews.users_reviews.append(UsersReviewsForCourse.from_CourseUserReview(course_user_review))
+            teachers_report.courses_users_reviews.append(course_views)
+        course_views.users_reviews.append(UsersReviewsViewForCourse.from_CourseUserReview(course_user_review))
 
     return teachers_report
    

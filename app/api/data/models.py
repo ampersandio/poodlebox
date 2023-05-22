@@ -227,7 +227,7 @@ class CourseUserReview(BaseModel):
         )
     
 
-class UsersReviewsForCourse(BaseModel):
+class UsersReviewsViewForCourse(BaseModel):
     user_id: int
     full_name: str
     email: str
@@ -251,18 +251,18 @@ class UsersReviewsForCourse(BaseModel):
         )
 
 
-class CourseUsersReviews(BaseModel):
+class CourseViewForReport(BaseModel):
     course_id: int
     title: str
     total_rating: float | None
     sections_titles: list[str] | None
-    users_reviews: list[UsersReviewsForCourse]
+    users_reviews: list[UsersReviewsViewForCourse]
 
 
 class TeachersReport(BaseModel):
     teacher_id: int
     teacher_name: str
-    courses_users_reviews: list[CourseUsersReviews]
+    courses_users_reviews: list[CourseViewForReport]
 
     
 class Subscription(BaseModel):
