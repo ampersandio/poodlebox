@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from api.data.models import User, TokenData
@@ -10,13 +10,15 @@ from api.services.users import get_user
 from api.data.database import update_query
 from config import settings
 
-
 PASSWORD_REQUIRED_LENGTH = 5
 PASSWORD_SPECIAL_SYMBOLS = '!@#$%^&*()_+-=,./<>?"'
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/authorization/login')
 
+def get_oauth2_scheme(auto_error: bool = True):
+    return OAuth2PasswordBearer(tokenUrl='/api/authorization/login', auto_error=auto_error)
+
+oauth2_scheme = get_oauth2_scheme()
 
 def hash_password(password: str):
     return password_context.hash(password)

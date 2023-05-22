@@ -2,9 +2,81 @@
 <h1 align="center">
   <br>
   <a href=""><img src="app/assets/poodlebox.png" alt="Markdownify" width="200"></a>
-
 </h1>
 
+## API Documentation
+
+This API documentation provides details about the available endpoints and their functionalities.
+
+## Database Schema
+
+<h1 align="center">
+  <br>
+  <a href=""><img src="app/assets/schema_diagram.png" alt="Markdownify" width=auto></a>
+</h1>
+
+## Technologies Used
+
+The API is built using the following technologies:
+
+- Framework: FastAPI
+- Database: MariaDB
+- Authentication: JWT (JSON Web Tokens)
+- Mail Client: MailJet API
+
+## Authentication
+
+
+The authentication section handles user registration and login. The authentication service includes the following components:
+
+- **Password Hashing**: Passwords are hashed using the bcrypt algorithm to securely store them in the database.
+- **Password Validation**: Passwords are validated to ensure they meet the required length and complexity criteria.
+- **Token-based Authentication**: JWT (JSON Web Tokens) are used for token-based authentication. When a user logs in successfully, an access token is generated and returned. This access token must be included in the `Authorization` header of subsequent requests to authenticate the user.
+- **Access Token Expiration**: Access tokens have an expiration time, typically set to 360 minutes (6 hours) by default. Users need to obtain a new access token after it expires.
+- **User Verification**: Users can be marked as verified by updating their profile. This verification can be used to control access to certain endpoints or features.
+
+
+## Authentication
+
+The authentication section handles user registration and login.
+
+| Method | Endpoint                                 | Description                     |
+|--------|------------------------------------------|---------------------------------|
+| POST   | `/api/authorization/registration/students` | Register Student       |
+| POST   | `/api/authorization/registration/teachers` | Register Teacher       |
+| POST   | `/api/authorization/login`                 | Login                  |
+
+## Courses
+
+The courses section provides endpoints for managing courses and their sections.
+
+| Method | Endpoint                                 | Description                     |
+|--------|------------------------------------------|---------------------------------|
+| GET    | `/api/courses/`                        | Get All Courses           |
+| POST   | `/api/courses/`                        | Create Course             |
+| GET    | `/api/courses/{course_id}`              | Get Course By Id          |
+| GET    | `/api/courses/{course_id}/sections/`    | Get Course Sections       |
+| POST   | `/api/courses/{course_id}/sections/`    | Add Section               |
+| GET    | `/api/courses/{course_id}/sections/{section_id}` | Get Section By Id |
+| POST   | `/api/courses/{course_id}/sections/{section_id}` | Add Content To Section |
+
+## Students
+
+The students section includes endpoints related to student profiles and course enrollment.
+
+| Method | Endpoint                                 | Description                     |
+|--------|------------------------------------------|---------------------------------|
+| GET    | `/api/students/courses`                   | Get Courses For Student         |
+| GET    | `/api/students/profiles`                  | Get Student Profile             |
+| PUT    | `/api/students/profiles`                  | Change Student Profile          |
+| GET    | `/api/students/courses/{course_id}`       | Get Course For Student By Id    |
+| PUT    | `/api/students/courses/{course_id}`       | Enroll Or Unenroll From Course  |
+
+Please refer to the API documentation for specific details about each endpoint.
+
+
+
+<!-- 
 <h4 align="center">E-Learning Portal of the Future<a href="" target="_blank"></a>.</h4>
 
 <p align="center">
@@ -121,4 +193,4 @@ MIT
 
 > [amitmerchant.com](https://www.amitmerchant.com) &nbsp;&middot;&nbsp;
 > GitHub [@amitmerchant1990](https://github.com/amitmerchant1990) &nbsp;&middot;&nbsp;
-> Twitter [@amit_merchant](https://twitter.com/amit_merchant)
+> Twitter [@amit_merchant](https://twitter.com/amit_merchant) -->

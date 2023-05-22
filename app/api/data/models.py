@@ -100,19 +100,26 @@ class Content(BaseModel):
 
     @classmethod
     def read_from_query_result(cls,id,title,description,content_type):
-        if content_type==1:
-            content_type='video'
         return cls(id=id,title=title,description=description,content_type=content_type)
 
-class Section(BaseModel):
-    id:int
+class ContentCreate(BaseModel):
     title:str
-    content:list[Content]|None=None
+    description:str
+    content_type:str
+
+class Section(BaseModel):
+    id: int
+    title: str
+    content: list[Content] | None = None
     
     @classmethod
-    def read_from_query_result(cls,id,title,content):
-        return cls(id=id,title=title,content=content)
-
+    def read_from_query_result(cls, id: int, title: str, content: list[Content] | None = None):
+        return cls(id=id, title=title, content=content or [])  
+    
+class SectionCreate(BaseModel):
+    title: str
+    content: list[ContentCreate] | None = None
+    
 class TeacherShow(BaseModel):
     id:int
     first_name:str
@@ -124,6 +131,22 @@ class TeacherShow(BaseModel):
     @classmethod
     def read_from_query_result(cls,id,first_name,last_name,phone_number,email,linked_in_profile):
         return cls(id=id,first_name=first_name,last_name=last_name,phone_number=phone_number,email=email,linked_in_profile=linked_in_profile)
+    
+class Course(BaseModel):
+    id:int
+    title:str
+    description:str
+    objectives:str
+    premium:bool
+    active:bool
+    owner:int
+    price:float | None = None
+    course_picture:str | None = None
+    
+    @classmethod
+    def read_from_query_result(cls,id,title,description,objectives,premium,active,owner,price,course_picture):
+        return cls(id=id,title=title,description=description,objectives=objectives,premium=premium,active=active,owner=owner,price=price,course_picture=course_picture)
+
 
 class CourseShow(BaseModel):
     id:int

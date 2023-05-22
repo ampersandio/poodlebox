@@ -3,41 +3,26 @@ from fastapi.responses import JSONResponse
 from typing import Annotated, Optional
 from api.services import courses
 from api.data.models import User, CourseCreate
-from api.services.authorization import get_current_user
+from api.services.authorization import get_current_user,get_oauth2_scheme
 from api.services.students import get_students_courses_id
 
 courses_router = APIRouter(prefix="/courses")
 
+custom_oauth2_scheme = get_oauth2_scheme(auto_error=False)
 
 @courses_router.get("/")
-def get_all_courses(
-    request: Request,
-    token: str = Header(None),
-    title=None,
-    tag=None,
-    sort=None,
-    sort_by=None,
-):
-    if "authorization" not in request.headers.keys() and token is None:
-        result = courses.get_courses_anonymous()
-    elif token is not None and get_current_user(token).role == "student":
-        result = courses.get_courses_student(get_current_user(token).id)
-    elif token is not None and get_current_user(token).role == "teacher":
-        result = courses.get_courses_teacher()
-    elif (
-        "authorization" in request.headers.keys()
-        and get_current_user(request.headers.get("authorization")[7:]).role == "student"
-    ):
-        result = courses.get_courses_student(
-            get_current_user(request.headers.get("authorization")[7:]).id
-        )
-    elif (
-        "authorization" in request.headers.keys()
-        and get_current_user(request.headers.get("authorization")[7:]).role == "teacher"
-    ):
-        result = courses.get_courses_teacher()
+def get_all_courses(current_user: User | None = Depends(custom_oauth2_scheme),title=None,tag=None,sort=None,sort_by=None):
+    if current_user:
+        user = get_current_user(current_user)
+        if user.role=='teacher':
+           result = courses.get_courses_teacher()
+        elif user.role=='student':
+            result=courses.get_courses_student(user.id)
+        else:
+            result=courses.get_courses_teacher()
     else:
-        raise HTTPException(status_code=401, detail="User not authenticated")
+        result=courses.get_courses_anonymous()
+
     if title:
         result = [x for x in result if title.lower() in x.title.lower()]
     if tag:
@@ -70,7 +55,7 @@ def get_course_by_id(
     return result
 
 
-@courses_router.put("/")
+@courses_router.post("/")
 def create_course(course: CourseCreate, current_user: User = Depends(get_current_user)):
     if current_user.role != "teacher":
         raise HTTPException(
