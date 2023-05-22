@@ -19,7 +19,7 @@ def get_courses(request: Request, token: str = None):
     headers = {}
 
     if token:
-        headers["AuThoRizaTion"] = f"Bearer {token}"
+        headers["authorization"] = f"Bearer {token}"
 
     courses = requests.get(f"{host}/api/courses", headers=headers)
     return courses.json()
@@ -28,18 +28,50 @@ def get_courses(request: Request, token: str = None):
 @frontend_router.get("/")
 def index(request: Request):
     host = "http://" + request.headers["host"]
+    headers = {}
+    
+    token = request.cookies.get("token")
+    
     try:
-        token = request.headers.get("cookie")[6:]
         user = get_current_user(token)
         courses = get_courses(request, token)
-
     except:
         user = None
         courses = get_courses(request)
 
-    popular_courses = requests.get(f"{host}/api/courses/popular")
+    if token:
+        headers["authorization"] = f"Bearer {token}"
+
+    popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
     print(popular_courses.json())
-    return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses, "most_popular":popular_courses.json()})
+
+    return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses, "most_popular": popular_courses.json()} )
+
+
+@frontend_router.post("/")
+def form_data(request: Request, username: str = Form(...), password: str = Form(...)):
+    user = authenticate_user(username, password)
+    host = "http://" + request.headers["host"]
+    headers = {}
+
+    if user is not None:
+        token = create_access_token({"sub": username})
+
+        if token:
+            headers["authorization"] = f"Bearer {token}"
+        popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
+
+        courses = get_courses(request, token)
+        response = templates.TemplateResponse(
+            "index.html",
+            {"request": request, "user": user, "courses": courses, "headers": headers, "most_popular": popular_courses.json()}
+        )
+        response.set_cookie(key="token", value=token)
+        return response
+    else:
+        return templates.TemplateResponse("message.html", {"request": request, "message": "Login Invalid"})
+    
+
 
 @frontend_router.get("/search")
 def search(request: Request, search_query: str):
@@ -85,19 +117,6 @@ def register(
 
     return templates.TemplateResponse("message.html", {"request": request})
 
-
-@frontend_router.post("/")
-def process_form_data(request: Request, username: str = Form(...), password: str = Form(...)):
-    user = authenticate_user(username, password)
-
-    if user is not None:
-        token = create_access_token({"sub": username})
-        courses = get_courses(request, token)
-        response = templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses})
-        response.set_cookie(key="token", value=token)
-        return response
-    else:
-        return templates.TemplateResponse("message.html", {"request": request, "message": "Login Invalid"})
 
 
 @frontend_router.get("/logout", tags=["Frontend"])
