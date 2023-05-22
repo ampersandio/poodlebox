@@ -100,3 +100,7 @@ def enroll_or_unenroll_from_course(
         status_code=200,
         content={"msg": "You have successfully unenrolled from the course"},
     )
+
+@students_router.put("/courses/{course_id}/progress")
+def check_progress(cours_id:int,current_user: User = Depends(get_current_user)):
+    pass

@@ -20,7 +20,7 @@ def get_all_courses(current_user: User | None = Depends(custom_oauth2_scheme)):
         return {"message": "You are not logged in."}
 
 #     request: Request,
-#     token: str = Header(None),
+#     token: str = Header({"detail":"Unauthorized"}None),
 #     title=None,
 #     tag=None,
 #     sort=None,
@@ -118,22 +118,29 @@ def get_course_sections(course_id, current_user: Annotated[User, Depends(get_cur
     
 
 @courses_router.get("/{course_id}/sections/{section_id}")
-def get_section_by_id(course_id:int,section_id:int,current_user: Annotated[User, Depends(get_current_user)]):  
+def get_section_by_id(course_id:int, section_id:int, current_user: Annotated[User, Depends(get_current_user)]):
     course = courses.get_course_by_id(course_id)
+    student_courses = get_students_courses_id(current_user.id)
     
-    if (current_user.role not in ["teacher", "admin"]) and(course.id not in get_students_courses_id(current_user.id)):
-        raise HTTPException(status_code=401,detail="You don't have access to this section")
+    if current_user.role not in ["teacher", "admin"] and course.id not in student_courses:
+        raise HTTPException(status_code=401, detail="You don't have access to this section")
     
-    if course is not None:
-        section = courses.get_section_by_id(section_id)
-    else:
-        raise HTTPException(status_code=404,detail="Course with this ID does not exist")
+    if course is None:
+        raise HTTPException(status_code=404, detail="Course with this ID does not exist")
     
-    if section is not None:
-        return section
-    else:
-        raise HTTPException(status_code=404, detail="Section with this id does not exist")
+    section = courses.get_section_by_id(section_id)
     
+    if section is None:
+        raise HTTPException(status_code=404, detail="Section with this ID does not exist")
+    
+    if current_user.role == "student":
+        courses.visited_section(current_user.id, section.id)
+    
+    if (current_user.role == "student" and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id)):
+        courses.change_subscription(3, current_user.id, course.id)
+    
+    return section
+
 
 @courses_router.post("/{course_id}/sections/")
 def add_section(section: SectionCreate, course_id:int, current_user: Annotated[User, Depends(get_current_user)]):

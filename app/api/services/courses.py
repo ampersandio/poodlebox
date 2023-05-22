@@ -1,4 +1,4 @@
-from api.data.database import read_query, insert_query
+from api.data.database import read_query, insert_query, update_query
 from api.data.models import (
     TeacherShow,
     CourseShow,
@@ -248,31 +248,38 @@ def get_content_by_id(content_id:int) -> Content:
     return content
 
 
-
-def add_content(section_id:int, content:ContentCreate):
-
+def add_content(section_id: int, content: ContentCreate) -> Content:
     content_type_id = read_query("select id from content_types where type = ?;", (content.content_type,))[0][0]
     
-    if content_type_id:
-        last_content_id = insert_query("insert into content(title,description,content_types_id,sections_id) values(?,?,?,?);",(content.title,content.description,content_type_id,section_id,))
-
-    else:
+    if not content_type_id:
         last_content_type_id = insert_query("insert into content_types(type) values(?);", (content.content_type,))
-        last_content_id = insert_query("insert into content(title,description,content_types_id,sections_id) values(?,?,?,?);", (content.title,content.description,last_content_type_id,section_id))
+        content_type_id = last_content_type_id
+        
+    last_content_id = insert_query("insert into content(title, description, content_types_id, sections_id) values(?,?,?,?);",(content.title, content.description, content_type_id, section_id))
 
     return get_content_by_id(last_content_id)
-
-
-def get_most_popular(role:str | None = None):
-    courses = []
     
+
+def get_most_popular(role: str | None = None):
     if role is None:
-        courses_data = read_query("select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id where c.premium = 0 group by c.id order by count(u.users_id) desc limit 3;")
+        query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id where c.premium = 0 group by c.id order by count(u.users_id) desc limit 3;"
     else:
-        courses_data = read_query("select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id group by c.id order by count(u.users_id) desc limit 3;")
+        query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id group by c.id order by count(u.users_id) desc limit 3;"
 
-    for i in courses_data:
-        courses.append(Course.read_from_query_result(*i))
-
+    courses_data = read_query(query)
+    courses = [Course.read_from_query_result(*data) for data in courses_data]
+    
     return courses
 
+
+def visited_section(user_id:int,section_id:int):
+    last_section = insert_query("insert into users_has_sections(users_id,sections_id) values(?,?);", (user_id,section_id))
+    
+def n_sections_by_course_id(course_id:int) -> int:
+    return read_query("select c.title,c.id as course_id, count(*) as number_of_sections from sections as s join courses as c on s.courses_id = c.id where c.id = ? group by courses_id;", (course_id,))
+
+def n_visited_sections(user_id:int, course_id:int) -> int:
+    return read_query("select count(*) from users_has_sections as us join sections as s on us.sections_id = s.id where us.users_id = ? and s.courses_id = ?;", (user_id,course_id,))
+
+def change_subscription(subscription:int, user_id:int, course_id:int):
+    update_query("update users_has_courses set subscriptions = ? where users_id = ? and courses_id = ?;", (subscription,user_id,course_id))

@@ -99,3 +99,4 @@ def get_profile(student_id):
 
 def change_password(student_id, new_pass):
     update_query("update users set password=? where id=?", (new_pass, student_id))
+
