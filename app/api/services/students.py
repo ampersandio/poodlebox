@@ -13,80 +13,40 @@ def get_students_courses_id(student_id):
     return courses_ids
 
 
-def enroll_in_course(student_id, course_id, subscription: Subscription):
-    course = get_course_by_id(course_id)
+def check_enrollment_status(student_id,course_id):
     data = read_query(
         "select subscriptions_id from users_has_courses where users_id=? and courses_id=?",
         (student_id, course_id),
     )
-    number_subs = read_query(
-        "select count(distinct uc.courses_id) from users_has_courses uc join courses c on c.id=uc.courses_id and c.premium=1 where uc.users_id=?",
-        (student_id,),
-    )
-    if data == [] and subscription.enroll == True and course.premium is False:
+    if data==[]:
+        return "No status"
+    return data[0][0]
+
+def get_students_number_courses_premium(student_id):
+    number_subs = read_query("select count(distinct uc.courses_id) from users_has_courses uc join courses c on c.id=uc.courses_id and c.premium=1 where uc.users_id=?",
+        (student_id,))
+    return number_subs[0][0]
+
+
+
+def enroll_in_course(student_id, course_id, subscription: Subscription,expired):
+    if subscription.enroll==True and expired==False:
         insert_query(
             "insert into users_has_courses(users_id,courses_id,scubscriptions_id) values(?,?,?)",
             (student_id, course_id, 2),
         )
-        return "Request sent"
-    elif (
-        data == []
-        and subscription.enroll == True
-        and number_subs[0][0] == 5
-        and course.premium is True
-    ):
-        return "You can't enroll in more premium courses"
-    elif (
-        data == []
-        and subscription.enroll == True
-        and number_subs[0][0] < 5
-        and course.premium is True
-    ):
-        insert_query(
-            "insert into users_has_courses(users_id,courses_id,scubscriptions_id) values(?,?,?)",
-            (student_id, course_id, 2),
+    elif subscription.enroll==True and expired==True:
+        update_query(
+            "update users_has_courses set subscriptions_id=? where courses_id=? and users_id=?",
+            (2, course_id, student_id),
         )
-        return "Request sent"
-    elif data == [] and subscription.enroll == False:
-        return "Nothing to update"
-    elif data != [] and subscription.enroll == False:
+    else:
         update_query(
             "update users_has_courses set subscriptions_id=? where courses_id=? and users_id=?",
             (3, course_id, student_id),
-        )
-    elif data != [] and subscription.enroll == True and data[0][0] in [1, 2]:
-        return "Nothing to update"
-    elif (
-        data != []
-        and subscription.enroll == True
-        and data[0][0] == 3
-        and course.premium is False
-    ):
-        update_query(
-            "update users_has_courses set subscriptions_id=? where courses_id=? and users_id=?",
-            (2, course_id, student_id),
-        )
-        return "Request sent"
-    elif (
-        data != []
-        and subscription.enroll == True
-        and data[0][0] == 3
-        and course.premium is True
-        and number_subs[0][0] == 5
-    ):
-        return "You can't enroll in more premium courses"
-    elif (
-        data != []
-        and subscription.enroll == True
-        and data[0][0] == 3
-        and course.premium is True
-        and number_subs[0][0] < 5
-    ):
-        update_query(
-            "update users_has_courses set subscriptions_id=? where courses_id=? and users_id=?",
-            (2, course_id, student_id),
-        )
-        return "Request sent"
+        )         
+
+
 
 
 def get_profile(student_id):
