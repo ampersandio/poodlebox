@@ -3,70 +3,39 @@ from fastapi.responses import JSONResponse
 from typing import Annotated, Optional
 from api.services import courses
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate
-from api.services.authorization import get_current_user, get_oauth2_scheme
+from api.services.authorization import get_current_user,get_oauth2_scheme
 from api.services.students import get_students_courses_id
 
-courses_router = APIRouter(prefix="/courses", tags=["Courses"])
+courses_router = APIRouter(prefix="/courses")
 
 custom_oauth2_scheme = get_oauth2_scheme(auto_error=False)
 
 @courses_router.get("/")
-def get_all_courses(current_user: User | None = Depends(custom_oauth2_scheme)):
+def get_all_courses(current_user: User | None = Depends(custom_oauth2_scheme),title=None,tag=None,sort=None,sort_by=None):
     if current_user:
         user = get_current_user(current_user)
-
-        return {"message": "You are logged in."}
+        if user.role=='teacher':
+           result = courses.get_courses_teacher()
+        elif user.role=='student':
+            result=courses.get_courses_student(user.id)
+        else:
+            result=courses.get_courses_teacher()
     else:
-        return {"message": "You are not logged in."}
+        result=courses.get_courses_anonymous()
 
-#     request: Request,
-#     token: str = Header({"detail":"Unauthorized"}None),
-#     title=None,
-#     tag=None,
-#     sort=None,
-#     sort_by=None,
-# ):
-#     if "authorization" not in request.headers.keys() and token is None:
-#         result = courses.get_courses_anonymous()
-#     elif token is not None and get_current_user(token).role == "student":
-#         result = courses.get_courses_student(get_current_user(token).id)
-#     elif token is not None and get_current_user(token).role == "teacher":
-#         result = courses.get_courses_teacher()
-#     elif (
-#         "authorization" in request.headers.keys() and get_current_user(request.headers.get("authorization")[7:]).role == "student"
-#     ):
-#         result = courses.get_courses_student(
-#             get_current_user(request.headers.get("authorization")[7:]).id
-#         )
-#     elif (
-#         "authorization" in request.headers.keys() and get_current_user(request.headers.get("authorization")[7:]).role == "teacher"
-#     ):
-#         result = courses.get_courses_teacher()
-#     else:
-#         raise HTTPException(status_code=401, detail="User not authenticated")
-#     if title:
-#         result = [x for x in result if title.lower() in x.title.lower()]
-#     if tag:
-#         result = [x for x in result if tag in x.tags]
+    if title:
+        result = [x for x in result if title.lower() in x.title.lower()]
+    if tag:
+        result = [x for x in result if tag in x.tags]
 
-#     if sort and (sort == "asc" or sort == "desc"):
-#         if sort_by == "id":
-#             result = sorted(result, key=lambda r: r.id, reverse=sort == "desc")
-#         elif sort_by == "rating":
-#             result = sorted(result, key=lambda r: r.rating, reverse=sort == "desc")
+    if sort and (sort == "asc" or sort == "desc"):
+        if sort_by == "id":
+            result = sorted(result, key=lambda r: r.id, reverse=sort == "desc")
+        elif sort_by == "rating":
+            result = sorted(result, key=lambda r: r.rating, reverse=sort == "desc")
 
-#     return result
+    return result
 
-
-@courses_router.get("/popular")
-def get_most_popular_courses(request: Request):
-    if "authorization" in request.headers.keys():
-        token = request.headers.get("authorization")[7:]
-        user_role = get_current_user(token).role
-        return courses.get_most_popular(user_role)
-    else:
-        return courses.get_most_popular(None)
-    
 
 @courses_router.get("/{course_id}")
 def get_course_by_id(
