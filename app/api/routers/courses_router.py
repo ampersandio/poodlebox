@@ -6,7 +6,7 @@ from api.data.models import User, CourseCreate, SectionCreate, ContentCreate
 from api.services.authorization import get_current_user,get_oauth2_scheme
 from api.services.students import get_students_courses_id
 
-courses_router = APIRouter(prefix="/courses")
+courses_router = APIRouter(prefix="/courses", tags=["Courses"])
 
 custom_oauth2_scheme = get_oauth2_scheme(auto_error=False)
 

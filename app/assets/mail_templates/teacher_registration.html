@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Approval</title>
+    <style>
+        /* Styles for the email body */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        /* Styles for the main container */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        /* Styles for the heading */
+        h1 {
+            color: #333333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Styles for the teacher details */
+        .teacher-details {
+            margin-bottom: 30px;
+        }
+
+        /* Styles for the labels */
+        .label {
+            font-weight: bold;
+        }
+
+        /* Styles for the values */
+        .value {
+            margin-left: 10px;
+        }
+
+        /* Styles for the approval button */
+        .approval-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+
+        /* Styles for the rejection button */
+        .rejection-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Approval</h1>
+        
+        <div class="teacher-details">
+            <p><span class="label">Name:</span><span class="value">{{ teacher_name }}</span></p>
+            <p><span class="label">Email:</span><span class="value">{{ teacher_email }}</span></p>
+            <p><span class="label">Subject:</span><span class="value">{{ teacher_subject }}</span></p>
+        </div>
+        
+        <p>A teacher has registered on the portal and is awaiting your approval.</p>
+        
+        <p>Please review the teacher's information and take the appropriate action in your profile.</p>
+        
+        <p>
+            <a href="{{ approval_link }}" class="approval-button">Login to your profile</a>
+            <!-- <a href="{{ rejection_link }}" class="rejection-button">Reject</a> -->
+        </p>
+        
+        <p>If you have any questions or need further assistance, feel free to contact our support team.</p>
+    </div>
+</body>
+</html>
