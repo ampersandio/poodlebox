@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request
 from typing import Annotated, Optional
-from api.services.students import enroll_in_course
+from api.services.students import enroll_in_course,get_students_number_courses_premium,check_enrollment_status
 from api.data.models import User, Subscription, StudentEdit
 from api.services.authorization import get_current_user
 from api.services.courses import (
@@ -78,25 +78,40 @@ def enroll_or_unenroll_from_course(
     course_id,
     subscription: Subscription,
     current_user: User = Depends(get_current_user),
-):
-    if get_course_by_id(course_id) == "Not found":
+):  
+    course=get_course_by_id(course_id)
+    if course == "Not found":
         raise HTTPException(status_code=404, detail="Course not found")
-    result = enroll_in_course(current_user.id, course_id, subscription)
-    if result == "Nothing to update":
+    result = check_enrollment_status(current_user.id, course_id)
+    number= get_students_number_courses_premium(current_user.id)
+    if (result == "No status" or result==3) and subscription.enroll==False:
         raise HTTPException(status_code=400, detail="There is nothing to update")
-    elif result == "Request sent":
+    elif (result == "No status" or result==3) and subscription.enroll==True and number<5:
+        if result=="No status":
+         enroll_in_course(current_user.id,course_id,subscription,False)
+        else:
+         enroll_in_course(current_user.id,course_id,subscription,True) 
         return JSONResponse(
             status_code=201, content={"msg": "Your request has been sent for review"}
         )
-    elif result == "You are not enrolled in this course":
-        raise HTTPException(
-            status_code=400, detail="You are not enrolled in this course"
+    elif (result == "No status" or result==3) and subscription.enroll==True and number==5 and course.premium==False:
+        if result=="No status":
+         enroll_in_course(current_user.id,course_id,subscription,False)
+        else:
+         enroll_in_course(current_user.id,course_id,subscription,True) 
+        return JSONResponse(
+            status_code=201, content={"msg": "Your request has been sent for review"}
         )
-    elif result == "You can't enroll in more premium courses":
-        raise HTTPException(
-            status_code=400, detail="You can't enroll in any more premium courses"
-        )
-    return JSONResponse(
+    elif (result == "No status" or result==3)  and subscription.enroll==True and number==5 and course.premium==True:
+        raise HTTPException(status_code=400,detail="You can't enroll in any more premium courses")
+    elif result in [1,2] and subscription.enroll==True:
+        raise HTTPException(status_code=400, detail="There is nothing to update")
+    
+    elif result in [1,2] and subscription.enroll==False:
+        enroll_in_course(current_user.id,course_id,subscription, False)
+        return JSONResponse(
         status_code=200,
         content={"msg": "You have successfully unenrolled from the course"},
     )
+    enroll_in_course(current_user.id,course_id,subscription,False)
+    return JSONResponse(status_code=201, content={"msg": "Your request has been sent for review"})
