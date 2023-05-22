@@ -52,7 +52,8 @@ def register_student(request:Request, information: StudentRegistration) -> JSONR
 
 @authorization_router.post('/registration/teachers', tags=['Authentication'])
 def register_teacher(information: TeacherRegistration, current_user: Annotated[User, Depends(authorization_services.get_current_user)]) -> JSONResponse:
-    if current_user.role != 3:
+    print(current_user.role)
+    if current_user.role != 'admin':
         raise HTTPException(status_code=400, detail='Only an admin can register a teacher')
 
     if user_services.get_user(information.email) is not None:
