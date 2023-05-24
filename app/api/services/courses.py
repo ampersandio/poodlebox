@@ -76,7 +76,7 @@ def get_course_by_id(course_id:int):
         (course_id,),
     )
     if data_course == []:
-        return "Not found"
+        return None
     owner = TeacherShow.read_from_query_result(*data_course[0][8:])
     course = CourseShowId.read_from_query_result(
         *data_course[0][:8], teacher=owner, sections=list_sections
@@ -113,8 +113,6 @@ def get_students_courses(student_id):
             "select c.id,c.title,c.description,c.objectives,c.premium,round(sum(r.rating)/count(r.id),2) as rating,c.price,group_concat(distinct t.name) as tags,ifnull(round((count(distinct us.sections_id)/count(distinct s.id))*100),0) as progress,uc.subscriptions_id,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id left join sections s on s.courses_id=c.id left join sections se on se.courses_id=c.id left join users_has_sections us on us.sections_id=se.id left join users_has_courses uc on uc.courses_id=c.id where us.users_id=?  and uc.users_id=? and c.id=? group by c.id",
             (student_id, student_id, x),
         )
-        if data_course == []:
-            return "Not found"
         owner = TeacherShow.read_from_query_result(*data_course[0][10:])
         course = CoursesShowStudent.read_from_query_result(
             *data_course[0][:10], teacher=owner, sections=list_sections
@@ -143,7 +141,7 @@ def get_student_course_by_id(student_id, course_id):
         (student_id, student_id, course_id),
     )
     if data_course == []:
-        return "Not found"
+        return None
     owner = TeacherShow.read_from_query_result(*data_course[0][10:])
     course = CoursesShowStudent.read_from_query_result(
         *data_course[0][:10], teacher=owner, sections=list_sections
@@ -155,7 +153,7 @@ def get_student_course_by_id(student_id, course_id):
 def get_course_by_title(title):
     course_id = read_query("select id from courses where title=?", (title,))
     if course_id == []:
-        return "Not found"
+        return None
     data_sections = read_query(
         "select id,title from sections where courses_id=?", (course_id[0][0],)
     )
@@ -174,7 +172,7 @@ def get_course_by_title(title):
         (title,),
     )
     if data_course == []:
-        return "Not found"
+        return None
     owner = TeacherShow.read_from_query_result(*data_course[0][8:])
     course = CourseShowId.read_from_query_result(
         *data_course[0][:8], teacher=owner, sections=list_sections

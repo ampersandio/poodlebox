@@ -42,7 +42,7 @@ def get_course_by_id(
     course_id, current_user: Annotated[User, Depends(get_current_user)]
 ):
     result = courses.get_course_by_id(course_id)
-    if result == "Not found":
+    if result == None:
         raise HTTPException(status_code=404, detail="Course not found")
     if (
         current_user.role == "Student"
@@ -62,7 +62,7 @@ def create_course(course: CourseCreate, current_user: User = Depends(get_current
             status_code=403, detail="You don't have access to this section"
         )
     course_result=courses.get_course_by_title(course.title)
-    if course_result!="Not found":
+    if course_result!=None:
         raise HTTPException(
             status_code=400, detail="A course with that title already exists"
         )     
