@@ -63,10 +63,10 @@ def change_student_profile(
 def get_course_for_student_by_id(
     course_id, current_user: User = Depends(get_current_user)
 ):
-    if get_course_by_id(course_id) == "Not found":
+    if get_course_by_id(course_id) == None:
         raise HTTPException(status_code=404, detail="Course not found")
     result = get_student_course_by_id(current_user.id, course_id)
-    if result == "Not found":
+    if result == None:
         raise HTTPException(
             status_code=403, detail="You have never been enrolled in this course"
         )
@@ -80,7 +80,7 @@ def enroll_or_unenroll_from_course(
     current_user: User = Depends(get_current_user),
 ):  
     course=get_course_by_id(course_id)
-    if course == "Not found":
+    if course == None:
         raise HTTPException(status_code=404, detail="Course not found")
     result = check_enrollment_status(current_user.id, course_id)
     number= get_students_number_courses_premium(current_user.id)
