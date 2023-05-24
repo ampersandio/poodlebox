@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request,  Form
 from config import settings
 from fastapi.templating import Jinja2Templates
 from api.services.authorization import get_current_user, create_access_token, authenticate_user
-from api.utils.utils import generate_html 
+from api.utils.utils import user_registration 
 from mailjet_rest import Client
 
 
@@ -109,7 +109,7 @@ def register(
         date_of_birth:str = Form(...)):
     
     host = "http://" + request.headers["host"]
-    data = generate_html(username,host)
+    data = user_registration(username,host)
     result = mailjet.send.create(data=data)
 
     print (result.status_code)

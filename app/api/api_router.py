@@ -14,7 +14,6 @@ api_router.include_router(report_router)
 api_router.include_router(admins_router)
 
 
-
 @api_router.get("/")
 def sub_router():
     return {"this is api_router.py"}
