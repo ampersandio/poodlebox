@@ -9,13 +9,11 @@ from api.data.models import StudentRegistration, TeacherRegistration, Token, Use
 import api.services.authorization as authorization_services
 import api.services.users as user_services
 from api.utils.utils import user_registration, teacher_registration
-from mailjet_rest import Client
 
 from jose import jwt
 
 authorization_router = APIRouter(prefix='/authorization')
 
-mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
 
 @authorization_router.post('/registration/students', tags=['Authentication'])
 def register_student(request:Request, information: StudentRegistration) -> JSONResponse:
@@ -40,12 +38,7 @@ def register_student(request:Request, information: StudentRegistration) -> JSONR
 
     user_services.register_student(information)
 
-    data = user_registration(information,host)
-    result = mailjet.send.create(data=data)
-
-    print (result.status_code)
-    print (result.json())
-
+    user_registration(information,host)
 
     return JSONResponse(status_code=201, content={'msg': 'Student registered successfully'})
 
@@ -82,14 +75,9 @@ def register_teacher(request:Request, information: TeacherRegistration, current_
 
     user_services.register_teacher(information)
 
-    data = user_registration(information,host)
-    result = mailjet.send.create(data=data)
+    user_registration(information,host)
 
-    data = teacher_registration(information)
-    result = mailjet.send.create(data=data)
-
-    print (result.status_code)
-    print (result.json())
+    teacher_registration(information)
 
 
     return JSONResponse(status_code=201, content={'msg': 'Teacher registered successfully'})

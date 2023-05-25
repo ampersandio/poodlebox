@@ -8,15 +8,9 @@ from api.services.students import get_profile
 from api.services.courses import get_course_by_id, get_courses_students
 from api.services.admins import student_status, course_status, pending_registrations, approve_registration
 from api.services.users import get_user_by_id
-from api.utils.utils import teacher_approval
+from api.utils.utils import teacher_approval, course_deactivated
 
 admins_router = APIRouter(prefix="/admins", tags=["Admins"])
-
-from mailjet_rest import Client
-from config import settings
-
-
-mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
 
 
 @admins_router.put("/students/{student_id}/status/{disabled}")
@@ -49,14 +43,17 @@ def change_course_status(course_id: int, disabled: bool, current_user = Depends(
         raise HTTPException(status_code=404, detail="Course with this Id does not exist")
 
     students = get_courses_students(course_id)
-    print(students)
 
-    # if current_user.role == "admin":
-    #     course_status(course_id, disabled)
-    # else:
-    #     raise HTTPException(status_code=403, detail="You're not allowed in the admin section")
+    if current_user.role == "admin":
+        course_status(course_id, disabled)
+
+        for student in students:
+            course_deactivated(student, course.title)
+
+    else:
+        raise HTTPException(status_code=403, detail="You're not allowed in the admin section")
     
-    # return JSONResponse(status_code=201, content="Course status updated")
+    return JSONResponse(status_code=201, content="Course status updated")
 
 
 @admins_router.put("/courses/{course_id}/students/{student_id}")
@@ -101,11 +98,7 @@ def approve(teacher_id: int, current_user = Depends(get_current_user)):
 
     teacher = get_user_by_id(teacher_id)
 
-    data = teacher_approval(teacher)
-    result = mailjet.send.create(data=data)
-
-    print (result.status_code)
-    print (result.json())
+    teacher_approval(teacher)
 
     if teacher is None:
         raise HTTPException(status_code=404, detail="Teacher with this Id does not exist")

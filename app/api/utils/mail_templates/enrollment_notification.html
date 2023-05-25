@@ -3,72 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Course Enrollment Verification</title>
-    <style>
-        /* Styles for the email body */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-        }
-
-        /* Styles for the main container */
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-        }
-
-        /* Styles for the heading */
-        h1 {
-            color: #333333;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-        /* Styles for the course details */
-        .course-details {
-            margin-bottom: 30px;
-        }
-
-        /* Styles for the labels */
-        .label {
-            font-weight: bold;
-        }
-
-        /* Styles for the values */
-        .value {
-            margin-left: 10px;
-        }
-
-        /* Styles for the verification button */
-        .verification-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #4caf50;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 3px;
-        }
-    </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Course Enrollment Verification</h1>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 30px;">
+        <h1 style="color: #333333; font-size: 24px; margin-bottom: 20px;">Course Enrollment Verification</h1>
         
-        <div class="course-details">
+        <div style="margin-bottom: 30px;">
             <!-- <p><span class="label">Student:</span><span class="value">{{ student_name }}</span></p> -->
-            <p><span class="label">Course:</span><span class="value">{course_title}</span></p>
+            <p><span style="font-weight: bold;">Course:</span><span style="margin-left: 10px;">{course_title}</span></p>
             <!-- <p><span class="label">Instructor:</span><span class="value">{{ instructor_name }}</span></p> -->
         </div>
         
         <p>Congratulations! {student_first_name} {student_last_name} has enrolled in your course: "{course_title}" course.</p>
         
-        <p>Please login to your teacher profile to verify his enrollment:</p>
+        <p>Please login to your teacher profile to verify their enrollment:</p>
         
-        <a href="/login" class="verification-button">Login to your profile</a>
+        <a href="/login" style="display: inline-block; padding: 10px 20px; background-color: #4caf50; color: #ffffff; text-decoration: none; border-radius: 3px;" class="verification-button">Login to your profile</a>
     </div>
 </body>
 </html>
