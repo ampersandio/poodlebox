@@ -340,3 +340,12 @@ def role_from_id(role_id: int) -> str:
                 3: 'admin'
         }
         return role_ids_to_roles[role_id]
+
+class Certificate(BaseModel):
+    id:str
+    course_id:int
+    issued_date:date
+
+    @classmethod
+    def read_from_query_result(cls,id,course_id,issued_date):
+        return cls(id=id,course_id=course_id,issued_date=issued_date)
