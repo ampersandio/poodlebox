@@ -37,6 +37,11 @@ def get_all_courses(current_user: User | None = Depends(custom_oauth2_scheme),ti
     return result
 
 
+@courses_router.get("/popular")
+def get_most_popular_courses(request: Request):
+    return courses.get_most_popular()
+
+
 @courses_router.get("/{course_id}")
 def get_course_by_id(
     course_id, current_user: Annotated[User, Depends(get_current_user)]

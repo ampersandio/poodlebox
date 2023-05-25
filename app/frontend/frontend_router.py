@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request,  Form
 from config import settings
 from fastapi.templating import Jinja2Templates
 from api.services.authorization import get_current_user, create_access_token, authenticate_user
-from api.utils.utils import generate_html 
+from api.utils.utils import user_registration 
 from mailjet_rest import Client
 
 
@@ -72,7 +72,6 @@ def form_data(request: Request, username: str = Form(...), password: str = Form(
         return templates.TemplateResponse("message.html", {"request": request, "message": "Login Invalid"})
     
 
-
 @frontend_router.get("/search")
 def search(request: Request, search_query: str):
     host = "http://"+(request.headers["host"])
@@ -100,6 +99,7 @@ def login(request:Request):
 def register(request:Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
+
 @frontend_router.post("/register")
 def register(
         request:Request, 
@@ -109,14 +109,13 @@ def register(
         date_of_birth:str = Form(...)):
     
     host = "http://" + request.headers["host"]
-    data = generate_html(username,host)
+    data = user_registration(username,host)
     result = mailjet.send.create(data=data)
 
     print (result.status_code)
     print (result.json())
 
     return templates.TemplateResponse("message.html", {"request": request})
-
 
 
 @frontend_router.get("/logout", tags=["Frontend"])

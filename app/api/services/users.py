@@ -56,3 +56,12 @@ def view_add(student_id):
     courses_with_this_tag=read_query("select group_concat(distinct courses_id) from tags_has_courses where tags_id=? group by courses_id",(tag,))
     course=random.choice(courses_with_this_tag[0])
     return courses.get_course_by_id(course)
+
+def get_user_by_id(user_id) -> User | None:
+    user_data = read_query('SELECT * FROM users WHERE id=?;', (user_id,))
+
+    if not user_data:
+        return None
+    
+    user = User.from_query(*user_data[0])
+    return user

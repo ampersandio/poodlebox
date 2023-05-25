@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Registered in Poodlebox</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 30px;">
+        <h1 style="color: #333333; font-size: 24px; margin-bottom: 20px;">Admin Approval</h1>
+        
+        <div style="margin-bottom: 30px;">
+            <p><span style="font-weight: bold;">Name:</span><span style="margin-left: 10px;">{teacher_first_name} {teacher_last_name}</span></p>
+            <p><span style="font-weight: bold;">Email:</span><span style="margin-left: 10px;">{teacher_email}</span></p>
+        </div>
+        
+        <p>A teacher has registered on the portal and is awaiting your approval.</p>
+        
+        <p>Please review the teacher's information and take the appropriate action in your profile.</p>
+        
+        <p>
+            <a href="{approval_link}" style="display: inline-block; padding: 10px 20px; background-color: #4caf50; color: #ffffff; text-decoration: none; border-radius: 3px;">Approve Teachers Registration</a>
+            <!-- <a href="{{ rejection_link }}" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: #ffffff; text-decoration: none; border-radius: 3px;">Reject</a> -->
+        </p>
+        
+    </div>
+</body>
+</html>

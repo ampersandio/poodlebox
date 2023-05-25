@@ -8,14 +8,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from api.data.models import StudentRegistration, TeacherRegistration, Token, User
 import api.services.authorization as authorization_services
 import api.services.users as user_services
-from api.utils.utils import generate_html 
-from mailjet_rest import Client
+from api.utils.utils import user_registration, teacher_registration
 
 from jose import jwt
 
 authorization_router = APIRouter(prefix='/authorization')
 
-mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
 
 @authorization_router.post('/registration/students', tags=['Authentication'])
 def register_student(request:Request, information: StudentRegistration) -> JSONResponse:
@@ -40,18 +38,14 @@ def register_student(request:Request, information: StudentRegistration) -> JSONR
 
     user_services.register_student(information)
 
-    data = generate_html(information.email,host)
-    result = mailjet.send.create(data=data)
-
-    print (result.status_code)
-    print (result.json())
-
+    user_registration(information,host)
 
     return JSONResponse(status_code=201, content={'msg': 'Student registered successfully'})
 
 
 @authorization_router.post('/registration/teachers', tags=['Authentication'])
-def register_teacher(information: TeacherRegistration, current_user: Annotated[User, Depends(authorization_services.get_current_user)]) -> JSONResponse:
+def register_teacher(request:Request, information: TeacherRegistration, current_user: Annotated[User, Depends(authorization_services.get_current_user)]) -> JSONResponse:
+    host = "http://" + request.headers["host"]
     if current_user.role != "admin":
         raise HTTPException(status_code=400, detail='Only an admin can register a teacher')
 
@@ -81,6 +75,11 @@ def register_teacher(information: TeacherRegistration, current_user: Annotated[U
 
     user_services.register_teacher(information)
 
+    user_registration(information,host)
+
+    teacher_registration(information)
+
+
     return JSONResponse(status_code=201, content={'msg': 'Teacher registered successfully'})
 
 
@@ -99,9 +98,10 @@ def login(form_data:Annotated[OAuth2PasswordRequestForm, Depends()]) -> dict:
 
 @authorization_router.get('/token/{token}', tags=['Authentication'])
 def get_user(token:str):
+    print(token)
     user = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
     user = user_services.get_user(user["sub"])
-
+    print(user)
     if user is not None:
         authorization_services.verify_mail(user)
         return JSONResponse(status_code=201, content={'msg': 'email validation successfull'})
