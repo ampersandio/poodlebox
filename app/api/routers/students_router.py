@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request
 from typing import Annotated, Optional
-from api.services.students import enroll_in_course,get_students_number_courses_premium,check_enrollment_status
+from api.services.students import enroll_in_course,get_students_number_courses_premium,check_enrollment_status, view_add
 from api.data.models import User, Subscription, StudentEdit
 from api.services.authorization import get_current_user
 from api.services.courses import (
@@ -115,3 +115,5 @@ def enroll_or_unenroll_from_course(
     )
     enroll_in_course(current_user.id,course_id,subscription,False)
     return JSONResponse(status_code=201, content={"msg": "Your request has been sent for review"})
+
+

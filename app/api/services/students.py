@@ -4,6 +4,8 @@ from api.services.courses import get_course_by_id
 from api.utils.utils import send_enrollment_mail
 from mailjet_rest import Client
 from config import settings
+import random
+from api.services import courses
 
 mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
 
@@ -69,4 +71,9 @@ def get_profile(student_id):
 
 def change_password(student_id, new_pass):
     update_query("update users set password=? where id=?", (new_pass, student_id))
+
+
+
+
+
 
