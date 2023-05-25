@@ -44,8 +44,8 @@ def register_teacher(teacher_info: TeacherRegistration) -> None:
         )
     )
 
-def view_add(student_id):
-    tags_with_highest_interest=read_query("select group_concat(distinct tags_id) from interests where users_id=? group by tags_id order by relevance desc limit 3",(student_id,))
+def view_add(users_id):
+    tags_with_highest_interest=read_query("select group_concat(distinct tags_id) from interests where users_id=? group by tags_id order by relevance desc limit 3",(users_id,))
     print(tags_with_highest_interest)
     if tags_with_highest_interest==[]:
         tags_with_highest_interest=read_query("select group_concat(distinct tags_id) from interests group by tags_id order by relevance desc limit 3")
@@ -54,7 +54,7 @@ def view_add(student_id):
         course=random.choice(courses_with_this_tag[0])
         return courses.get_course_by_id(course)
     tag=random.choice(tags_with_highest_interest[0])
-    courses_with_this_tag=read_query("select group_concat(distinct courses_id) from tags_has_courses where tags_id=? and courses_id not in (select courses_id from users_has_courses where users_id=?) group by courses_id",(tag,student_id))
+    courses_with_this_tag=read_query("select group_concat(distinct courses_id) from tags_has_courses where tags_id=? and courses_id not in (select courses_id from users_has_courses where users_id=?) group by courses_id",(tag,users_id))
     course=random.choice(courses_with_this_tag[0])
     return courses.get_course_by_id(course)
 
