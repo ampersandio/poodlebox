@@ -1,127 +1,173 @@
 from api.services.authorization import create_access_token
-from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration
+from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User
+
+from config import settings
+from mailjet_rest import Client
+
+mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
+
+
+def generate_message(from_email,from_name,to_email,to_name,subject,text_part,html_part):
+    message = {'Messages': [
+                    {
+                            "From": {
+                                    "Email": from_email,
+                                    "Name": from_name
+                            },
+                            "To": [
+                                    {
+                                            "Email": to_email,
+                                            "Name": to_name
+                                    }
+                            ],
+                            "Subject": subject,
+                            "TextPart": text_part,
+                            "HTMLPart": html_part
+                    }
+                ]}
+    
+    return message
+
+
+def generate_template(template_path,replacements):
+    with open(template_path, 'r') as template:   
+        html_template = template.read()
+
+    ready_template = html_template
+
+    for key,value in replacements.items():
+        ready_template = ready_template.replace(key, str(value))
+
+    return ready_template
 
 
 def user_registration(information:StudentRegistration, host:str):
 
     token = create_access_token({"sub":information.email})
-    print(token)
 
-    with open("api/utils/mail_templates/student_registration.html", 'r') as template:   
-        html_template = template.read()
+    replacements = {
+        '{student_first_name}':str(information.first_name),
+        '{student_last_name}':information.last_name,
+        '{student_email}':information.email,
+        '{approval_link}':f"{host}/api/authorization/token/{token}/"
+    }
 
-    ready_template = html_template.replace ('{student_first_name}', str(information.first_name ))
-    ready_template = ready_template.replace('{student_last_name}', str(information.last_name))
-    ready_template = ready_template.replace('{student_email}', str(information.email))
-    ready_template = ready_template.replace('{approval_link}', str(f"{host}/api/authorization/token/{token}/"))
+    html_template = generate_template("api/utils/mail_templates/user_registration.html", replacements)
 
-    message = {'Messages': [
-                    {
-                            "From": {
-                                    "Email": "anedelev@gmail.com",
-                                    "Name": "Verify Your Email"
-                            },
-                            "To": [
-                                    {
-                                            "Email": information.email,
-                                            "Name": "passenger 1"
-                                    }
-                            ],
-                            "Subject": "Poodlebox Mail Verification",
-                            "TextPart": "Dear PoodleBox User",
-                            "HTMLPart": ready_template
-                    }
-                ]}
-    
-    return message
+    message = generate_message(
+        from_email="anedelev@gmail.com",
+        from_name="Poodlebox Admin",
+        to_email=information.email,
+        to_name=information.first_name + " " + information.last_name,
+        subject="Poodlebox Mail Verification",
+        text_part="Dear PoodleBox User",
+        html_part=html_template
+    )
+
+    result = mailjet.send.create(data=message)
+
+    print(result.status_code)
+    print(result.json())
 
 
 def enrollment_mail(student:Student, course:Course, teacher:TeacherShow):
 
-    with open("api/utils/mail_templates/enrollment_notification.html", 'r') as template:   
-        html_template = template.read()
+    replacements = {
+        '{student_first_name}': student.first_name,
+        '{student_last_name}': student.last_name,
+        '{course_title}': course.title,
+    }
 
-    ready_template = html_template.replace ('{student_first_name}', str(student.first_name ))
-    ready_template = ready_template.replace('{student_last_name}', str(student.last_name))
-    ready_template = ready_template.replace('{course_title}', str(course.title))
+    html_template = generate_template("api/utils/mail_templates/enrollment_notification.html", replacements)
 
-    message = {'Messages': [
-                    {
-                            "From": {
-                                    "Email": "anedelev@gmail.com",
-                                    "Name": "Student Enrolled in Your Class"
-                            },
-                            "To": [
-                                    {
-                                            "Email": f"{teacher.email}",
-                                            "Name": f" {teacher .first_name} {teacher. last_name}"
-                                    }
-                            ],
-                            f"Subject": "New Student Enrollment in your course {course.title}",
-                            "TextPart": "Greetings",
-                            "HTMLPart": ready_template
-                    }
-                ]}
-    
-    return message
+    message = generate_message(
+        from_email="anedelev@gmail.com",
+        from_name="Poodlebox Admin",
+        to_email=teacher.email,
+        to_name=teacher.first_name + " " + teacher.last_name,
+        subject="New Student Enrollment in your course {course.title}",
+        text_part="Greetings",
+        html_part=html_template
+    )
+
+    result = mailjet.send.create(data=message)
+
+    print(result.status_code)
+    print(result.json())
 
 
 def teacher_registration(information:TeacherRegistration):
 
-    with open("api/utils/mail_templates/teacher_registration.html", 'r') as template:   
-        html_template = template.read()
+    replacements = {
+    '{teacher_first_name}': information.first_name,
+    '{teacher_last_name}': information.last_name,
+    '{teacher_email}': information.email
+    }
 
-    ready_template = html_template.replace ('{teacher_first_name}', str(information.first_name ))
-    ready_template = ready_template.replace('{teacher_last_name}', str(information.last_name))
-    ready_template = ready_template.replace('{teacher_email}', str(information.email))
+    html_template = generate_template("api/utils/mail_templates/teacher_registration.html", replacements)
 
-    message = {'Messages': [
-                    {
-                            "From": {
-                                    "Email": "anedelev@gmail.com",
-                                    "Name": "Teacher Registered"
-                            },
-                            "To": [
-                                    {
-                                            "Email": "anedelev@gmail.com",
-                                            "Name": f" {information.first_name} {information.last_name}"
-                                    }
-                            ],
-                            "Subject": "New Teacher Registered At Poodlebox",
-                            "TextPart": "Greetings",
-                            "HTMLPart": ready_template
-                    }
-                ]}
-    
-    return message
+    message = generate_message(
+        from_email="anedelev@gmail.com",
+        from_name="Poodlebox Admin",
+        to_email="anedelev@gmail.com",
+        to_name=information.first_name + " " + information.last_name,
+        subject="New Teacher Registered At Poodlebox",
+        text_part="Greetings",
+        html_part=html_template
+    )
+
+    result = mailjet.send.create(data=message)
+
+    print(result.status_code)
+    print(result.json())
 
 
 def teacher_approval(teacher:TeacherShow):
-    print(teacher)
-    with open("api/utils/mail_templates/teacher_approved.html", 'r') as template:   
-        html_template = template.read()
 
-    ready_template = html_template.replace ('{teacher_first_name}', str(teacher.first_name ))
-    ready_template = ready_template.replace('{teacher_last_name}', str(teacher.last_name))
-    ready_template = ready_template.replace('{teacher_email}', str(teacher.email))
+    replacements = {
+    '{teacher_first_name}': teacher.first_name,
+    '{teacher_last_name}': teacher.last_name,
+    '{teacher_email}': teacher.email
+    }
 
-    message = {'Messages': [
-                    {
-                            "From": {
-                                    "Email": "anedelev@gmail.com",
-                                    "Name": "Teacher Registered"
-                            },
-                            "To": [
-                                    {
-                                            "Email": f"{teacher.email}",
-                                            "Name": f"{teacher.first_name} {teacher.last_name}"
-                                    }
-                            ],
-                            "Subject": "Your Registration At Poodblebox Was Approved",
-                            "TextPart": "Greetings",
-                            "HTMLPart": ready_template
-                    }
-                ]}
-    
-    return message
+    html_template = generate_template("api/utils/mail_templates/teacher_approved.html", replacements)
 
+    message = generate_message(
+        from_email="anedelev@gmail.com",
+        from_name="Poodlebox Admin",
+        to_email=teacher.email,
+        to_name=teacher.first_name + " " + teacher.last_name,
+        subject="Your Registration At Poodblebox Was Approved",
+        text_part="Greetings",
+        html_part=html_template
+    )
+
+    result = mailjet.send.create(data=message)
+
+    print(result.status_code)
+    print(result.json())
+
+def course_deactivated(student:User, course_title:str):
+    replacements = {
+    '{student_first_name}':student.first_name,
+    '{student_last_name}':student.last_name,
+    '{student_email}':student.email,
+    '{course_title}':course_title
+    }
+
+    html_template = generate_template("api/utils/mail_templates/course_status", replacements)
+
+    message = generate_message(
+        from_email="anedelev@gmail.com",
+        from_name="Poodlebox Admin",
+        to_email=student.email,
+        to_name=student.first_name + " " + student.last_name,
+        subject="Course you've been enrolled in, is now Inactive",
+        text_part="Greetings",
+        html_part=html_template
+    )
+
+    result = mailjet.send.create(data=message)
+
+    print(result.status_code)
+    print(result.json())

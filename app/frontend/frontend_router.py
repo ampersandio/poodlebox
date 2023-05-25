@@ -72,7 +72,6 @@ def form_data(request: Request, username: str = Form(...), password: str = Form(
         return templates.TemplateResponse("message.html", {"request": request, "message": "Login Invalid"})
     
 
-
 @frontend_router.get("/search")
 def search(request: Request, search_query: str):
     host = "http://"+(request.headers["host"])
@@ -100,6 +99,7 @@ def login(request:Request):
 def register(request:Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
+
 @frontend_router.post("/register")
 def register(
         request:Request, 
@@ -116,7 +116,6 @@ def register(
     print (result.json())
 
     return templates.TemplateResponse("message.html", {"request": request})
-
 
 
 @frontend_router.get("/logout", tags=["Frontend"])
