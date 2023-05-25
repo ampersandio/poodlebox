@@ -1,5 +1,7 @@
 from api.data.database import read_query, insert_query
 from api.data.models import User, StudentRegistration, TeacherRegistration
+import random
+from api.services import courses
 
 
 def get_user(email: str) -> User | None:
@@ -42,6 +44,18 @@ def register_teacher(teacher_info: TeacherRegistration) -> None:
         )
     )
 
+def view_add(student_id):
+    tags_with_highest_interest=read_query("select group_concat(distinct tags_id) from interests where users_id=? group by tags_id order by relevance desc limit 3",(student_id))
+    if tags_with_highest_interest==[]:
+        tags_with_highest_interest=read_query("select group_concat(distinct tags_id) from interests group by tags_id order by relevance desc limit 3")
+        tag=random.choice(tags_with_highest_interest[0])
+        courses_with_this_tag=read_query("select group_concat(distinct courses_id) from tags_has_courses where tags_id=? group by courses_id",(tag,))
+        course=random.choice(courses_with_this_tag[0])
+        return courses.get_course_by_id(course)
+    tag=random.choice(tags_with_highest_interest[0])
+    courses_with_this_tag=read_query("select group_concat(distinct courses_id) from tags_has_courses where tags_id=? group by courses_id",(tag,))
+    course=random.choice(courses_with_this_tag[0])
+    return courses.get_course_by_id(course)
 
 def get_user_by_id(user_id) -> User | None:
     user_data = read_query('SELECT * FROM users WHERE id=?;', (user_id,))
