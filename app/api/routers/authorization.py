@@ -46,7 +46,6 @@ def register_student(request:Request, information: StudentRegistration) -> JSONR
     print (result.status_code)
     print (result.json())
 
-
     return JSONResponse(status_code=201, content={'msg': 'Student registered successfully'})
 
 
@@ -74,7 +73,6 @@ def register_teacher(information: TeacherRegistration, current_user: Annotated[U
         raise HTTPException(status_code=400, detail='Linked in profile cannot be empty')
 
     authorization_services.validate_email(information.email)
-
     authorization_services.validate_password(information.password)
 
     information.password = authorization_services.hash_password(information.password)
