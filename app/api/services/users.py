@@ -41,3 +41,13 @@ def register_teacher(teacher_info: TeacherRegistration) -> None:
         False
         )
     )
+
+
+def get_user_by_id(user_id) -> User | None:
+    user_data = read_query('SELECT * FROM users WHERE id=?;', (user_id,))
+
+    if not user_data:
+        return None
+    
+    user = User.from_query(*user_data[0])
+    return user

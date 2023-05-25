@@ -115,3 +115,9 @@ def enroll_or_unenroll_from_course(
     )
     enroll_in_course(current_user.id,course_id,subscription,False)
     return JSONResponse(status_code=201, content={"msg": "Your request has been sent for review"})
+
+
+@students_router.get("/courses/progress/{course_id}")
+def get_course_progress(course_id:int):
+    pass
+

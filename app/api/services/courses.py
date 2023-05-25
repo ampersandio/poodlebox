@@ -11,6 +11,7 @@ from api.data.models import (
     CoursesShowStudent,
     CourseCreate,
     CourseShow,
+    User
     )
 
 
@@ -78,9 +79,7 @@ def get_course_by_id(course_id:int):
     if data_course == []:
         return None
     owner = TeacherShow.read_from_query_result(*data_course[0][8:])
-    course = CourseShowId.read_from_query_result(
-        *data_course[0][:8], teacher=owner, sections=list_sections
-    )
+    course = CourseShowId.read_from_query_result( *data_course[0][:8], teacher=owner, sections=list_sections)
 
     return course
 
@@ -270,14 +269,26 @@ def get_most_popular(role: str | None = None):
     return courses
 
 
+def get_courses_students(course_id: int):
+    data = read_query("select u.* from courses as c join users_has_courses as uc on c.id = uc.courses_id join users as u on uc.users_id = u.id where c.id = ?;", (course_id, ))
+    if data:
+        students = [User.from_query(*row) for row in data]
+        return students 
+    else:
+        return None
+
+
 def visited_section(user_id:int,section_id:int):
     last_section = insert_query("insert into users_has_sections(users_id,sections_id) values(?,?);", (user_id,section_id))
     
+
 def n_sections_by_course_id(course_id:int) -> int:
     return read_query("select c.title,c.id as course_id, count(*) as number_of_sections from sections as s join courses as c on s.courses_id = c.id where c.id = ? group by courses_id;", (course_id,))
 
+
 def n_visited_sections(user_id:int, course_id:int) -> int:
     return read_query("select count(*) from users_has_sections as us join sections as s on us.sections_id = s.id where us.users_id = ? and s.courses_id = ?;", (user_id,course_id,))
+
 
 def change_subscription(subscription:int, user_id:int, course_id:int):
     update_query("update users_has_courses set subscriptions = ? where users_id = ? and courses_id = ?;", (subscription,user_id,course_id))

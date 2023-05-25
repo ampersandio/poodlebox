@@ -2,7 +2,9 @@
 
 
 {% block content %}
+
 <ul>
+{% if courses %}
 {% for course in courses %}
 
 <li>
@@ -16,6 +18,7 @@
 
 {% endfor %}
 </ul>
+{% endif %}
 
 <h3>Most Popular Courses</h3>
 <ul>

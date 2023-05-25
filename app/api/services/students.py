@@ -1,7 +1,7 @@
 from api.data.database import read_query, insert_query, update_query
 from api.data.models import Subscription, Student
 from api.services.courses import get_course_by_id
-from api.utils.utils import send_enrollment_mail
+from api.utils.utils import enrollment_mail
 from mailjet_rest import Client
 from config import settings
 
@@ -52,7 +52,7 @@ def enroll_in_course(student_id: int, course_id:int, subscription: Subscription,
         update_query("update users_has_courses set subscriptions_id=? where courses_id=? and users_id=?", (3, course_id, student_id))         
 
     if send_mail:
-        data = send_enrollment_mail(student,course,teacher)
+        data = enrollment_mail(student,course,teacher)
         result = mailjet.send.create(data=data)
 
         print (result.status_code)
