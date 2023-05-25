@@ -6,7 +6,7 @@ from api.services import courses
 from typing import Annotated
 
 
-teachers_router = APIRouter(prefix="/teachers", tags=["Courses"])
+teachers_router = APIRouter(prefix="/teachers", tags=["Teachers"])
 
 @teachers_router.post("/courses")
 def create_course(course: CourseCreate, current_user: User = Depends(get_current_user)):
