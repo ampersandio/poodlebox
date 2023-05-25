@@ -46,7 +46,6 @@ def register_teacher(teacher_info: TeacherRegistration) -> None:
 
 def view_add(users_id):
     tags_with_highest_interest=read_query("select group_concat(distinct tags_id) from interests where users_id=? group by tags_id order by relevance desc limit 3",(users_id,))
-    print(tags_with_highest_interest)
     if tags_with_highest_interest==[]:
         tags_with_highest_interest=read_query("select group_concat(distinct tags_id) from interests group by tags_id order by relevance desc limit 3")
         tag=random.choice(tags_with_highest_interest[0])
