@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, File, UploadFile
 from fastapi.responses import JSONResponse
 from api.data.models import User,CourseCreate, SectionCreate, ContentCreate, TeachersReport
 from api.services.authorization import get_current_user
@@ -43,7 +43,7 @@ def create_course(course: CourseCreate, current_user: User = Depends(get_current
 
 @teachers_router.post("/{course_id}/sections/")
 def add_section(section: SectionCreate, course_id:int, current_user: Annotated[User, Depends(get_current_user)]):
-    course = courses.get_course_by_id(course_id, current_user)
+    course = courses.get_course_by_id(course_id)
     if current_user.role != "teacher" or course.teacher.email != current_user.email:
         raise HTTPException(status_code=403, detail="This user does not have permission to add sections to this course")
     else:
@@ -54,8 +54,8 @@ def add_section(section: SectionCreate, course_id:int, current_user: Annotated[U
 
 @teachers_router.post("/{course_id}/sections/{section_id}/content")
 def add_content_to_section(course_id:int, section_id:int, content:ContentCreate, current_user: Annotated[User, Depends(get_current_user)]):
-    course = courses.get_course_by_id(course_id, current_user)
-    section = courses.get_section_by_id(course_id,section_id,current_user)
+    course = courses.get_course_by_id(course_id)
+    section = courses.get_section_by_id(section_id)
 
     if current_user.role != "teacher" or course.teacher.email != current_user.email:
         raise HTTPException(status_code=403, detail="This user does not have permission to add sections to this course")
