@@ -148,14 +148,15 @@ class CourseShow(BaseModel):
     rating:float|None=None
     price:float|None=None
     tags:list[str]
+    course_picture:str|None=None
     teacher:TeacherShow|None=None
     
     @classmethod
-    def read_from_query_result(cls,id,title,description,objectives,premium,rating,price,tags,teacher):
+    def read_from_query_result(cls,id,title,description,objectives,premium,rating,price,tags,course_picture,teacher):
         if tags is not None:
             tags=[x for x in tags.split(",")]
         premium=bool(premium)
-        return cls(id=id,title=title,description=description,objectives=objectives,premium=premium,rating=rating,price=price,tags=tags,teacher=teacher)
+        return cls(id=id,title=title,description=description,objectives=objectives,premium=premium,rating=rating,price=price,tags=tags,course_picture=course_picture,teacher=teacher)
 
 class CourseShowId(BaseModel):
     id:int
@@ -166,15 +167,16 @@ class CourseShowId(BaseModel):
     rating:float|None=None
     price:float|None=None
     tags:list[str]
+    course_picture:str|None=None
     teacher:TeacherShow|None=None
     sections:list[Section]|None=None
     
     @classmethod
-    def read_from_query_result(cls,id,title,description,objectives,premium,rating,price,tags,teacher,sections):
+    def read_from_query_result(cls,id,title,description,objectives,premium,rating,price,tags,course_picture,teacher,sections):
         if tags is not None:
             tags=[x for x in tags.split(",")]
         premium=bool(premium)
-        return cls(id=id,title=title,description=description,objectives=objectives,premium=premium,rating=rating,price=price,tags=tags,teacher=teacher,sections=sections)
+        return cls(id=id,title=title,description=description,objectives=objectives,premium=premium,rating=rating,price=price,tags=tags,course_picture=course_picture,teacher=teacher,sections=sections)
 
 class CoursesShowStudent(BaseModel):
     id:int
@@ -308,6 +310,7 @@ class Student(BaseModel):
     email:str
     verified_email:bool
     date_of_birth:date
+    avg_rating_give:float
     total_number_of_courses:int
     number_of_pending_subscriptions:int
     number_of_active_subscriptions:int
@@ -349,3 +352,8 @@ class Certificate(BaseModel):
     @classmethod
     def read_from_query_result(cls,id,course_id,issued_date):
         return cls(id=id,course_id=course_id,issued_date=issued_date)
+
+
+class Query(BaseModel):
+    q:str
+
