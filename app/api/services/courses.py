@@ -79,8 +79,8 @@ def get_course_by_id(course_id:int):
     )
     if data_course == []:
         return None
-    owner = TeacherShow.read_from_query_result(*data_course[0][8:])
-    course = CourseShowId.read_from_query_result( *data_course[0][:8], teacher=owner, sections=list_sections)
+    owner = TeacherShow.read_from_query_result(*data_course[0][9:])
+    course = CourseShowId.read_from_query_result( *data_course[0][:9], teacher=owner, sections=list_sections)
 
     return course
 
