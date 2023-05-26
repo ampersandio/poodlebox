@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request
 from typing import Annotated, Optional
 from api.services.students import enroll_in_course,get_students_number_courses_premium,check_enrollment_status
+from api.services.certificates import get_certificates,get_certificate_by_course
 from api.data.models import User, Subscription, StudentEdit
 from api.services.authorization import get_current_user
 from api.services.courses import (
@@ -13,7 +14,19 @@ from api.services.authorization import hash_password
 from fastapi.responses import JSONResponse
 
 
+
 students_router = APIRouter(prefix="/students", tags=["Students"])
+
+@students_router.get("/courses/certificates")
+def get_certificates_of_student(current_user: User = Depends(get_current_user)):
+    return get_certificates(current_user.id)
+
+@students_router.get("courses/{course_id}/certificates")
+def get_certificate_of_student_for_course(course_id,current_user: User = Depends(get_current_user)):
+    result=get_certificate_by_course(current_user.id,course_id)
+    if result==None:
+        raise HTTPException(status_code=404,detail="Certificate for this course not found")
+    return result
 
 
 @students_router.get("/courses")
@@ -57,6 +70,7 @@ def change_student_profile(
     return JSONResponse(
         status_code=200, content={"msg": "Password changed successfully"}
     )
+
 
 
 @students_router.get("/courses/{course_id}")
@@ -115,5 +129,6 @@ def enroll_or_unenroll_from_course(
     )
     enroll_in_course(current_user.id,course_id,subscription,False)
     return JSONResponse(status_code=201, content={"msg": "Your request has been sent for review"})
+
 
 

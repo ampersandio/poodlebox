@@ -1,7 +1,8 @@
 from api.data.database import read_query, insert_query, update_query
-from api.data.models import Subscription, Student
+from api.data.models import Subscription, Student, Certificate
 from api.services.courses import get_course_by_id
 from api.utils.utils import enrollment_mail
+import uuid
 
 def get_students_courses_id(student_id):
     data = read_query(
@@ -61,9 +62,6 @@ def get_profile(student_id):
 
 def change_password(student_id, new_pass):
     update_query("update users set password=? where id=?", (new_pass, student_id))
-
-
-
 
 
 
