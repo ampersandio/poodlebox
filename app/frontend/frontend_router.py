@@ -24,7 +24,6 @@ def get_courses(request: Request, token: str | None  = None, tag:str = None):
     
     if tag:
         courses = requests.get(f"{host}/api/courses/?tag={tag}", headers=headers)
-        print(courses.json())
     else:
         courses = requests.get(f"{host}/api/courses/", headers=headers)
 
@@ -85,7 +84,6 @@ def course(request: Request,course_id:int):
     user = get_current_user(token)
     course = get_course_by_id(course_id)
 
-    print(user.email == course.teacher.email)
     return templates.TemplateResponse("course.html", {"request": request, "course":course, "user":user})
 
 

@@ -33,7 +33,6 @@ def get_courses_teacher():
     )
     list_courses = []
     for x in range(len(data)):
-        print(data[x][9:])
         owner = TeacherShow.read_from_query_result(*data[x][9:])
         course = CourseShow.read_from_query_result(*data[x][:9], teacher=owner)
         list_courses.append(course)
