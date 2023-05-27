@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Request,  Form
+from fastapi import APIRouter, Request,  Form, Depends
 from config import settings
 from fastapi.templating import Jinja2Templates
 from api.services.authorization import get_current_user, create_access_token, authenticate_user
+from api.services.courses import get_course_by_id
 from api.utils.utils import user_registration 
 from mailjet_rest import Client
 
@@ -14,36 +15,40 @@ templates = Jinja2Templates(directory="frontend/templates")
 mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
 
 
-def get_courses(request: Request, token: str = None):
+def get_courses(request: Request, token: str | None  = None, tag:str = None):
     host = "http://" + request.headers["host"]
     headers = {}
 
     if token:
         headers["authorization"] = f"Bearer {token}"
+    
+    if tag:
+        courses = requests.get(f"{host}/api/courses/?tag={tag}", headers=headers)
+        print(courses.json())
+    else:
+        courses = requests.get(f"{host}/api/courses/", headers=headers)
 
-    courses = requests.get(f"{host}/api/courses", headers=headers)
     return courses.json()
 
 
 @frontend_router.get("/")
-def index(request: Request):
+def index(request: Request,tag:str=None):
     host = "http://" + request.headers["host"]
     headers = {}
     
     token = request.cookies.get("token")
-    
+
     try:
         user = get_current_user(token)
-        courses = get_courses(request, token)
+        courses = get_courses(request, token, tag=tag)
     except:
         user = None
-        courses = get_courses(request)
+        courses = get_courses(request, tag=tag)
 
     if token:
         headers["authorization"] = f"Bearer {token}"
 
     popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
-    print(popular_courses.json())
 
     return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses, "most_popular": popular_courses.json()} )
 
@@ -71,6 +76,18 @@ def form_data(request: Request, username: str = Form(...), password: str = Form(
     else:
         return templates.TemplateResponse("message.html", {"request": request, "message": "Login Invalid"})
     
+
+@frontend_router.get("/courses/{course_id}/")
+def course(request: Request,course_id:int):
+
+    token = request.headers["cookie"][6:]
+
+    user = get_current_user(token)
+    course = get_course_by_id(course_id)
+
+    print(user.email == course.teacher.email)
+    return templates.TemplateResponse("course.html", {"request": request, "course":course, "user":user})
+
 
 @frontend_router.get("/search")
 def search(request: Request, search_query: str):

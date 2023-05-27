@@ -186,11 +186,13 @@ def create_course(course: CourseCreate, owner):
     else:
         course.premium = 0
     list_of_tags = []
+
     for x in course.tags:
         data = read_query("select id from tags where name=?", (x,))
         if data==[]:
             return f"Tag {x} doesn't exist"
         list_of_tags.append(data[0][0])
+        
     course_id = insert_query(
         "insert into courses(title,description,objectives,premium,active,owner,price,course_picture) values(?,?,?,?,?,?,?,?)",
         (
@@ -210,6 +212,8 @@ def create_course(course: CourseCreate, owner):
             (x, course_id),
         )
 
+def add_course_photo(course_picrture:str, course_id:int):
+    insert_query("update courses set course_picture = ? where id = ?", (course_picrture,course_id))
 
 def get_section_by_id(section_id:int) -> Section:
     section_data = read_query("select id, title from sections where id = ?;", (section_id,))
@@ -259,14 +263,15 @@ def add_content(section_id: int, content: ContentCreate) -> Content:
     
 
 def get_most_popular(role: str | None = None):
+    all_courses = get_courses_teacher()
     if role is None:
-        query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id where c.premium = 0 group by c.id order by count(u.users_id) desc limit 3;"
+        query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id where c.premium = 0 group by c.id order by count(u.users_id) desc limit 5;"
     else:
-        query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id group by c.id order by count(u.users_id) desc limit 3;"
+        query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id group by c.id order by count(u.users_id) desc limit 5;"
 
     courses_data = read_query(query)
     courses = [Course.read_from_query_result(*data) for data in courses_data]
-    
+
     return courses
 
 

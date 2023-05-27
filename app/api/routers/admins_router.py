@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request, File, UploadFile
 from fastapi.responses import JSONResponse
-from typing import Annotated, Optional
-from api.services import courses
 
 from api.services.authorization import get_current_user, get_oauth2_scheme
 from api.services.students import get_profile

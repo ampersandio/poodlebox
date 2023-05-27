@@ -1,9 +1,12 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, File, UploadFile, Form, Body, Request
 from fastapi.responses import JSONResponse
 from api.data.models import User,CourseCreate, SectionCreate, ContentCreate, TeachersReport
 from api.services.authorization import get_current_user
 from api.services import courses,report
 from typing import Annotated
+import os
+import base64
+
 
 
 teachers_router = APIRouter(prefix="/teachers", tags=["Teachers"])
@@ -20,7 +23,30 @@ def get_report(current_user: Annotated[User, Depends(get_current_user)]) -> Teac
 
     return teachers_report
 
-@teachers_router.post("/courses")
+
+@teachers_router.post("/courses/")
+def course_create(title:str = Form(...),description:str=Form(...),objectives:str=Form(...), premium:bool = Form(...), tags:list[str] = Form(...), file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
+    course = CourseCreate(title=title, description=description, objectives=objectives, premium=premium, tags=tags, course_pic=file.filename)
+
+    try:
+        contents = file.file.read()
+
+        upload_dir = "assets/course_thumbnails/"
+        file_path = os.path.join(upload_dir, file.filename)
+
+        with open(file_path, 'wb') as f:
+            f.write(contents)
+    
+    except Exception:
+        return {"message": "There was an error uploading the file"}
+    finally:
+        file.file.close()
+
+
+    create_course(course,current_user)
+
+
+# @teachers_router.post("/courses")
 def create_course(course: CourseCreate, current_user: User = Depends(get_current_user)):
     if current_user.role != "teacher":
         raise HTTPException(
@@ -41,9 +67,42 @@ def create_course(course: CourseCreate, current_user: User = Depends(get_current
     return JSONResponse(status_code=201, content={"msg":"Course created"})
 
 
-@teachers_router.post("/{course_id}/sections/")
+@teachers_router.post("/courses/{course_id}/thumbnail")
+def upload_photo(course_id=int, file: UploadFile = File(...)):
+
+    course = courses.get_course_by_id(course_id)
+
+    if course is None:
+        raise HTTPException(status_code=403, detail="Course with this Id does not exist")  
+    
+    try:
+        contents = file.file.read()
+
+        upload_dir = "assets/course_thumbnails/"
+        file_path = os.path.join(upload_dir, file.filename)
+
+        with open(file_path, 'wb') as f:
+            f.write(contents)
+    
+        courses.add_course_photo(file.filename,course_id)
+
+    except Exception:
+        return {"message": "There was an error uploading the file"}
+    finally:
+        file.file.close()
+
+
+    return {"message": f"Successfully uploaded {file.filename}"}
+
+
+
+@teachers_router.post("/courses/{course_id}/sections/")
 def add_section(section: SectionCreate, course_id:int, current_user: Annotated[User, Depends(get_current_user)]):
-    course = courses.get_course_by_id(course_id, current_user)
+    course = courses.get_course_by_id(course_id)
+
+    if course is None:
+        raise HTTPException(status_code=403, detail="Course with this Id does not exist")
+    
     if current_user.role != "teacher" or course.teacher.email != current_user.email:
         raise HTTPException(status_code=403, detail="This user does not have permission to add sections to this course")
     else:
@@ -52,10 +111,10 @@ def add_section(section: SectionCreate, course_id:int, current_user: Annotated[U
     return JSONResponse(status_code=201, content={"msg":"Section created"})
 
 
-@teachers_router.post("/{course_id}/sections/{section_id}/content")
+@teachers_router.post("/courses/{course_id}/sections/{section_id}/content")
 def add_content_to_section(course_id:int, section_id:int, content:ContentCreate, current_user: Annotated[User, Depends(get_current_user)]):
-    course = courses.get_course_by_id(course_id, current_user)
-    section = courses.get_section_by_id(course_id,section_id,current_user)
+    course = courses.get_course_by_id(course_id)
+    section = courses.get_section_by_id(section_id)
 
     if current_user.role != "teacher" or course.teacher.email != current_user.email:
         raise HTTPException(status_code=403, detail="This user does not have permission to add sections to this course")
