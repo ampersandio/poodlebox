@@ -60,7 +60,6 @@ def get_course_by_id(
     return result
 
 
-
 @courses_router.get("/{course_id}/sections/")
 def get_course_sections(course_id, current_user: Annotated[User, Depends(get_current_user)]):  
     course = courses.get_course_by_id(course_id)

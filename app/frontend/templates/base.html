@@ -22,8 +22,8 @@
         <header class="p-3 bg-dark text-white">
             <div class="container">
               <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <a href="./" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none me-4">
-                    <img src="{{ url_for('static', path='/poodlebox_icon_bw.png') }}" alt="Poodlebox" width="160" height="28">
+                <a href="/poodlebox" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none me-4">
+                    <img src="{{ url_for('static', path='files/poodlebox_icon_bw.png') }}" alt="Poodlebox" width="160" height="28">
                 </a>
         
                 <ul class="nav col-12 col-lg-auto me-lg-5 mb-2 justify-content-center mb-md-0">
@@ -32,14 +32,13 @@
                 </ul>
         
                 <form class="col-12 col-lg d-flex mb-3 mb-lg-0 me-lg-5" action="./search" method="GET">
-                  <input type="search" class="form-control form-control-dark" name="search_query" placeholder="Search Courses" aria-label="Search">
+                  <input type="search" class="form-control form-control-dark me-3" name="search_query" placeholder="Search Courses" aria-label="Search">
                   <button class = "btn btn-outline-light me-2" type="submit">Search</button>
                 </form>
                 
                 {% if user %}
-                logged in as: {{user.email}}
-                <a href="./logout/"><button type="button" class="btn btn-warning">Log Out</button></a>
-
+                <a href="" class="nav-link px-2 text-white me-3">{{user.email}}
+                <a href="/poodlebox/logout/"><button type="button" class="btn btn-warning">Log Out</button></a>
                 {% else %}
                 <div class="text-end">
                   <a href="./login/"><button type="button" class="btn btn-outline-light me-2">Login</button></a>
@@ -66,7 +65,7 @@
           </div>
       
           <div class="text-tight mt-4 mb-4">
-            <img style="filter: brightness(0.25);"src="{{ url_for('static', path='/poodlebox_icon_bw.png') }}" alt="Poodlebox" width="160" height="28">
+            <img style="filter: brightness(0.25);"src="{{ url_for('static', path='files/poodlebox_icon_bw.png') }}" alt="Poodlebox" width="160" height="28">
           </div>
       
         </div>

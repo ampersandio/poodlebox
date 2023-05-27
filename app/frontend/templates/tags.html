@@ -48,7 +48,7 @@
 
         <ul style="list-style-type: none;padding-left:0!important;">
           {% for tag in course.tags %}
-            <a href="./?tag={{tag}}"><li class="tag" style="display: inline-block!important;">{{tag}}</li></a>
+            <li class="tag" style="display: inline-block!important;">{{tag}}</li>
           {% endfor %}
         </ul>
       </div>
@@ -64,37 +64,6 @@
 
 <hr>
 
-<h2>Popular Courses</h2>
-<div class="col-lg-12 justify-content-lg-between">
-    {% if most_popular %}
-
-      <div class="row">
-        {% for course in most_popular %}
-    
-          <div class="col-md-3">
-            <div class="card" style="width: 18rem;">
-                {% if course.course_picture %}
-                <img class="card-img-top" src="{{ url_for('assets', path=course.course_picture) }}" width="320" height="auto" alt="">
-                {% else %}
-                <img class="card-img-top" src="{{ url_for('assets', path='no_thumbnail.png') }}" width="320" height="auto" alt="">
-                {% endif %}
-              <div class="card-body">
-                <h5 style="" class="card-title">{{course.title}}</h5>
-
-                <p class="card-text">{{course.description[:22] + '...' if course.description|length > 22 else course.description}}</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
-              </div>
-            </div>
-          </div>
-
-        {% endfor %}
-      </div>
-    {% endif %}
-  </div>
-<br>
-<br>
-<br>
-<hr>
 
 <script>
 
