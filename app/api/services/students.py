@@ -39,7 +39,7 @@ def enroll_in_course(student_id: int, course_id:int, subscription: Subscription,
     send_mail = False
 
     if subscription.enroll==True and expired==False:
-        insert_query("insert into users_has_courses(users_id,courses_id,scubscriptions_id) values(?,?,?)", (student_id, course_id, 2),)
+        insert_query("insert into users_has_courses(users_id,courses_id,subscriptions_id) values(?,?,?)", (student_id, course_id, 2),)
         send_mail = True
 
     elif subscription.enroll==True and expired==True:
