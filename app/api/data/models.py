@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
 from collections import defaultdict
-
+from typing import Dict, Optional, TypedDict
 
 class User(BaseModel):
     id: int
@@ -310,7 +310,6 @@ class Student(BaseModel):
     email:str
     verified_email:bool
     date_of_birth:date
-    avg_rating_give:float
     total_number_of_courses:int
     number_of_pending_subscriptions:int
     number_of_active_subscriptions:int
@@ -357,3 +356,26 @@ class Certificate(BaseModel):
 class Query(BaseModel):
     q:str
 
+class Calendar(BaseModel):
+    summary:str
+
+class DateTime(BaseModel):
+    dateTime:str
+
+class TimeZone(BaseModel):
+    timeZone:str
+
+class Event(BaseModel):
+    summary:str
+    description:str|None=None
+    class Dates(TypedDict):
+        dateTime:str
+    start:Dates
+    end:Dates
+
+class Rule(BaseModel):
+    class Scope(TypedDict):
+        type:str
+        value:str
+    scope:Scope
+    role:str
