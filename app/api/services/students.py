@@ -11,7 +11,7 @@ def get_students_courses_id(student_id):
     )
     if data==[]:
         return []
-    courses_ids = [x for x in data[0].split(",")]
+    courses_ids = [int(x) for x in data[0][0].split(",")]
     return courses_ids
 
 

@@ -13,7 +13,6 @@ from api.data.models import (
     CourseShow,
     User
     )
-from api.services.students import get_students_courses_id
 
 
 def get_courses_anonymous():
@@ -126,8 +125,6 @@ def get_students_courses(student_id):
 
 
 def get_student_course_by_id(student_id, course_id):
-    if course_id not in get_students_courses_id(student_id):
-        return None
     data_sections = read_query(
         "select id,title from sections where courses_id=?", (course_id,)
     )

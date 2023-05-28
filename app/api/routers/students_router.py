@@ -9,6 +9,7 @@ from api.services.courses import (
     get_student_course_by_id,
     get_course_by_id,
 )
+from api.services.students import get_students_courses_id
 from api.services.students import get_profile, change_password
 from api.services.authorization import hash_password
 from fastapi.responses import JSONResponse
@@ -22,7 +23,9 @@ def get_certificates_of_student(current_user: User = Depends(get_current_user)):
     return get_certificates(current_user.id)
 
 @students_router.get("courses/{course_id}/certificates")
-def get_certificate_of_student_for_course(course_id,current_user: User = Depends(get_current_user)):
+def get_certificate_of_student_for_course(course_id:int,current_user: User = Depends(get_current_user)):
+    if course_id not in get_students_courses_id(current_user.id):
+        raise HTTPException(status_code=403,detail="You have never been enrolled in this course")
     result=get_certificate_by_course(current_user.id,course_id)
     if result==None:
         raise HTTPException(status_code=404,detail="Certificate for this course not found")
@@ -75,21 +78,21 @@ def change_student_profile(
 
 @students_router.get("/courses/{course_id}")
 def get_course_for_student_by_id(
-    course_id, current_user: User = Depends(get_current_user)
+    course_id:int, current_user: User = Depends(get_current_user)
 ):
     if get_course_by_id(course_id) == None:
         raise HTTPException(status_code=404, detail="Course not found")
-    result = get_student_course_by_id(current_user.id, course_id)
-    if result == None:
+    if course_id not in get_students_courses_id(current_user.id):
         raise HTTPException(
             status_code=403, detail="You have never been enrolled in this course"
         )
+    result = get_student_course_by_id(current_user.id, course_id)
     return result
 
 
 @students_router.put("/courses/{course_id}")
 def enroll_or_unenroll_from_course(
-    course_id,
+    course_id:int,
     subscription: Subscription,
     current_user: User = Depends(get_current_user),
 ):  
