@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request,  Form, Depends
 from config import settings
 from fastapi.templating import Jinja2Templates
 from api.services.authorization import get_current_user, create_access_token, authenticate_user
-from api.services.courses import get_course_by_id
+from api.services.courses import get_course_by_id,get_students_courses
 from api.utils.utils import user_registration 
 from mailjet_rest import Client
 
@@ -47,9 +47,14 @@ def index(request: Request,tag:str=None):
     if token:
         headers["authorization"] = f"Bearer {token}"
 
+    # user_courses_ids = get_students_courses(user.id)
+    # print(user.id)
+    # print(user_courses_ids)
+    # print([item["id"] for item in courses])
+
     popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
 
-    return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses, "most_popular": popular_courses.json()} )
+    return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses,  "most_popular": popular_courses.json()} )
 
 
 @frontend_router.post("/")

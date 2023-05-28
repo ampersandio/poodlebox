@@ -11,15 +11,22 @@
 }
 
 @font-face {
-  font-family: 'Mont2';
-  src: url('files/Mont-Bold.woff') format('woff');
+  font-family: 'Seemore-Bold';
+  src: url('files/Seemore-Bold.woff') format('woff');
 }
+
+@font-face {
+  font-family: 'Saymore-Medium';
+  src: url('files/Saymore-Medium.woff') format('woff');
+}
+
+
 
 
 * {
     padding:0;
     margin:0;
-    font-family: 'IBM Plex Mono', monospace !important;
+    font-family: 'Saymore-Medium', monospace !important;
 }
 
 .card-body {
@@ -40,23 +47,18 @@
   }
 
  h4, h5, h6  {
-    font-family: 'IBM Plex Mono' !important;
+    font-family: 'Saymore-Medium' !important;
     font-weight: 600;
 }
 
-h6  {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-weight: 600;
-  font-size: 15px !important;
-}
 
 p  {
-  font-family: 'IBM Plex Mono', monospace !important;
+  font-family: 'Saymore-Medium', monospace !important;
   /* font-weight: 600; */
 }
 
 h3 {
-  font-family: 'CustomFont', monospace !important;
+  font-family: 'Seemore-Bold', monospace !important;
   font-weight: 600;
   font-size: 100px !important;
 
@@ -136,6 +138,8 @@ a {
 }
 
 .tag:hover{
+  color:#0742cd;
+  background-color:#ffc107;
   transform: scale(1.01);
   transition: .2s ease-in-out 0s;
   cursor: pointer;
@@ -143,9 +147,9 @@ a {
 }
 
 .title {
-  font-family: 'Mont2' !important;
+  font-family: 'Seemore-Bold' !important;
   font-weight: 600;
-  font-size: 50px !important;
+  font-size: 32px !important;
 
 }
 
@@ -153,20 +157,7 @@ a:link {
   text-decoration: none;
 }
 
-/* 
-a:visited {
-  text-decoration: none;
-}
 
-a:hover {
-  text-decoration: none;
-}
-
-a:active {
-  text-decoration: none;
-} */
-
-/* a { color:#d99a30 !important; } */
 a:hover { color:#0742cd !important; }
 
 
@@ -320,7 +311,7 @@ ul {
 }
 
 :root {
-  --star-size: 40px;
+  --star-size: 30px;
   --star-color: #d2d2d2;
   --star-background: #fc0;
 }
@@ -337,6 +328,7 @@ ul {
     content: '★★★★★';
     letter-spacing: 3px;
     background: linear-gradient(90deg, var(--star-background) var(--percent), var(--star-color) var(--percent));
+    background-clip:text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
