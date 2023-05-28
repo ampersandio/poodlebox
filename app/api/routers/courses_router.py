@@ -44,7 +44,7 @@ def get_most_popular_courses(request: Request):
 
 @courses_router.get("/{course_id}")
 def get_course_by_id(
-    course_id, current_user: Annotated[User, Depends(get_current_user)]
+    course_id:int, current_user: Annotated[User, Depends(get_current_user)]
 ):
     result = courses.get_course_by_id(course_id)
     if result == None:
@@ -61,7 +61,7 @@ def get_course_by_id(
 
 
 @courses_router.get("/{course_id}/sections/")
-def get_course_sections(course_id, current_user: Annotated[User, Depends(get_current_user)]):  
+def get_course_sections(course_id:int, current_user: Annotated[User, Depends(get_current_user)]):  
     course = courses.get_course_by_id(course_id)
 
     if (current_user.role not in ["teacher", "admin"]) and(course.id not in get_students_courses_id(current_user.id)):
