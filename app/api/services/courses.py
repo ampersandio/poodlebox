@@ -162,8 +162,10 @@ def create_course(course: CourseCreate, owner):
     for x in course.tags:
         data = read_query("select id from tags where name=?", (x,))
         if data == []:
-            return f"Tag {x} doesn't exist"
-        list_of_tags.append(data[0][0])
+            id=insert_query("insert into tags(name) values(?)",(x,))
+            list_of_tags.append(id)
+        else:
+         list_of_tags.append(data[0][0])
 
     try:
         course_id = insert_query(
