@@ -1,32 +1,36 @@
-from pydantic import BaseModel, EmailStr
-from pydantic import validator
+from pydantic import BaseModel, validator, EmailStr,  constr, conint
+from typing import TypedDict
 from datetime import date
-from collections import defaultdict
-from typing import Dict, Optional, TypedDict
 
 
-class BasicUser(BaseModel):
-    email: str
-    first_name: str
-    last_name: str
+class StudentRegistration(BaseModel):
+    email: EmailStr
+    first_name: constr(min_length=1, max_length=20)
+    last_name: constr(min_length=1, max_length=20)
     password: str
     date_of_birth: date
 
-
-class StudentRegistration(BasicUser):
-    pass
-
-
-class TeacherRegistration(BasicUser):
+class TeacherRegistration(StudentRegistration):
     phone_number: str
     linked_in_profile: str
 
+class TeacherShow(BaseModel):
+    id: int
+    first_name: constr(min_length=1, max_length=20)
+    last_name: constr(min_length=1, max_length=20)
+    email: EmailStr
+    phone_number: str
+    linked_in_profile: str
+
+    @classmethod
+    def read_from_query_result(cls, id:int, first_name:str, last_name:str, phone_number:str, email:EmailStr, linked_in_profile:str):
+        return cls(id=id, first_name=first_name, last_name=last_name, phone_number=phone_number, email=email, linked_in_profile=linked_in_profile)
 
 class User(BaseModel):
     id: int
-    email: str
-    first_name: str
-    last_name: str
+    email: EmailStr
+    first_name: constr(min_length=1, max_length=20)
+    last_name: constr(min_length=1, max_length=20)
     hashed_password: str
     phone_number: str | None
     date_of_birth: date
@@ -48,7 +52,7 @@ class User(BaseModel):
     def from_query(
         cls,
         id: int,
-        email: str,
+        email: EmailStr,
         first_name: str,
         last_name: str,
         hashed_password: str,
@@ -77,48 +81,38 @@ class User(BaseModel):
             profile_picture=profile_picture,
         )
 
-
 class Token(BaseModel):
     access_token: str
     token_type: str
 
-
 class TokenData(BaseModel):
-    email: str | None = None
-
-
-class UserInDB(BaseModel):
-    hashed_password: str
-
+    email: EmailStr | None = None
 
 class ContentCreate(BaseModel):
     title: str
     description: str
     content_type: str
 
-
 class Content(ContentCreate):
     id: int
 
     @classmethod
-    def read_from_query_result(cls, id, title, description, content_type):
-        return cls(
-            id=id, title=title, description=description, content_type=content_type
-        )
+    def read_from_query_result(cls, id:int, title:str, description:str, content_type:str):
+        return cls(id=id, title=title, description=description, content_type=content_type)
 
     def __eq__(self, other: object) -> bool:
         return self.title == other.title
 
-
-class Section(BaseModel):
-    id: int
+class SectionCreate(BaseModel):
     title: str
-    content: list[Content] | None = None
+    content: list[ContentCreate] | None = None
+
+
+class Section(SectionCreate):
+    id: int
 
     @classmethod
-    def read_from_query_result(
-        cls, id: int, title: str, content: list[Content] | None = None
-    ):
+    def read_from_query_result(cls, id: int, title: str, content: list[Content] | None = None):
         return cls(id=id, title=title, content=content or [])
 
     def __eq__(self, other: object) -> bool:
@@ -126,58 +120,26 @@ class Section(BaseModel):
             return self.id == other.id
         return False
 
-
-class SectionCreate(BaseModel):
-    title: str
-    content: list[ContentCreate] | None = None
-
-
-class TeacherShow(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-    phone_number: str
-    email: str
-    linked_in_profile: str
-
-    @classmethod
-    def read_from_query_result(
-        cls, id, first_name, last_name, phone_number, email, linked_in_profile
-    ):
-        return cls(
-            id=id,
-            first_name=first_name,
-            last_name=last_name,
-            phone_number=phone_number,
-            email=email,
-            linked_in_profile=linked_in_profile,
-        )
-
-
-class Course(BaseModel):
-    id: int
+class BaseCourse(BaseModel):
     title: str
     description: str
     objectives: str
     premium: bool
-    active: bool
-    owner: int
     price: float | None = None
     course_picture: str | None = None
 
+
+class CourseCreate(BaseCourse):
+    tags: list[str]
+
+
+class Course(BaseCourse):
+    id: int
+    active: bool
+    owner: int
+
     @classmethod
-    def read_from_query_result(
-        cls,
-        id,
-        title,
-        description,
-        objectives,
-        premium,
-        active,
-        owner,
-        price,
-        course_picture,
-    ):
+    def read_from_query_result(cls, id:int, title:str, description:str, objectives:str, premium:bool, active:bool, owner:int, price:float, course_picture:str):
         return cls(
             id=id,
             title=title,
@@ -190,36 +152,20 @@ class Course(BaseModel):
             course_picture=course_picture,
         )
 
-
-class CourseShow(BaseModel):
+class CourseShow(BaseCourse):
     id: int
-    title: str
-    description: str
-    objectives: str
-    premium: bool
     rating: float | None = None
-    price: float | None = None
     tags: list[str]
-    course_picture: str | None = None
     teacher: TeacherShow | None = None
 
     @classmethod
-    def read_from_query_result(
-        cls,
-        id,
-        title,
-        description,
-        objectives,
-        premium,
-        rating,
-        price,
-        tags,
-        course_picture,
-        teacher,
-    ):
+    def read_from_query_result(cls,id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], course_picture:str, teacher: TeacherShow):
+
         if tags is not None:
             tags = [x for x in tags.split(",")]
-        premium = bool(premium)
+
+        # premium = bool(premium)
+
         return cls(
             id=id,
             title=title,
@@ -233,38 +179,16 @@ class CourseShow(BaseModel):
             teacher=teacher,
         )
 
-
-class CourseShowId(BaseModel):
-    id: int
-    title: str
-    description: str
-    objectives: str
-    premium: bool
-    rating: float | None = None
-    price: float | None = None
-    tags: list[str]
-    course_picture: str | None = None
-    teacher: TeacherShow | None = None
+class CourseShowId(CourseShow):
     sections: list[Section] | None = None
 
     @classmethod
-    def read_from_query_result(
-        cls,
-        id,
-        title,
-        description,
-        objectives,
-        premium,
-        rating,
-        price,
-        tags,
-        course_picture,
-        teacher,
-        sections,
-    ):
+    def read_from_query_result(cls, id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], course_picture:str, teacher:TeacherShow, sections:list[Section]):
+
         if tags is not None:
             tags = [x for x in tags.split(",")]
-        premium = bool(premium)
+
+        # premium = bool(premium)
         return cls(
             id=id,
             title=title,
@@ -278,7 +202,6 @@ class CourseShowId(BaseModel):
             teacher=teacher,
             sections=sections,
         )
-
 
 class CoursesShowStudent(BaseModel):
     id: int
@@ -295,30 +218,13 @@ class CoursesShowStudent(BaseModel):
     sections: list[Section] | None = None
 
     @classmethod
-    def read_from_query_result(
-        cls,
-        id,
-        title,
-        description,
-        objectives,
-        premium,
-        rating,
-        price,
-        tags,
-        progress,
-        subscripton_status,
-        teacher,
-        sections,
-    ):
-        if subscripton_status == 2:
-            subscripton_status = "Pending"
-        elif subscripton_status == 1:
-            subscripton_status = "Active"
-        elif subscripton_status == 3:
-            subscripton_status = "Expired"
+    def read_from_query_result(cls,id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], progress:int, subscription_status:str, teacher:TeacherShow, sections:list[Section]):
+
         if tags is not None:
             tags = [x for x in tags.split(",")]
-        premium = bool(premium)
+
+        # premium = bool(premium)
+
         return cls(
             id=id,
             title=title,
@@ -329,11 +235,10 @@ class CoursesShowStudent(BaseModel):
             price=price,
             tags=tags,
             progress=progress,
-            subscripton_status=subscripton_status,
+            subscription_status=subscription_from_id(subscription_status),
             teacher=teacher,
             sections=sections,
         )
-
 
 class CourseUserReview(BaseModel):
     course_id: int
@@ -341,7 +246,7 @@ class CourseUserReview(BaseModel):
     total_rating: float | None
     sections_titles: list[str] | None
     user_id: int
-    email: str
+    email: EmailStr
     full_name: str
     subscription: str
     role: str
@@ -357,7 +262,7 @@ class CourseUserReview(BaseModel):
         total_rating: float | None,
         sections_titles: str | None,
         user_id: int,
-        email: str,
+        email: EmailStr,
         full_name: str,
         subscription_id: int,
         role_id: int,
@@ -380,11 +285,10 @@ class CourseUserReview(BaseModel):
             review=review,
         )
 
-
 class UsersReviewsViewForCourse(BaseModel):
     user_id: int
     full_name: str
-    email: str
+    email: EmailStr
     subscription: str
     role: str
     completed: float
@@ -404,7 +308,6 @@ class UsersReviewsViewForCourse(BaseModel):
             review=course_user_review.review,
         )
 
-
 class CourseViewForReport(BaseModel):
     course_id: int
     title: str
@@ -412,32 +315,19 @@ class CourseViewForReport(BaseModel):
     sections_titles: list[str] | None
     users_reviews: list[UsersReviewsViewForCourse]
 
-
 class TeachersReport(BaseModel):
     teacher_id: int
     teacher_name: str
     courses_users_reviews: list[CourseViewForReport]
 
-
 class Subscription(BaseModel):
     enroll: bool
 
-
-class CourseCreate(BaseModel):
-    title: str
-    description: str
-    objectives: str
-    premium: bool
-    price: float | None = None
-    tags: list[str]
-    course_picture: str | None = None
-
-
 class Student(BaseModel):
     id: int
-    first_name: str
-    last_name: str
-    email: str
+    first_name: constr(min_length=1, max_length=20)
+    last_name: constr(min_length=1, max_length=20)
+    email: EmailStr
     verified_email: bool
     date_of_birth: date
     total_number_of_courses: int
@@ -473,21 +363,17 @@ class Student(BaseModel):
             number_of_expired_subscriptions=number_of_expired_subscriptions,
         )
 
-
 class StudentEdit(BaseModel):
     new_password: str
     confirm_new_password: str
-
 
 def subscription_from_id(id: int):
     subscription_from_subscription_id = {1: "Active", 2: "Pending", 3: "Expired"}
     return subscription_from_subscription_id[id]
 
-
 def role_from_id(role_id: int) -> str:
     role_ids_to_roles = {1: "student", 2: "teacher", 3: "admin"}
     return role_ids_to_roles[role_id]
-
 
 class Certificate(BaseModel):
     id: str
@@ -498,22 +384,17 @@ class Certificate(BaseModel):
     def read_from_query_result(cls, id, course_id, issued_date):
         return cls(id=id, course_id=course_id, issued_date=issued_date)
 
-
 class Query(BaseModel):
     q: str
-
 
 class Calendar(BaseModel):
     summary: str
 
-
 class DateTime(BaseModel):
     dateTime: str
 
-
 class TimeZone(BaseModel):
     timeZone: str
-
 
 class Event(BaseModel):
     summary: str
@@ -524,7 +405,6 @@ class Event(BaseModel):
 
     start: Dates
     end: Dates
-
 
 class Rule(BaseModel):
     class Scope(TypedDict):

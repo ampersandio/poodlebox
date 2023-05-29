@@ -10,7 +10,6 @@ courses_router = APIRouter(prefix="/courses", tags=["Courses"])
 
 custom_oauth2_scheme = get_oauth2_scheme(auto_error=False)
 
-
 @courses_router.get("/")
 def get_all_courses(
     current_user: User | None = Depends(custom_oauth2_scheme),
@@ -61,9 +60,7 @@ def get_course_by_id(
         and result.id not in get_students_courses_id(current_user.id)
         and result.premium is True
     ):
-        raise HTTPException(
-            status_code=402, detail="You don't have access to this course"
-        )
+        raise HTTPException(status_code=402, detail="You don't have access to this course")
     return result
 
 
