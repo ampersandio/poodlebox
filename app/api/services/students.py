@@ -1,19 +1,17 @@
 from api.data.database import read_query, insert_query, update_query
-from api.data.models import Subscription, Student
+from api.data.models import Subscription, Student, Certificate
 from api.services.courses import get_course_by_id
-from api.utils.utils import send_enrollment_mail
-from mailjet_rest import Client
-from config import settings
-
-mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
+from api.utils.utils import enrollment_mail
+import uuid
 
 def get_students_courses_id(student_id):
     data = read_query(
         "select group_concat(distinct courses_id) from users_has_courses where users_id=? group by users_id",
         (student_id,),
     )
-
-    courses_ids = [int(x) for x in data[0]]
+    if data==[]:
+        return []
+    courses_ids = [int(x) for x in data[0][0].split(",")]
     return courses_ids
 
 
@@ -41,7 +39,7 @@ def enroll_in_course(student_id: int, course_id:int, subscription: Subscription,
     send_mail = False
 
     if subscription.enroll==True and expired==False:
-        insert_query("insert into users_has_courses(users_id,courses_id,scubscriptions_id) values(?,?,?)", (student_id, course_id, 2),)
+        insert_query("insert into users_has_courses(users_id,courses_id,subscriptions_id) values(?,?,?)", (student_id, course_id, 2),)
         send_mail = True
 
     elif subscription.enroll==True and expired==True:
@@ -52,11 +50,7 @@ def enroll_in_course(student_id: int, course_id:int, subscription: Subscription,
         update_query("update users_has_courses set subscriptions_id=? where courses_id=? and users_id=?", (3, course_id, student_id))         
 
     if send_mail:
-        data = send_enrollment_mail(student,course,teacher)
-        result = mailjet.send.create(data=data)
-
-        print (result.status_code)
-        print (result.json())
+        enrollment_mail(student,course,teacher)
 
 
 def get_profile(student_id):
@@ -69,4 +63,6 @@ def get_profile(student_id):
 
 def change_password(student_id, new_pass):
     update_query("update users set password=? where id=?", (new_pass, student_id))
+
+
 

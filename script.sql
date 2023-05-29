@@ -169,7 +169,7 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- -----------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS `poodle_box`.`certificates` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL,
   `users_id` INT(45) NOT NULL,
   `courses_id` INT(45) NOT NULL,
   `issued_date` DATE NOT NULL,

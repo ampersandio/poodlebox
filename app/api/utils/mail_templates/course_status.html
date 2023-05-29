@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Poodlebox course you were enrolled in is now Inactive</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 30px;">
+        <h1 style="color: #333333; font-size: 24px; margin-bottom: 20px;">Course Deactivated</h1>
+        
+        <div style="margin-bottom: 30px;">
+            <p><span style="font-weight: bold;">Name:</span><span style="margin-left: 10px;">{student_first_name} {student_last_name}</span></p>
+            <p><span style="font-weight: bold;">Email:</span><span style="margin-left: 10px;">{student_email}</span></p>
+        </div>
+        
+        <p>We're sorry to inform you that the course {course_title} you've enrolled in is now <strong>Inactive</strong>.</p>
+        <p>You can take a look at all the other courses we're offering!</p>
+                
+        <p>
+            <a href="{approval_link}" style="display: inline-block; padding: 10px 20px; background-color: #4caf50; color: #ffffff; text-decoration: none; border-radius: 3px;" class="approval-button">Courses</a>
+            <!-- <a href="{{ rejection_link }}" style="display: inline-block; padding: 10px 20px; background-color: #f44336; color: #ffffff; text-decoration: none; border-radius: 3px;" class="rejection-button">Reject</a> -->
+        </p>
+        
+        <p>May the poodlebox force be with you!</p>
+    </div>
+</body>
+</html>

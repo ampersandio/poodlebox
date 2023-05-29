@@ -2,15 +2,31 @@
 
 @font-face {
   font-family: 'CustomFont';
-  src: url('OhnoSoftie-Black.woff') format('woff');
+  src: url('files/OhnoSoftie-Black.woff') format('woff');
 }
+
+@font-face {
+  font-family: 'CustomFont2';
+  src: url('files/OhnoSoftie-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Seemore-Bold';
+  src: url('files/Seemore-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Saymore-Medium';
+  src: url('files/Saymore-Medium.woff') format('woff');
+}
+
 
 
 
 * {
     padding:0;
     margin:0;
-    font-family: 'IBM Plex Mono', monospace !important;
+    font-family: 'Saymore-Medium', monospace !important;
 }
 
 .card-body {
@@ -31,28 +47,20 @@
   }
 
  h4, h5, h6  {
-    font-family: 'IBM Plex Mono' !important;
+    font-family: 'Saymore-Medium' !important;
     font-weight: 600;
 }
 
-h6  {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-weight: 600;
-  font-size: 15px !important;
-}
- h5 {
-  margin-left: 15px !important;
- }
 
 p  {
-  font-family: 'IBM Plex Mono', monospace !important;
+  font-family: 'Saymore-Medium', monospace !important;
   /* font-weight: 600; */
 }
 
 h3 {
-  font-family: 'CustomFont', monospace !important;
+  font-family: 'Seemore-Bold', monospace !important;
   font-weight: 600;
-  font-size: 125px !important;
+  font-size: 100px !important;
 
 }
 
@@ -73,10 +81,6 @@ h3 {
       padding: 1px 10px !important;
   }
 
-/* .btn {
-    padding:2px;
-} */
-
 html, body {
     height: 100%;
   }
@@ -94,7 +98,6 @@ html, body {
     margin-top: auto;
   }
   
-
   header {
     background: linear-gradient(45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
     background-size: 400% 400%;
@@ -114,10 +117,48 @@ html, body {
       background-position: 0% 50%;
     }
   }
-  
 
-/* a { color:#d99a30 !important; } */
-a:hover { color:#9e31d0 !important; }
+a {
+  color: rgb(44, 62, 80) !important;
+}
+  
+.thumbnail:hover {
+  transform: scale(1.01);
+  transition: .2s ease-in-out 0s;
+  cursor: pointer;
+  opacity: 80%;
+}
+
+
+.tag {
+  padding: 5px 10px 5px 10px;
+  border-radius: 5px;
+  background-color:#e1e1e1;
+  color:rgb(94, 79, 79);
+}
+
+.tag:hover{
+  color:#0742cd;
+  background-color:#ffc107;
+  transform: scale(1.01);
+  transition: .2s ease-in-out 0s;
+  cursor: pointer;
+  opacity: 80%;
+}
+
+.title {
+  font-family: 'Seemore-Bold' !important;
+  font-weight: 600;
+  font-size: 32px !important;
+
+}
+
+a:link {
+  text-decoration: none;
+}
+
+
+a:hover { color:#0742cd !important; }
 
 
  .vote_button:hover {
@@ -129,9 +170,9 @@ a:hover { color:#9e31d0 !important; }
   color: #6a8fc7;
 }
 
-/* li a:visited {
+li a:visited {
   color: #1253cd;
-} */
+}
 
 .container-fluid, .container-xxl, .container-xl, .container-lg, .container-md, .container-sm {
 --bs-gutter-x: 2.0rem !important;}
@@ -144,14 +185,6 @@ textarea, input {
   font-family: 'IBM Plex Mono', monospace !important;
 }
 
-
-a.temperature.nav-link {
-  color: darkkhaki;
-}
-
-.header-username {
-  color: #9c7da8;
-}
 
 .right-column {
   background-color: #d7d7d7 !important;
@@ -219,4 +252,100 @@ a.temperature.nav-link {
     flex: 0 0 auto;
     width: 320px !important;
   }
+}
+
+ul {
+  list-style-type: none;
+  padding-left:0em!important;
+}
+
+.section {
+  padding-top: 1em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid rgb(212, 212, 212);
+}
+
+.un {
+  font-size:1.2em;
+  display: inline-block;
+}
+
+.un:after {
+  content: '';
+  width: 0px;
+  height: 2px;
+  display: block;
+  background: black;
+  transition: 300ms;
+}
+
+.un:hover:after {
+  width: 100%;
+}
+
+.learn {
+  background-color: #e9f3ff;
+  padding:2em;
+  border-radius: 1em;
+
+}
+
+.Background {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: -1;
+  width: 100%;
+}
+
+.Background
+{
+    position:absolute;
+    left:0px;
+    top:0px;
+    z-index:-1;
+    opacity:30%;
+}
+
+:root {
+  --star-size: 30px;
+  --star-color: #d2d2d2;
+  --star-background: #fc0;
+}
+
+.Stars {
+  --percent: calc(var(--rating) / 10 * 100%);
+  
+  display: inline-block;
+  font-size: var(--star-size);
+  font-family: Times;
+  line-height: 1;
+  
+  &::before {
+    content: '★★★★★';
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, var(--star-background) var(--percent), var(--star-color) var(--percent));
+    background-clip:text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.img-container {
+  position: relative;
+}
+
+.badge {
+  float: left;
+  position: absolute;
+  left: 30px;
+  top: 20px;
+  z-index: 1000;
+  background-color: #92AD40;
+  padding: 5px;
+  color: #FFFFFF;
+  font-weight: bold;
 }
