@@ -377,12 +377,13 @@ def role_from_id(role_id: int) -> str:
 
 class Certificate(BaseModel):
     id: str
+    user_id:int
     course_id: int
     issued_date: date
 
     @classmethod
-    def read_from_query_result(cls, id, course_id, issued_date):
-        return cls(id=id, course_id=course_id, issued_date=issued_date)
+    def read_from_query_result(cls, id,user_id,course_id, issued_date):
+        return cls(id=id,user_id=user_id,course_id=course_id, issued_date=issued_date)
 
 class Query(BaseModel):
     q: str
