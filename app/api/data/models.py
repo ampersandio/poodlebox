@@ -92,13 +92,15 @@ class ContentCreate(BaseModel):
     title: str
     description: str
     content_type: str
+    link: str | None = None
+
 
 class Content(ContentCreate):
     id: int
 
     @classmethod
-    def read_from_query_result(cls, id:int, title:str, description:str, content_type:str):
-        return cls(id=id, title=title, description=description, content_type=content_type)
+    def read_from_query_result(cls, id:int, title:str, description:str, content_type:str, link:str):
+        return cls(id=id, title=title, description=description, content_type=content_type, link=link)
 
     def __eq__(self, other: object) -> bool:
         return self.title == other.title

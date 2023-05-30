@@ -68,7 +68,7 @@ def get_course_by_id(course_id: int):
     ]
     for x in list_sections:
         data_content = read_query(
-            "select c.id,c.title,c.description,c.content_types_id from content c join sections s on s.id=c.sections_id where s.title=?",
+            "select c.id,c.title,c.description,c.content_types_id,link from content c join sections s on s.id=c.sections_id where s.title=?",
             (x.title,),
         )
         list_content = [Content.read_from_query_result(*row) for row in data_content]
@@ -198,7 +198,7 @@ def get_section_by_id(section_id: int) -> Section:
         "select id, title from sections where id = ?;", (section_id,)
     )
     content_data = read_query(
-        "select c.id, c.title, c.description, ct.type from content as c join content_types as ct on c.content_types_id = ct.id where sections_id = ?;",
+        "select c.id, c.title, c.description, ct.type, link from content as c join content_types as ct on c.content_types_id = ct.id where sections_id = ?;",
         (section_id,),
     )
     content = [Content.read_from_query_result(*row) for row in content_data]
