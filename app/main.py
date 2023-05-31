@@ -24,4 +24,5 @@ app.include_router(api_router)
 app.include_router(frontend_router)
 app.mount("/static", StaticFiles(directory="frontend/style"), name="static")
 app.mount("/assets", StaticFiles(directory="assets/course_thumbnails"), name="assets")
+app.mount("/documents", StaticFiles(directory="assets/documents"), name="documents")
 

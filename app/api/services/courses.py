@@ -285,12 +285,13 @@ def add_content(section_id: int, content: ContentCreate) -> Content:
         content_type_id = content_type_id[0][0]
 
     last_content_id = insert_query(
-        "insert into content(title, description, content_types_id, sections_id) values(?,?,?,?);",
+        "insert into content(title, description, content_types_id, sections_id, link) values(?,?,?,?,?);",
         (
             content.title,
             content.description,
             content_type_id,
             section_id,
+            content.link
         ),
     )
 

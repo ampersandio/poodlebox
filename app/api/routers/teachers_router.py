@@ -1,10 +1,12 @@
+import os
 from fastapi import APIRouter,HTTPException,Depends, File, UploadFile,Form
+from config import settings
 from fastapi.responses import JSONResponse
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, TeachersReport
 from api.services.authorization import get_current_user
 from api.services import courses, report
-from typing import Annotated
-import os
+from api.utils.utils import file_upload
+from typing import Annotated, Optional
 
 
 teachers_router = APIRouter(prefix="/teachers", tags=["Teachers"])
@@ -27,46 +29,18 @@ def get_report(current_user: Annotated[User, Depends(get_current_user)]) -> Teac
 
 
 @teachers_router.post("/courses/")
-def course_create( title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(...),  current_user: User = Depends(get_current_user)):
+def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(...),  current_user: User = Depends(get_current_user)):
     '''
     Create course with thumbnail attached as a file: Upload = File(...)
     '''
 
     course = CourseCreate( title=title, description=description,  objectives=objectives, premium=premium, tags=tags, course_picture=file.filename)
 
-    try:
-        contents = file.file.read()
-
-        upload_dir = "assets/course_thumbnails/"
-        file_path = os.path.join(upload_dir, file.filename)
-
-        with open(file_path, "wb") as f:
-            f.write(contents)
-
-    except Exception:
-        return {"message": "There was an error uploading the file"}
-    finally:
-        file.file.close()
-
-    create_course(course, current_user)
-    return JSONResponse(status_code=201, content={"msg": "Course created"})
-
-
-# @teachers_router.post("/courses")
-def create_course(course: CourseCreate, current_user: User = Depends(get_current_user)):
-    '''
-    Create course functionality without a thumbnail
-    '''
+    file_upload(file, "course_thumbnails", course)
 
     if current_user.role != "teacher":
-        raise HTTPException(
-            status_code=403, detail="You don't have access to this section"
-        )
-    # course_result = courses.get_course_by_title(course.title)
-    # if course_result != None:
-    #     raise HTTPException(
-    #         status_code=400, detail="A course with that title already exists"
-    #     )
+        raise HTTPException(status_code=403, detail="You don't have access to this section")
+    
     if current_user.verified_email == False:
         raise HTTPException(status_code=403, detail="Your email is not verified")
     
@@ -81,6 +55,16 @@ def create_course(course: CourseCreate, current_user: User = Depends(get_current
     return JSONResponse(status_code=201, content={"msg": "Course created"})
 
 
+# # @teachers_router.post("/courses")
+# def create_course(course: CourseCreate, current_user: User = Depends(get_current_user)):
+#     '''
+#     Create course functionality without a thumbnail
+#     '''
+
+
+#     return JSONResponse(status_code=201, content={"msg": "Course created"})
+
+
 @teachers_router.post("/courses/{course_id}/thumbnail")
 def upload_photo(course_id=int, file: UploadFile = File(...)):
     '''
@@ -92,21 +76,7 @@ def upload_photo(course_id=int, file: UploadFile = File(...)):
     if course is None:
         raise HTTPException(status_code=403, detail="Course with this Id does not exist")
 
-    try:
-        contents = file.file.read()
-
-        upload_dir = "assets/course_thumbnails/"
-        file_path = os.path.join(upload_dir, file.filename)
-
-        with open(file_path, "wb") as f:
-            f.write(contents)
-
-        courses.add_course_photo(file.filename, course_id)
-
-    except Exception:
-        return {"message": "There was an error uploading the file"}
-    finally:
-        file.file.close()
+    file_upload(file, "course_thumbnails", course)
 
     return {"message": f"Successfully uploaded {file.filename}"}
 
@@ -194,7 +164,8 @@ def delete_section(course_id: int,section_id: int,current_user: Annotated[User, 
 
 
 @teachers_router.post("/courses/{course_id}/sections/{section_id}/content")
-def add_content_to_section(course_id:int, section_id:int, content:ContentCreate, current_user:Annotated[User, Depends(get_current_user)]):
+async def add_content_to_section(course_id:int, section_id:int, title:str = Form(...), description:str = Form(...), content_type:str = Form(...), file: Optional[UploadFile] = File(None), current_user: User = Depends(get_current_user)):
+
     course = courses.get_course_by_id(course_id)
     section = courses.get_section_by_id(section_id)
 
@@ -205,5 +176,10 @@ def add_content_to_section(course_id:int, section_id:int, content:ContentCreate,
         raise HTTPException(status_code=404, detail="Section with this Id does not exist")
 
     else:
-        courses.add_content(section_id, content)
-        return JSONResponse(status_code=201, content={"msg": "Content created"})
+
+        link = file_upload(file,"documents",title)
+        content = ContentCreate(title=title, description=description, content_type=content_type, link=link)
+
+    courses.add_content(section_id, content)
+    return JSONResponse(status_code=201, content={"msg": "Content created"})
+

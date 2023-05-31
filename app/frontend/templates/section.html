@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid d-flex justify-content-between" style="padding:0px!important;">
+    <div>
+      <h3>{{section.title}}</h3>
+      <h6 style="color:#ddd;">{{course.title}}/{{section.title}}/</h6>
+    </div>
+
+</div>
+
+<hr>
+<br>
+
+<div class="accordion" style="  outline: 0 !important;" id="accordionExample">
+
+  {% for content in section.content %}
+  <div class="accordion-item" style="border-width:0px!important;">
+
+
+  <div class="d-flex align-items-center">
+    <h2 class="accordion-header flex-grow-1">
+      {% if content.content_type == "video" %}
+        <img src="{{ url_for('static', path='files/icons/video-file--v1.png') }}" alt="Poodlebox" width="50px" height="auto">
+      {% else %}
+        <img src="{{ url_for('static', path='files/icons/link.png') }}" alt="Poodlebox" width="50px" height="auto">
+      {% endif %}
+    </h2>
+
+    <button class="accordion-button collapsed" style="background-color:#fff!important;" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{content.id}}" aria-expanded="false" aria-controls="collapseThree">
+      {{content.title}}
+    </button>
+  </div>
+
+    <div id="collapse_{{content.id}}" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <span style="margin-left:20px!important;">{{content.description}}</span>
+        <hr>        
+        {% if content.link and content.content_type != "video" %}
+        <p>DOWNLOAD:</p><a href="{{ url_for('documents', path=content.link) }}">{{content.title}} {{ url_for('documents', path=content.link) }}</a>
+        {% else %}
+        <div style="width:100%;height:727px;">
+        {{content.link|safe}}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <hr>
+  {% endfor %}
+
+</div>
+
+{% endblock content %}
