@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Course Completion Notification</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 30px;">
+        <h1 style="color: #333333; font-size: 24px; margin-bottom: 20px;">Course Completion Notification</h1>
+        
+        <div style="margin-bottom: 30px;">
+            <!-- <p><span class="label">Student:</span><span class="value">{{ student_name }}</span></p> -->
+            <p><span style="font-weight: bold;">Course:</span><span style="margin-left: 10px;">{course_title}</span></p>
+            <!-- <p><span class="label">Instructor:</span><span class="value">{{ instructor_name }}</span></p> -->
+        </div>
+        
+        <p>Congratulations {student_first_name} {student_last_name}! You have successfully completed the {course_title} course!</p>
+        
+        <p>Login to find see your certificate:</p>
+        
+        <a href="/login" style="display: inline-block; padding: 10px 20px; background-color: #4caf50; color: #ffffff; text-decoration: none; border-radius: 3px;" class="verification-button">Login</a>
+    </div>
+</body>
+</html>
