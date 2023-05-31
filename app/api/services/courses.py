@@ -89,12 +89,12 @@ def get_course_by_id(course_id: int):
 
 def get_students_courses(student_id):
     courses = read_query(
-        "select group_concat(distinct courses_id) from users_has_courses where users_id=? group by users_id",
+        "select group_concat(distinct courses_id) from users_has_courses where users_id=?",
         (student_id,),
     )
 
     list_courses = []
-    if courses == []:
+    if courses == [(None,)]:
         return []
     courses = [int(x) for x in courses[0][0].split(",")]
     for x in courses:

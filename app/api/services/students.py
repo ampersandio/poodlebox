@@ -6,13 +6,23 @@ import uuid
 
 def get_students_courses_id(student_id):
     data = read_query(
-        "select group_concat(distinct courses_id) from users_has_courses where users_id=? group by users_id",
+        "select group_concat(distinct courses_id) from users_has_courses where users_id=?",
         (student_id,),
     )
-    if data==[]:
+    if data==[(None,)]:
         return []
     courses_ids = [int(x) for x in data[0][0].split(",")]
     return courses_ids
+
+def get_students_active_courses(student_id):
+    data = read_query(
+        "select group_concat(distinct courses_id) from users_has_courses where users_id=? and subscriptions_id=1",
+        (student_id,),
+    )
+    if data==[(None,)]:
+        return []
+    courses_ids = [int(x) for x in data[0][0].split(",")]
+    return courses_ids 
 
 
 def check_enrollment_status(student_id,course_id):

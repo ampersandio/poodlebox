@@ -3,6 +3,7 @@ from mariadb.connections import Connection
 from config import settings
 
 
+
 DATABASE = settings.db_name
 USER = settings.db_user
 PASSWORD = settings.db_password

@@ -1,6 +1,8 @@
 from pydantic import BaseModel, validator, EmailStr,  constr, conint
 from typing import TypedDict
-from datetime import date
+from datetime import date,datetime
+import pytz
+
 
 
 class StudentRegistration(BaseModel):
@@ -387,32 +389,91 @@ class Certificate(BaseModel):
     def read_from_query_result(cls, id,user_id,course_id, issued_date):
         return cls(id=id,user_id=user_id,course_id=course_id, issued_date=issued_date)
 
-class Query(BaseModel):
-    q: str
+# class Query(BaseModel):
+#     q: str
 
-class Calendar(BaseModel):
-    summary: str
+# class Calendar(BaseModel):
+#     summary: str
 
-class DateTime(BaseModel):
-    dateTime: str
+# class DateTime(BaseModel):
+#     dateTime: str
 
-class TimeZone(BaseModel):
-    timeZone: str
+# class TimeZone(BaseModel):
+#     timeZone: str
+
+# class Event(BaseModel):
+#     summary: str
+#     description: str | None = None
+
+#     class Dates(TypedDict):
+#         dateTime: str
+
+#     start: Dates
+#     end: Dates
+
+# class Rule(BaseModel):
+#     class Scope(TypedDict):
+#         type: str
+#         value: str
+
+#     scope: Scope
+#     role: str
 
 class Event(BaseModel):
-    summary: str
-    description: str | None = None
+    id:int|None=None
+    name:str
+    start:datetime
+    end:datetime
+    link_to_event:str
 
-    class Dates(TypedDict):
-        dateTime: str
+    @classmethod
+    def read_from_query_result(cls,id,name,start,end,link_to_event):
+        return cls(id=id,name=name,start=start,end=end,link_to_event=link_to_event)
 
-    start: Dates
-    end: Dates
+class EventChange(BaseModel):
+    name:str|None=None
+    start:datetime|None=None
+    end:datetime|None=None
+    link_to_event:str|None=None
 
-class Rule(BaseModel):
-    class Scope(TypedDict):
-        type: str
-        value: str
+class EventCreate(BaseModel):
+    name:str
+    start:datetime
+    end:datetime
+    link_to_event:str
+    @classmethod
+    def read_from_query_result(cls,name,start,end,link_to_event):
+        return cls(name=name,start=start,end=end,link_to_event=link_to_event)
 
-    scope: Scope
-    role: str
+class Calendar(BaseModel):
+    id:int|None=None
+    name:str
+    course_id:int
+    owner_id:int
+
+    @classmethod
+    def read_from_query_result(cls,id,name,course_id,owner_id):
+        return cls(id=id,name=name,course_id=course_id,owner_id=owner_id)
+    
+class CalendarCreate(BaseModel):
+    name:str
+    course_id:int
+
+    @classmethod
+    def read_from_query_result(cls,name,course_id):
+        return cls(name=name,course_id=course_id)
+
+class CalendarById(BaseModel):
+    id:int
+    name:str
+    course_id:int
+    owner:TeacherShow
+    events:list[Event]|None=None
+
+    @classmethod
+    def read_from_query_result(cls,id,name,course_id,owner,events):
+        return cls(id=id,name=name,course_id=course_id,owner=owner,events=events)
+
+
+class CalendarChange(BaseModel):
+    owner_id:int
