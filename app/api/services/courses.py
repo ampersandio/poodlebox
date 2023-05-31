@@ -369,7 +369,7 @@ def n_visited_sections(user_id: int, course_id: int) -> int:
 
 def change_subscription(subscription: int, user_id: int, course_id: int):
     update_query(
-        "update users_has_courses set subscriptions = ? where users_id = ? and courses_id = ?;",
+        "update users_has_courses set subscriptions_id = ? where users_id = ? and courses_id = ?;",
         (
             subscription,
             user_id,
