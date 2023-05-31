@@ -60,7 +60,7 @@ p  {
 h3 {
   font-family: 'Seemore-Bold', monospace !important;
   font-weight: 600;
-  font-size: 100px !important;
+  font-size: 60px !important;
 
 }
 
@@ -239,6 +239,11 @@ textarea, input {
 
 .accordion {
   margin-bottom: 100px !important;
+  border-width: 0px !important;
+}
+
+.accordion-button:focus {
+  box-shadow: 0 0 0 0rem rgba(13, 110, 253, 0.25) !important;
 }
 
 ::selection {

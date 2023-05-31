@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     api_key: str
     api_secret: str
 
+    video_api_key: str
+
     class Config:
         env_file = '../.env'
         

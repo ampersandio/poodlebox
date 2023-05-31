@@ -16,23 +16,29 @@
 
 <hr>
 <div class = "learn">
+<h4 style="color:#2F5DFF">Learning Objectives:</h4>
 <ul>
     <br>
-    <h4 style="color:#2F5DFF">What will you learn?</h4>
-    <li>
-        <p>{{course.objectives}}</p>
-    </li>
+    {% set list1 = course.objectives.split(',') %}
+
+    {% for item in list1 %}
+      <li>- {{ item }} </li>
+    {% endfor %} 
+
 </ul>
 </div>
+<br>
+
+<br>
 <hr>
 <ul>
 {% for section in  course.sections %}
 <div class="section">
     
-<li><a class="un" href="">{{section.title}}</a></li>
-    <p style="margin-bottom:0px!important;color:#bfc0c2!important;">Progress 0/5</p>
+<a class="un" href="./sections/{{section.id}}"><li>{{section.title}}</li></a>
 
 </div>
 {% endfor %}
 </ul>
+</div>
 {% endblock content %}
