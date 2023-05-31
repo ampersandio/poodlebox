@@ -1,8 +1,13 @@
 from api.services.authorization import create_access_token
-from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User
-
+from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User, CourseCreate
+from fastapi import File
 from config import settings
 from mailjet_rest import Client
+import os, requests
+from requests.auth import HTTPBasicAuth
+
+
+auth = HTTPBasicAuth(settings.video_api_key, '')
 
 mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
 
@@ -162,3 +167,57 @@ def course_deactivated(student:User, course_title:str):
 
     print(result.status_code)
     print(result.json())
+
+
+def file_upload(file:File,destination:str | None = None, title:str | None = None):
+
+    video_extensions = ['.mp4', '.avi', '.mov', '.wmv', '.flv']
+
+    if file.filename[-4:] in video_extensions:    
+
+        url = 'https://ws.api.video/videos'
+        token = requests.get("https://sandbox.api.video/upload-tokens", auth=auth)
+
+        payload = {
+            "public": True,
+            "panoramic": False,
+            "mp4Support": True,
+            "title": f"{title}"
+        }
+
+        response = requests.post(url, json=payload, auth=auth)
+        video_id = response.json()["videoId"]
+
+        url = f'https://ws.api.video/videos/{video_id}/source'
+
+        headers = {'Authorization': f'Bearer {token}'}
+
+        contents = file.file.read()  # Read the file contents
+
+        files = {'file': (file.filename, contents)}
+        response = requests.post(url, headers=headers, files=files, auth=auth)
+
+        link = response.json()["assets"]["iframe"]
+
+        return link
+    
+    else:
+        try:
+            contents = file.file.read()
+
+            upload_dir = f"assets/{destination}"
+            file_path = os.path.join(upload_dir, file.filename)
+
+            if not os.path.exists(upload_dir):
+                os.makedirs(upload_dir)
+
+            with open(file_path, "wb") as f:
+                f.write(contents)
+
+            return file.filename
+    
+        except:
+            return {"message": "There was an error uploading the file"}
+        finally:
+            file.file.close()
+

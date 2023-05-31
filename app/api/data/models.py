@@ -92,13 +92,15 @@ class ContentCreate(BaseModel):
     title: str
     description: str
     content_type: str
+    link: str | None = None
+
 
 class Content(ContentCreate):
     id: int
 
     @classmethod
-    def read_from_query_result(cls, id:int, title:str, description:str, content_type:str):
-        return cls(id=id, title=title, description=description, content_type=content_type)
+    def read_from_query_result(cls, id:int, title:str, description:str, content_type:str, link:str):
+        return cls(id=id, title=title, description=description, content_type=content_type, link=link)
 
     def __eq__(self, other: object) -> bool:
         return self.title == other.title
@@ -378,12 +380,13 @@ def role_from_id(role_id: int) -> str:
 
 class Certificate(BaseModel):
     id: str
+    user_id:int
     course_id: int
     issued_date: date
 
     @classmethod
-    def read_from_query_result(cls, id, course_id, issued_date):
-        return cls(id=id, course_id=course_id, issued_date=issued_date)
+    def read_from_query_result(cls, id,user_id,course_id, issued_date):
+        return cls(id=id,user_id=user_id,course_id=course_id, issued_date=issued_date)
 
 class Query(BaseModel):
     q: str

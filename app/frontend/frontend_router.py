@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Request,  Form, Depends
+from fastapi import APIRouter, Request,  Form, Depends, HTTPException
 from config import settings
 from fastapi.templating import Jinja2Templates
 from api.services.authorization import get_current_user, create_access_token, authenticate_user
-from api.services.courses import get_course_by_id,get_students_courses
+from api.services.courses import get_course_by_id,get_students_courses,get_section_by_id
 from api.utils.utils import user_registration 
 from mailjet_rest import Client
+
+
 
 
 import requests
@@ -92,6 +94,25 @@ def course(request: Request,course_id:int):
     return templates.TemplateResponse("course.html", {"request": request, "course":course, "user":user})
 
 
+@frontend_router.get("/courses/{course_id}/sections/{section_id}")
+def course(request: Request, course_id:int, section_id:int):
+    host = "http://" + request.headers["host"]
+    course = get_course_by_id(course_id)
+
+    section = get_section_by_id(section_id)
+
+    try:
+        cookie_header = request.headers.get("cookie")[6:]
+        user = get_current_user(cookie_header)
+
+    except:
+        pass
+
+
+    return templates.TemplateResponse("section.html", {"request": request, "user": user, "course":course, "section":section, "host":host} )
+
+
+
 @frontend_router.get("/search")
 def search(request: Request, search_query: str):
     host = "http://"+(request.headers["host"])
@@ -144,3 +165,4 @@ def logout(request: Request):
     response = templates.TemplateResponse("message.html", {"request": request, "message":"Successfully Logged Out!"})
     response.delete_cookie(key="token")
     return response
+

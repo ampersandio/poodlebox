@@ -9,6 +9,9 @@ from api.data.models import User, TokenData
 from api.services.users import get_user
 from api.data.database import update_query
 from config import settings
+import os
+import pickle
+from googleapiclient.discovery import build
 
 PASSWORD_REQUIRED_LENGTH = 5
 PASSWORD_SPECIAL_SYMBOLS = '!@#$%^&*()_+-=,./<>?"'
@@ -99,3 +102,12 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
 def verify_mail(user:User):
     update_query("update users set verified_email = 1 where id = ?;", (user.id,))
 
+def start_service():
+    if os.path.exists("token.pkl"):
+        creds=pickle.load(open("token.pkl", "rb"))
+    else:
+        raise HTTPException(401)
+    if not creds.valid:
+        raise HTTPException(401)
+    service = build("calendar", "v3", credentials=creds)
+    return service

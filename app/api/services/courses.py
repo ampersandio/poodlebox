@@ -68,7 +68,7 @@ def get_course_by_id(course_id: int):
     ]
     for x in list_sections:
         data_content = read_query(
-            "select c.id,c.title,c.description,c.content_types_id from content c join sections s on s.id=c.sections_id where s.title=?",
+            "select c.id,c.title,c.description,c.content_types_id,link from content c join sections s on s.id=c.sections_id where s.title=?",
             (x.title,),
         )
         list_content = [Content.read_from_query_result(*row) for row in data_content]
@@ -162,8 +162,10 @@ def create_course(course: CourseCreate, owner):
     for x in course.tags:
         data = read_query("select id from tags where name=?", (x,))
         if data == []:
-            return f"Tag {x} doesn't exist"
-        list_of_tags.append(data[0][0])
+            id=insert_query("insert into tags(name) values(?)",(x,))
+            list_of_tags.append(id)
+        else:
+         list_of_tags.append(data[0][0])
 
     try:
         course_id = insert_query(
@@ -198,7 +200,7 @@ def get_section_by_id(section_id: int) -> Section:
         "select id, title from sections where id = ?;", (section_id,)
     )
     content_data = read_query(
-        "select c.id, c.title, c.description, ct.type from content as c join content_types as ct on c.content_types_id = ct.id where sections_id = ?;",
+        "select c.id, c.title, c.description, ct.type, link from content as c join content_types as ct on c.content_types_id = ct.id where sections_id = ?;",
         (section_id,),
     )
     content = [Content.read_from_query_result(*row) for row in content_data]
@@ -285,12 +287,13 @@ def add_content(section_id: int, content: ContentCreate) -> Content:
         content_type_id = content_type_id[0][0]
 
     last_content_id = insert_query(
-        "insert into content(title, description, content_types_id, sections_id) values(?,?,?,?);",
+        "insert into content(title, description, content_types_id, sections_id, link) values(?,?,?,?,?);",
         (
             content.title,
             content.description,
             content_type_id,
             section_id,
+            content.link
         ),
     )
 
