@@ -311,6 +311,7 @@ class UsersReviewsViewForCourse(BaseModel):
             review=course_user_review.review,
         )
 
+
 class CourseViewForReport(BaseModel):
     course_id: int
     title: str
@@ -318,13 +319,24 @@ class CourseViewForReport(BaseModel):
     sections_titles: list[str] | None
     users_reviews: list[UsersReviewsViewForCourse]
 
+
 class TeachersReport(BaseModel):
     teacher_id: int
     teacher_name: str
     courses_users_reviews: list[CourseViewForReport]
 
+
+class Review(BaseModel):
+    id: int | None
+    users_id: int
+    courses_id: int
+    rating: float
+    description: str
+
+
 class Subscription(BaseModel):
     enroll: bool
+
 
 class Student(BaseModel):
     id: int

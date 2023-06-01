@@ -13,6 +13,7 @@ from api.data.models import (
     CourseCreate,
     CourseShow,
     User,
+    Review
 )
 
 
@@ -376,3 +377,11 @@ def change_subscription(subscription: int, user_id: int, course_id: int):
             course_id,
         ),
     )
+
+
+def leave_review(user_id: int, course_id: int, rating: float, description: str) -> bool:
+    try:
+        insert_query('INSERT INTO reviews(users_id, courses_id, rating, description) VALUES(?,?,?,?)', (user_id, course_id, rating, description))
+        return True
+    except IntegrityError:
+        return False

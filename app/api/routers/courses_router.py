@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request
+from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request, Form
 from fastapi.responses import JSONResponse
 from typing import Annotated, Optional
 from api.services import courses
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate
 from api.services.authorization import get_current_user, get_oauth2_scheme
-from api.services.students import get_students_courses_id
+from api.services.students import get_students_courses_id, check_enrollment_status
 
 courses_router = APIRouter(prefix="/courses", tags=["Courses"])
 
@@ -120,3 +120,15 @@ def get_section_by_id(
         courses.change_subscription(3, current_user.id, course.id)
 
     return section
+
+
+@courses_router.post('/{course_id}/reviews')
+def post_review(course_id: int,  user: User = Depends(get_current_user), rating: float = Form(...), description: Optional[str] = Form(None)) -> JSONResponse:
+    if (enrollment := check_enrollment_status(user.id, course_id)) in ['No status', 2]:
+        raise HTTPException(status_code=409, detail=f'You must be currently or previously enrolled in course: {course_id} to leave a review, your current enrollment status is: {enrollment}')
+    
+    left_review = courses.leave_review(user.id, course_id, rating, description)
+    if left_review == False:
+        raise HTTPException(status_code=409, detail=f'User: {user.id} has already left a review for course: {course_id}')
+    
+    return JSONResponse(status_code=201, content={'msg': 'review created'})
