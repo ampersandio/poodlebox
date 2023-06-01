@@ -5,6 +5,7 @@ from api.services import courses
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate
 from api.services.authorization import get_current_user, get_oauth2_scheme
 from api.services.students import get_students_courses_id
+from api.utils.utils import email_certificate
 
 courses_router = APIRouter(prefix="/courses", tags=["Courses"])
 
@@ -110,8 +111,12 @@ def get_section_by_id(
 
     if current_user.role == "student":
         courses.visited_section(current_user.id, section.id)
+    
+    print(courses.n_visited_sections(current_user.id,course.id))
+    print(courses.n_sections_by_course_id(course.id)[0][2])
 
-    if current_user.role == "student" and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
+    if current_user.role == "student" and courses.n_visited_sections(current_user.id, course.id)[0][0] == courses.n_sections_by_course_id(course.id)[0][2]:
         courses.change_subscription(3, current_user.id, course.id)
+        email_certificate(current_user,course.title)
 
     return section

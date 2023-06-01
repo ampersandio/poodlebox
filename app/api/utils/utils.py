@@ -218,3 +218,22 @@ def file_upload(file:File,destination:str | None = None, title:str | None = None
         finally:
             file.file.close()
 
+def email_certificate(student:User,course_title):
+    replacements = {
+    '{student_first_name}':student.first_name,
+    '{student_last_name}':student.last_name,
+    '{student_email}':student.email,
+    '{course_title}':course_title
+    }
+    html_template = generate_template("api/utils/mail_templates/course_completion_notification.html", replacements)
+
+    message = generate_message(
+        to_email=student.email,
+        to_name=student.first_name + " " + student.last_name,
+        subject=f"{course_title} completion",
+        text_part="Greetings",
+        html_part=html_template
+    )
+
+    result = mailjet.send.create(data=message)
+
