@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request
 from fastapi.responses import JSONResponse
 from typing import Annotated, Optional
 from api.services import courses
-from api.data.models import User, CourseCreate, SectionCreate, ContentCreate
+from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, PendingEnrollment
 from api.services.authorization import get_current_user, get_oauth2_scheme
-from api.services.students import get_students_courses_id, check_enrollment_status
+from api.services.students import get_students_courses_id, check_enrollment_status, update_interest
 
 courses_router = APIRouter(prefix="/courses", tags=["Courses"])
 
@@ -160,3 +160,36 @@ def change_course_status(course_id: int, active: bool = Form(...), user: User = 
             raise HTTPException(status_code=409, detail=f'Course: {course_id} either not found, or already not active')
         
         return JSONResponse(status_code=200, content={'msg': f'Course: {course_id} deactivated'})
+    
+
+@courses_router.get('/pending_enrollments/reports')
+def get_pending_enrollments(user: User = Depends(get_current_user)) -> list[PendingEnrollment]:
+    pending_enrollments = courses.get_pending_enrollments(user.id)
+    if pending_enrollments is None:
+        raise HTTPException(status_code=404, detail=f'No pending enrollments for courses with owner: {user.id}')
+    
+    return pending_enrollments
+
+
+@courses_router.put('/pending_enrollments')
+def judge_enrollment(user_id: int = Form(...), course_id: int = Form(...), approved: bool = Form(...), user: User = Depends(get_current_user)) -> JSONResponse:
+    if user.role.lower() != 'admin':
+        owner = courses.get_course_owner(course_id)
+        if owner != user.id:
+            raise HTTPException(status_code=401, detail=f'Only the owner of course: {course_id} can judge enrollments for it')
+
+    if approved:
+        enrolled = courses.approve_enrollment(user_id, course_id)
+        if not enrolled:
+            raise HTTPException(status_code=404, detail=f'No enrollment request found for user: {user_id} in course: {course_id}')
+        
+        update_interest(user_id, course_id)
+        return JSONResponse(status_code=200, content={'msg': f'Enrollment for user: {user_id} in course: {course_id} approved'})
+    
+    if not approved:
+        rejected = courses.reject_enrollment(user_id, course_id)
+        if not rejected:
+            raise HTTPException(status_code=404, detail=f'No enrollment request found for user: {user_id} in course: {course_id}')
+        
+        update_interest(user_id, course_id)
+        return JSONResponse(status_code=200, content={'msg': f'Enrollment for user: {user_id} in course: {course_id} rejected'})

@@ -1,4 +1,4 @@
-from api.data.database import read_query, insert_query, update_query
+from api.data.database import read_query, insert_query, update_query, delete_query
 from mariadb import IntegrityError
 from api.data.models import (
     TeacherShow,
@@ -13,6 +13,7 @@ from api.data.models import (
     CourseCreate,
     CourseShow,
     User,
+    PendingEnrollment
 )
 
 
@@ -388,18 +389,12 @@ def leave_review(user_id: int, course_id: int, rating: float, description: str) 
 
 def deactivate_course(course_id: int) -> bool:
     updated = update_query('UPDATE courses SET active=0 WHERE id=?', (course_id,))
-    if updated == 0:
-        return False
-    
-    return True
+    return bool(updated)
 
 
 def activate_course(course_id: int) -> bool:
     updated = update_query('UPDATE courses SET active=1 WHERE id=?', (course_id,))
-    if updated == 0:
-        return False
-    
-    return True
+    return bool(updated)
 
 
 def get_course_owner(course_id: int) -> int:
@@ -407,3 +402,23 @@ def get_course_owner(course_id: int) -> int:
     owner = data[0][0]
 
     return owner
+
+
+def get_pending_enrollments(owner_id: int) -> list[PendingEnrollment] | None:
+    data = read_query('SELECT users_id, courses_id FROM users_has_courses WHERE subscriptions_id = 2 AND courses_id IN (SELECT id FROM courses WHERE owner = ?)', (owner_id,))
+
+    pending_enrollments = [PendingEnrollment.from_query(*row) for row in data]
+    if not pending_enrollments:
+        return None
+    
+    return pending_enrollments
+
+
+def approve_enrollment(user_id: int, course_id: int) -> bool:
+    enrolled = update_query('UPDATE users_has_courses SET subscriptions_id = 1 WHERE users_id=? AND courses_id=?', (user_id, course_id))
+    return bool(enrolled)
+
+
+def reject_enrollment(user_id: int, course_id: int) -> bool:
+    rejected = delete_query('DELETE FROM users_has_courses WHERE users_id=? AND courses_id=?', (user_id, course_id))
+    return bool(rejected)

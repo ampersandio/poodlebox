@@ -377,6 +377,23 @@ class Student(BaseModel):
             number_of_active_subscriptions=number_of_active_subscriptions,
             number_of_expired_subscriptions=number_of_expired_subscriptions,
         )
+    
+
+class PendingEnrollment(BaseModel):
+    user_id: int
+    course_id: int
+
+    @classmethod
+    def from_query(
+        cls,
+        user_id: int,
+        course_id: int
+    ):
+        return cls(
+            user_id=user_id,
+            course_id=course_id
+        )
+
 
 class StudentEdit(BaseModel):
     new_password: str
@@ -429,3 +446,6 @@ class Rule(BaseModel):
 
     scope: Scope
     role: str
+
+
+

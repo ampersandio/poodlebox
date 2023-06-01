@@ -51,4 +51,5 @@ def delete_query(sql: str, sql_params: tuple = ()) -> list:
         cursor.execute(sql, sql_params)
         connection.commit()
 
+        return cursor.rowcount
 
