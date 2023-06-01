@@ -46,7 +46,7 @@ def generate_template(template_path,replacements):
     return ready_template
 
 
-def user_registration(information:StudentRegistration, host:str):
+def user_registration_mail(information:StudentRegistration, host:str):
 
     token = create_access_token({"sub":information.email})
 
@@ -97,7 +97,7 @@ def enrollment_mail(student:Student, course:Course, teacher:TeacherShow):
     print(result.json())
 
 
-def teacher_registration(information:TeacherRegistration):
+def teacher_registration_mail(information:TeacherRegistration):
 
     replacements = {
     '{teacher_first_name}': information.first_name,
@@ -121,7 +121,7 @@ def teacher_registration(information:TeacherRegistration):
     print(result.json())
 
 
-def teacher_approval(teacher:TeacherShow):
+def teacher_approval_mail(teacher:TeacherShow):
 
     replacements = {
     '{teacher_first_name}': teacher.first_name,
@@ -145,7 +145,7 @@ def teacher_approval(teacher:TeacherShow):
     print(result.json())
 
 
-def course_deactivated(student:User, course_title:str):
+def course_deactivated_mail(student:User, course_title:str):
     replacements = {
     '{student_first_name}':student.first_name,
     '{student_last_name}':student.last_name,
@@ -174,9 +174,8 @@ def file_upload(file:File,destination:str | None = None, title:str | None = None
     video_extensions = ['.mp4', '.avi', '.mov', '.wmv', '.flv']
 
     if file.filename[-4:] in video_extensions:    
-
         url = 'https://ws.api.video/videos'
-        token = requests.get("https://sandbox.api.video/upload-tokens", auth=auth)
+        token = requests.get("https://ws.api.video/upload-tokens", auth=auth)
 
         payload = {
             "public": True,
@@ -191,14 +190,12 @@ def file_upload(file:File,destination:str | None = None, title:str | None = None
         url = f'https://ws.api.video/videos/{video_id}/source'
 
         headers = {'Authorization': f'Bearer {token}'}
-
-        contents = file.file.read()  # Read the file contents
+        contents = file.file.read()
 
         files = {'file': (file.filename, contents)}
         response = requests.post(url, headers=headers, files=files, auth=auth)
 
         link = response.json()["assets"]["iframe"]
-
         return link
     
     else:

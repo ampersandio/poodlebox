@@ -3,10 +3,8 @@ from config import settings
 from fastapi.templating import Jinja2Templates
 from api.services.authorization import get_current_user, create_access_token, authenticate_user
 from api.services.courses import get_course_by_id,get_students_courses,get_section_by_id
-from api.utils.utils import user_registration 
+from api.utils.utils import user_registration_mail 
 from mailjet_rest import Client
-
-
 
 
 import requests
@@ -91,7 +89,9 @@ def course(request: Request,course_id:int):
     user = get_current_user(token)
     course = get_course_by_id(course_id)
 
-    return templates.TemplateResponse("course.html", {"request": request, "course":course, "user":user})
+    student_courses = get_students_courses(user.id)
+
+    return templates.TemplateResponse("course.html", {"request": request, "course":course, "user":user, "student_courses":student_courses})
 
 
 @frontend_router.get("/courses/{course_id}/sections/{section_id}")
@@ -150,7 +150,7 @@ def register(
         date_of_birth:str = Form(...)):
     
     host = "http://" + request.headers["host"]
-    data = user_registration(username,host)
+    data = user_registration_mail(username,host)
     result = mailjet.send.create(data=data)
 
     print (result.status_code)

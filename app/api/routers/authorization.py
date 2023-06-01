@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from api.data.models import StudentRegistration, TeacherRegistration, Token, User
 import api.services.authorization as authorization_services
 import api.services.users as user_services
-from api.utils.utils import user_registration, teacher_registration
+from api.utils.utils import user_registration_mail, teacher_registration_mail
 
 from jose import jwt
 
@@ -32,13 +32,12 @@ def register_student(request:Request, information: StudentRegistration) -> JSONR
         raise HTTPException(status_code=400, detail='Date of birth cannot be empty')
 
     authorization_services.validate_email(information.email)
-
     authorization_services.validate_password(information.password)
+
     information.password = authorization_services.hash_password(information.password)
 
     user_services.register_student(information)
-
-    user_registration(information,host)
+    user_registration_mail(information,host)
 
     return JSONResponse(status_code=201, content={'msg': 'Student registered successfully'})
 
@@ -75,9 +74,8 @@ def register_teacher(request:Request, information: TeacherRegistration, current_
 
     user_services.register_teacher(information)
 
-    user_registration(information,host)
-
-    teacher_registration(information)
+    user_registration_mail(information,host)
+    teacher_registration_mail(information)
 
 
     return JSONResponse(status_code=201, content={'msg': 'Teacher registered successfully'})

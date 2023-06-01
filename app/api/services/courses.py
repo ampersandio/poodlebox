@@ -88,10 +88,7 @@ def get_course_by_id(course_id: int):
 
 
 def get_students_courses(student_id):
-    courses = read_query(
-        "select group_concat(distinct courses_id) from users_has_courses where users_id=?",
-        (student_id,),
-    )
+    courses = read_query( "select group_concat(distinct courses_id) from users_has_courses where users_id=?",(student_id,))
 
     list_courses = []
     if courses == [(None,)]:
@@ -106,7 +103,7 @@ def get_students_courses(student_id):
         ]
         for j in list_sections:
             data_content = read_query(
-                "select c.id,c.title,c.description,c.content_types_id from content c join sections s on s.id=c.sections_id where s.title=?",
+                "select c.id,c.title,c.description,c.content_types_id,c.link from content c join sections s on s.id=c.sections_id where s.title=?",
                 (j.title,),
             )
             list_content = [
@@ -117,6 +114,7 @@ def get_students_courses(student_id):
             "select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,ifnull(round((count(distinct us.sections_id)/count(distinct s.id))*100),0) as progress,uc.subscriptions_id,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id join users u on u.id=c.owner join tags_has_courses ta on ta.courses_id=c.id join tags t on t.id=ta.tags_id left join sections s on s.courses_id=c.id left join sections se on se.courses_id=c.id left join users_has_sections us on us.sections_id=se.id  and us.users_id=?  join users_has_courses uc on uc.courses_id=c.id and uc.users_id=? where c.id=?",
             (student_id, student_id, x),
         )
+        print(data_course[0][:10])
         owner = TeacherShow.read_from_query_result(*data_course[0][10:])
         course = CoursesShowStudent.read_from_query_result(
             *data_course[0][:10], teacher=owner, sections=list_sections
@@ -145,9 +143,7 @@ def get_student_course_by_id(student_id, course_id):
         (student_id, student_id, course_id),
     )
     owner = TeacherShow.read_from_query_result(*data_course[0][10:])
-    course = CoursesShowStudent.read_from_query_result(
-        *data_course[0][:10], teacher=owner, sections=list_sections
-    )
+    course = CoursesShowStudent.read_from_query_result(*data_course[0][:10], teacher=owner, sections=list_sections)
 
     return course
 

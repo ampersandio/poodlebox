@@ -106,17 +106,12 @@ def get_section_by_id(
 
     section = courses.get_section_by_id(section_id)
 
-    if section is None:
-        raise HTTPException(
-            status_code=404, detail="Section with this ID does not exist"
-        )
+    if section is None:raise HTTPException(status_code=404, detail="Section with this ID does not exist")
 
     if current_user.role == "student":
         courses.visited_section(current_user.id, section.id)
 
-    if current_user.role == "student" and courses.n_visited_sections(
-        current_user.id, course.id
-    ) == courses.n_sections_by_course_id(course.id):
+    if current_user.role == "student" and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
         courses.change_subscription(3, current_user.id, course.id)
 
     return section

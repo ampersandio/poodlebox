@@ -6,7 +6,7 @@ from api.services.students import get_profile
 from api.services.courses import get_course_by_id, get_courses_students
 from api.services.admins import student_status, course_status, pending_registrations, approve_registration
 from api.services.users import get_user_by_id
-from api.utils.utils import teacher_approval, course_deactivated
+from api.utils.utils import teacher_approval_mail, course_deactivated_mail
 
 admins_router = APIRouter(prefix="/admins", tags=["Admins"])
 
@@ -46,7 +46,7 @@ def change_course_status(course_id: int, disabled: bool, current_user = Depends(
         course_status(course_id, disabled)
 
         for student in students:
-            course_deactivated(student, course.title)
+            course_deactivated_mail(student, course.title)
 
     else:
         raise HTTPException(status_code=403, detail="You're not allowed in the admin section")
@@ -96,7 +96,7 @@ def approve(teacher_id: int, current_user = Depends(get_current_user)):
 
     teacher = get_user_by_id(teacher_id)
 
-    teacher_approval(teacher)
+    teacher_approval_mail(teacher)
 
     if teacher is None:
         raise HTTPException(status_code=404, detail="Teacher with this Id does not exist")
