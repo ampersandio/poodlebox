@@ -5,6 +5,7 @@ from api.utils.utils import enrollment_mail
 import uuid
 
 def get_students_courses_id(student_id):
+    '''Get all the ids of all the courses a student's been enrolled in'''
     data = read_query(
         "select group_concat(distinct courses_id) from users_has_courses where users_id=?",
         (student_id,),
@@ -15,6 +16,8 @@ def get_students_courses_id(student_id):
     return courses_ids
 
 def get_students_active_courses(student_id):
+    '''Get all the ids of all the courses a student's currently enrolled in'''
+
     data = read_query(
         "select group_concat(distinct courses_id) from users_has_courses where users_id=? and subscriptions_id=1",
         (student_id,),
@@ -26,6 +29,7 @@ def get_students_active_courses(student_id):
 
 
 def check_enrollment_status(student_id,course_id):
+    '''Check the enrollment status for a course a student's been enrolled in'''
     data = read_query(
         "select subscriptions_id from users_has_courses where users_id=? and courses_id=?",
         (student_id, course_id),
@@ -36,12 +40,14 @@ def check_enrollment_status(student_id,course_id):
 
 
 def get_students_number_courses_premium(student_id):
-    number_subs = read_query("select count(distinct uc.courses_id) from users_has_courses uc join courses c on c.id=uc.courses_id and c.premium=1 where uc.users_id=?",
+    '''Get the number of premium courses the student is currently enrolled in'''
+    number_subs = read_query("select count(distinct uc.courses_id) from users_has_courses uc join courses c on c.id=uc.courses_id and c.premium=1 where uc.users_id=? and uc.subscriptions_id=1",
         (student_id,))
     return number_subs[0][0]
 
 
 def enroll_in_course(student_id: int, course_id:int, subscription: Subscription, expired):
+    '''Change subscriptions status for a course'''
     student = get_profile(student_id)
     course = get_course_by_id(course_id)
     teacher = course.teacher
@@ -64,6 +70,7 @@ def enroll_in_course(student_id: int, course_id:int, subscription: Subscription,
 
 
 def get_profile(student_id):
+    '''Get the profile of a student'''
     data = read_query(
         "select u.id,u.first_name,u.last_name,u.email,u.verified_email,u.date_of_birth,count(distinct uc.courses_id),count(distinct uco.courses_id),count(distinct ucou.courses_id),count(distinct ucour.courses_id) from users u left join users_has_courses uc on u.id=uc.users_id left join users_has_courses uco on u.id=uco.users_id and uco.subscriptions_id=2 left join users_has_courses ucou on u.id=ucou.users_id and ucou.subscriptions_id=1 left join users_has_courses ucour on u.id=ucour.users_id and ucour.subscriptions_id= 3 where u.id=?",
         (student_id,),
@@ -72,6 +79,7 @@ def get_profile(student_id):
 
 
 def change_password(student_id, new_pass):
+    '''Change student's password'''
     update_query("update users set password=? where id=?", (new_pass, student_id))
 
 

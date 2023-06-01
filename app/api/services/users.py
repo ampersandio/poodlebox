@@ -45,6 +45,7 @@ def register_teacher(teacher_info: TeacherRegistration) -> None:
     )
 
 def view_ad(users_id):
+    '''Generate a random course ad for a user that has a random tag from the 3 most relevant tags for this user'''
     tags_with_highest_interest=read_query("select distinct tags_id from interests where users_id=? order by relevance desc limit 3",(users_id,))
     if tags_with_highest_interest==[]:
         tags_with_highest_interest=read_query("select distinct tags_id from interests group by tags_id order by relevance desc limit 3")
