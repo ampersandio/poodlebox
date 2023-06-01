@@ -13,7 +13,6 @@ from api.data.models import (
     CourseCreate,
     CourseShow,
     User,
-    Review
 )
 
 
@@ -385,3 +384,26 @@ def leave_review(user_id: int, course_id: int, rating: float, description: str) 
         return True
     except IntegrityError:
         return False
+    
+
+def deactivate_course(course_id: int) -> bool:
+    updated = update_query('UPDATE courses SET active=0 WHERE id=?', (course_id,))
+    if updated == 0:
+        return False
+    
+    return True
+
+
+def activate_course(course_id: int) -> bool:
+    updated = update_query('UPDATE courses SET active=1 WHERE id=?', (course_id,))
+    if updated == 0:
+        return False
+    
+    return True
+
+
+def get_course_owner(course_id: int) -> int:
+    data = read_query('SELECT owner FROM courses WHERE id=?', (course_id,))
+    owner = data[0][0]
+
+    return owner

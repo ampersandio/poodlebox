@@ -132,3 +132,31 @@ def post_review(course_id: int,  user: User = Depends(get_current_user), rating:
         raise HTTPException(status_code=409, detail=f'User: {user.id} has already left a review for course: {course_id}')
     
     return JSONResponse(status_code=201, content={'msg': 'review created'})
+
+
+@courses_router.put('/{course_id}/status')
+def change_course_status(course_id: int, active: bool = Form(...), user: User = Depends(get_current_user)) -> JSONResponse:
+    
+    if active == True:
+        if user.role.lower() != 'admin':
+            owner_id = courses.get_course_owner(course_id)
+            if owner_id != user.id:
+                raise HTTPException(status_code=401, detail=f'Only the owner of a course can change its status, you are user: {user.id}, owner for course: {course_id} is: {owner_id}')
+        
+        activated = courses.activate_course(course_id)        
+        if activated == False:
+            raise HTTPException(status_code=409, detail=f'Course: {course_id} either not found, or already active')
+        
+        return JSONResponse(status_code=200, content={'msg': f'Course: {course_id} activated'})
+    
+    if active == False:
+        if user.role.lower() != 'admin':
+            owner_id = courses.get_course_owner(course_id)
+            if owner_id != user.id:
+                raise HTTPException(status_code=401, detail=f'Only the owner of a course can change its status, you are user: {user.id}, owner for course: {course_id} is: {owner_id}')
+        
+        deactivated = courses.deactivate_course(course_id)        
+        if deactivated == False:
+            raise HTTPException(status_code=409, detail=f'Course: {course_id} either not found, or already not active')
+        
+        return JSONResponse(status_code=200, content={'msg': f'Course: {course_id} deactivated'})
