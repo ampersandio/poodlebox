@@ -17,6 +17,7 @@ from api.data.models import (
 
 
 def get_courses_anonymous():
+    '''Get all the courses for a user that doesn't have an account'''
     data = read_query(
         "select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,c.course_picture,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id where c.premium=0 group by c.id,c.title,c.description,c.objectives,c.price,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile,c.premium,u.id"
     )
@@ -29,6 +30,7 @@ def get_courses_anonymous():
 
 
 def get_courses_teacher():
+    '''Get all the courses in the database'''
     data = read_query(
         "select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,c.course_picture,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id group by c.id,c.title,c.description,c.objectives,c.price,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile,c.premium,u.id"
     )
@@ -41,6 +43,10 @@ def get_courses_teacher():
 
 
 def get_courses_student(student_id):
+    '''Get all the courses in the system with the one's that match 
+    the tags of the courses the student's already been enrolled in being at the top,
+    second are the courses that don't match the tags but the student's never been 
+    enrolled in and at the bottom are the ones the student has been enrolled in'''
     data_courses = read_query(
         "select c.id from courses c join users_has_courses uc on uc.courses_id=c.id where uc.users_id=?",
         (student_id,),
@@ -60,6 +66,7 @@ def get_courses_student(student_id):
 
 
 def get_course_by_id(course_id: int):
+    '''Get a course by its id'''
     data_sections = read_query(
         "select id,title from sections where courses_id=?", (course_id,)
     )
@@ -88,6 +95,7 @@ def get_course_by_id(course_id: int):
 
 
 def get_students_courses(student_id):
+    '''Get all the courses a student's been enrolled in'''
     courses = read_query(
         "select group_concat(distinct courses_id) from users_has_courses where users_id=?",
         (student_id,),
@@ -127,6 +135,7 @@ def get_students_courses(student_id):
 
 
 def get_student_course_by_id(student_id, course_id):
+    '''Get a course a student's been enrolled in by its id'''
     data_sections = read_query(
         "select id,title from sections where courses_id=?", (course_id,)
     )
@@ -153,6 +162,7 @@ def get_student_course_by_id(student_id, course_id):
 
 
 def create_course(course: CourseCreate, owner):
+    '''Create a course'''
     if course.premium == True:
         course.premium = 1
     else:
@@ -192,6 +202,7 @@ def create_course(course: CourseCreate, owner):
 
 
 def add_course_photo(course_picture: str, course_id: int):
+    '''Add a photo for a particular course'''
     insert_query("update courses set course_picture = ? where id = ?", (course_picture, course_id,))
 
 
