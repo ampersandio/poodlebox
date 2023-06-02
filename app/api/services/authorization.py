@@ -1,11 +1,9 @@
+from api.data.models import User, TokenData
 from datetime import datetime, timedelta
-from typing import Annotated
-
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from api.data.models import User, TokenData
 from api.services.users import get_user
 from api.data.database import update_query
 from config import settings
@@ -80,7 +78,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return encoded_jwt
 
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
+def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+
     credentials_exception = HTTPException(status_code=401, detail='Could not validate credentials')
     
     try: 
@@ -93,18 +92,9 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
         raise HTTPException(401)
     
     user = get_user(token_data.email)
+    
     return user
 
 
 def verify_mail(user:User):
     update_query("update users set verified_email = 1 where id = ?;", (user.id,))
-
-# def start_service():
-#     if os.path.exists("token.pkl"):
-#         creds=pickle.load(open("token.pkl", "rb"))
-#     else:
-#         raise HTTPException(401)
-#     if not creds.valid:
-#         raise HTTPException(401)
-#     service = build("calendar", "v3", credentials=creds)
-#     return service

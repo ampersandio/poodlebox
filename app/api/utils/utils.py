@@ -1,9 +1,10 @@
+import os, requests
+
 from api.services.authorization import create_access_token
-from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User, CourseCreate
+from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User
 from fastapi import File
 from config import settings
 from mailjet_rest import Client
-import os, requests
 from requests.auth import HTTPBasicAuth
 
 
@@ -67,10 +68,7 @@ def user_registration_mail(information:StudentRegistration, host:str):
         html_part=html_template
     )
 
-    result = mailjet.send.create(data=message)
-
-    print(result.status_code)
-    print(result.json())
+    mailjet.send.create(data=message)
 
 
 def enrollment_mail(student:Student, course:Course, teacher:TeacherShow):
@@ -91,10 +89,7 @@ def enrollment_mail(student:Student, course:Course, teacher:TeacherShow):
         html_part=html_template
     )
 
-    result = mailjet.send.create(data=message)
-
-    print(result.status_code)
-    print(result.json())
+    mailjet.send.create(data=message)
 
 
 def teacher_registration_mail(information:TeacherRegistration):
@@ -115,10 +110,7 @@ def teacher_registration_mail(information:TeacherRegistration):
         html_part=html_template
     )
 
-    result = mailjet.send.create(data=message)
-
-    print(result.status_code)
-    print(result.json())
+    mailjet.send.create(data=message)
 
 
 def teacher_approval_mail(teacher:TeacherShow):
@@ -139,10 +131,7 @@ def teacher_approval_mail(teacher:TeacherShow):
         html_part=html_template
     )
 
-    result = mailjet.send.create(data=message)
-
-    print(result.status_code)
-    print(result.json())
+    mailjet.send.create(data=message)
 
 
 def course_deactivated_mail(student:User, course_title:str):
@@ -163,10 +152,7 @@ def course_deactivated_mail(student:User, course_title:str):
         html_part=html_template
     )
 
-    result = mailjet.send.create(data=message)
-
-    print(result.status_code)
-    print(result.json())
+    mailjet.send.create(data=message)
 
 
 def file_upload(file:File,destination:str | None = None, title:str | None = None):
@@ -235,5 +221,5 @@ def email_certificate(student:User,course_title):
         html_part=html_template
     )
 
-    result = mailjet.send.create(data=message)
+    mailjet.send.create(data=message)
 

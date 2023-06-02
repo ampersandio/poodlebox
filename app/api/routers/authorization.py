@@ -1,3 +1,5 @@
+import api.utils.constants as constants
+
 from typing import Annotated
 from config import settings
 from datetime import date, timedelta
@@ -45,7 +47,7 @@ def register_student(request:Request, information: StudentRegistration) -> JSONR
 @authorization_router.post('/registration/teachers', tags=['Authentication'])
 def register_teacher(request:Request, information: TeacherRegistration, current_user: Annotated[User, Depends(authorization_services.get_current_user)]) -> JSONResponse:
     host = "http://" + request.headers["host"]
-    if current_user.role != "admin":
+    if current_user.role != constants.ADMIN_ROLE:
         raise HTTPException(status_code=400, detail='Only an admin can register a teacher')
 
     if user_services.get_user(information.email) is not None:
@@ -83,6 +85,7 @@ def register_teacher(request:Request, information: TeacherRegistration, current_
 
 @authorization_router.post('/login', tags=['Authentication'])
 def login(form_data:Annotated[OAuth2PasswordRequestForm, Depends()]) -> dict:
+
     user = authorization_services.authenticate_user(form_data.username, form_data.password)
 
     if not user:
@@ -90,16 +93,21 @@ def login(form_data:Annotated[OAuth2PasswordRequestForm, Depends()]) -> dict:
     
     access_token_expires = timedelta(minutes=settings.access_token_expires_minutes)
     access_token = authorization_services.create_access_token({'sub': user.email}, expires_delta=access_token_expires)
-
+    print(access_token)
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 
 @authorization_router.get('/token/{token}', tags=['Authentication'])
 def get_user(token:str):
-    print(token)
+    '''
+    Endpoint to validate mail account.
+    
+    '''
+
     user = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
     user = user_services.get_user(user["sub"])
-    print(user)
+
     if user is not None:
         authorization_services.verify_mail(user)
         return JSONResponse(status_code=201, content={'msg': 'email validation successfull'})

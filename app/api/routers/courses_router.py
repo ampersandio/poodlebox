@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request
-from fastapi.responses import JSONResponse
-from typing import Annotated, Optional
+import api.utils.constants as constants
+
+from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import Annotated
 from api.services import courses
-from api.data.models import User, CourseCreate, SectionCreate, ContentCreate
+from api.data.models import User
 from api.services.authorization import get_current_user, get_oauth2_scheme
 from api.services.students import get_students_courses_id
 from api.utils.utils import email_certificate
@@ -12,18 +13,13 @@ courses_router = APIRouter(prefix="/courses", tags=["Courses"])
 custom_oauth2_scheme = get_oauth2_scheme(auto_error=False)
 
 @courses_router.get("/")
-def get_all_courses(
-    current_user: User | None = Depends(custom_oauth2_scheme),
-    title=None,
-    tag=None,
-    sort=None,
-    sort_by=None,
-):
-    if current_user:
-        user = get_current_user(current_user)
-        if user.role == "teacher":
+def get_all_courses(token: str | None = Depends(custom_oauth2_scheme), title=None, tag=None,  sort=None,  sort_by=None):
+
+    if token:
+        user = get_current_user(token)
+        if user.role == constants.TEACHER_ROLE:
             result = courses.get_courses_teacher()
-        elif user.role == "student":
+        elif user.role == constants.STUDENT_ROLE:
             result = courses.get_courses_student(user.id)
         else:
             result = courses.get_courses_teacher()
@@ -50,18 +46,16 @@ def get_most_popular_courses(request: Request):
 
 
 @courses_router.get("/{course_id}")
-def get_course_by_id(
-    course_id: int, current_user: Annotated[User, Depends(get_current_user)]
-):
+def get_course_by_id(course_id: int, current_user: Annotated[User, Depends(get_current_user)]):
     result = courses.get_course_by_id(course_id)
-    if result == None:
-        raise HTTPException(status_code=404, detail="Course not found")
+    if result is None:
+        raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
     if (
-        current_user.role == "Student"
+        current_user.role == constants.STUDENT_ROLE
         and result.id not in get_students_courses_id(current_user.id)
         and result.premium is True
     ):
-        raise HTTPException(status_code=402, detail="You don't have access to this course")
+        raise HTTPException(status_code=402, detail=constants.COURSE_ACCESS_DENIED_DETAIL)
     return result
 
 
@@ -73,11 +67,11 @@ def get_course_sections(
 ):
     course = courses.get_course_by_id(course_id)
 
-    if (current_user.role not in ["teacher", "admin"]) and (
+    if (current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE]) and (
         course.id not in get_students_courses_id(current_user.id)
     ):
         raise HTTPException(
-            status_code=401, detail="You don't have access to this section"
+            status_code=401, detail=constants.SECTION_ACCESS_DENIED_DETAIL
         )
     else:
         return course.sections
@@ -93,29 +87,29 @@ def get_section_by_id(
     student_courses = get_students_courses_id(current_user.id)
 
     if (
-        current_user.role not in ["teacher", "admin"]
+        current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE]
         and course.id not in student_courses
     ):
         raise HTTPException(
-            status_code=401, detail="You don't have access to this section"
+            status_code=401, detail=constants.SECTION_ACCESS_DENIED_DETAIL
         )
 
     if course is None:
         raise HTTPException(
-            status_code=404, detail="Course with this ID does not exist"
+            status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL
         )
 
     section = courses.get_section_by_id(section_id)
 
-    if section is None:raise HTTPException(status_code=404, detail="Section with this ID does not exist")
+    if section is None:raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
 
-    if current_user.role == "student":
+    if current_user.role == constants.STUDENT_ROLE:
         courses.visited_section(current_user.id, section.id)
     
     print(courses.n_visited_sections(current_user.id,course.id))
     print(courses.n_sections_by_course_id(course.id)[0][2])
 
-    if current_user.role == "student" and courses.n_visited_sections(current_user.id, course.id)[0][0] == courses.n_sections_by_course_id(course.id)[0][2]:
+    if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id)[0][0] == courses.n_sections_by_course_id(course.id)[0][2]:
         courses.change_subscription(3, current_user.id, course.id)
         email_certificate(current_user,course.title)
 

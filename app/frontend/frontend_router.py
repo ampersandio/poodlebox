@@ -47,14 +47,42 @@ def index(request: Request,tag:str=None):
     if token:
         headers["authorization"] = f"Bearer {token}"
 
-    # user_courses_ids = get_students_courses(user.id)
-    # print(user.id)
-    # print(user_courses_ids)
-    # print([item["id"] for item in courses])
-
     popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
 
-    return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses,  "most_popular": popular_courses.json()} )
+    if tag:
+        message = f"Courses tagged with {tag}"
+    else:
+        message = "Available Courses"
+
+    return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses,  "most_popular": popular_courses.json(), "message":message} )
+
+
+
+
+@frontend_router.get("/profile")
+def index(request: Request,tag:str=None):
+    host = "http://" + request.headers["host"]
+    headers = {}
+    
+    token = request.cookies.get("token")
+
+    try:
+        user = get_current_user(token)
+        courses = get_courses(request, token, tag=tag)
+    except:
+        user = None
+
+    if token:
+        headers["authorization"] = f"Bearer {token}"
+
+    if tag:
+        message = f"Courses tagged with {tag}"
+    else:
+        message = "Available Courses"
+
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses, "message":message} )
+
+
 
 
 @frontend_router.post("/")
@@ -107,7 +135,6 @@ def course(request: Request, course_id:int, section_id:int):
 
     except:
         pass
-
 
     return templates.TemplateResponse("section.html", {"request": request, "user": user, "course":course, "section":section, "host":host} )
 
