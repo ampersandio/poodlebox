@@ -2,17 +2,18 @@ from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request
 from fastapi.responses import JSONResponse
 from typing import Annotated, Optional
 from api.services import courses
-from api.data.models import User, CourseCreate, SectionCreate, ContentCreate
+from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, CourseShow
 from api.services.authorization import get_current_user, get_oauth2_scheme
 from api.services.students import get_students_courses_id
 from api.utils.utils import email_certificate
+from fastapi_pagination import Page,paginate
 
 courses_router = APIRouter(prefix="/courses", tags=["Courses"])
 
 custom_oauth2_scheme = get_oauth2_scheme(auto_error=False)
 
 
-@courses_router.get("/")
+@courses_router.get("/",response_model=Page[CourseShow])
 def get_all_courses(
     current_user: User | None = Depends(custom_oauth2_scheme),
     title=None,
@@ -43,7 +44,7 @@ def get_all_courses(
         elif sort_by == "rating":
             result = sorted(result, key=lambda r: r.rating, reverse=sort == "desc")
 
-    return result
+    return paginate(result)
 
 
 @courses_router.get("/popular")

@@ -3,6 +3,7 @@ from api.data.models import Subscription, Student, Certificate
 from api.services.courses import get_course_by_id
 from api.utils.utils import enrollment_mail
 import uuid
+from api.data import database
 
 def get_students_courses_id(student_id):
     '''Get all the ids of all the courses a student's been enrolled in'''
@@ -35,7 +36,7 @@ def check_enrollment_status(student_id,course_id):
         (student_id, course_id),
     )
     if data==[]:
-        return "No status"
+        return None
     return data[0][0]
 
 

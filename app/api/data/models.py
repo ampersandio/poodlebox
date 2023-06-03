@@ -1,7 +1,6 @@
 from pydantic import BaseModel, validator, EmailStr,  constr, conint
 from typing import TypedDict
 from datetime import date,datetime
-import pytz
 
 
 
