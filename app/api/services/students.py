@@ -1,8 +1,7 @@
+from api.data.models import Subscription, Student
 from api.data.database import read_query, insert_query, update_query
-from api.data.models import Subscription, Student, Certificate
 from api.services.courses import get_course_by_id
 from api.utils.utils import enrollment_mail
-import uuid
 
 def get_students_courses_id(student_id):
     '''Get all the ids of all the courses a student's been enrolled in'''
@@ -35,7 +34,7 @@ def check_enrollment_status(student_id,course_id):
         (student_id, course_id),
     )
     if data==[]:
-        return "No status"
+        return None
     return data[0][0]
 
 
@@ -55,15 +54,15 @@ def enroll_in_course(student_id: int, course_id:int, subscription: Subscription,
     send_mail = False
 
     if subscription.enroll==True and expired==False:
-        insert_query("insert into users_has_courses(users_id,courses_id,subscriptions_id) values(?,?,?)", (student_id, course_id, 2),)
+        insert_query("insert into users_has_courses(users_id,courses_id,subscriptions_id) values(?,?,?)", (student_id, course_id, 2,))
         send_mail = True
 
     elif subscription.enroll==True and expired==True:
-        update_query("update users_has_courses set subscriptions_id=? where courses_id=? and users_id=?", (2, course_id, student_id),)
+        update_query("update users_has_courses set subscriptions_id=? where courses_id=? and users_id=?", (2, course_id, student_id,))
         send_mail = True
 
     else:
-        update_query("update users_has_courses set subscriptions_id=? where courses_id=? and users_id=?", (3, course_id, student_id))         
+        update_query("update users_has_courses set subscriptions_id=? where courses_id=? and users_id=?", (3, course_id, student_id,))         
 
     if send_mail:
         enrollment_mail(student,course,teacher)

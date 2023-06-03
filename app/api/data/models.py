@@ -1,9 +1,5 @@
 from pydantic import BaseModel, validator, EmailStr,  constr, conint
-from typing import TypedDict
-from datetime import date,datetime
-import pytz
-
-
+from datetime import date,datetime 
 
 class StudentRegistration(BaseModel):
     email: EmailStr
@@ -217,7 +213,7 @@ class CoursesShowStudent(BaseModel):
     price: float | None = None
     tags: list[str]
     progress: int
-    subscripton_status: str
+    subscription_status: str
     teacher: TeacherShow | None = None
     sections: list[Section] | None = None
 
@@ -239,7 +235,7 @@ class CoursesShowStudent(BaseModel):
             price=price,
             tags=tags,
             progress=progress,
-            subscription_status=subscription_from_id(subscription_status),
+            subscription_status=subscription_from_id((subscription_status)),
             teacher=teacher,
             sections=sections,
         )
@@ -327,6 +323,15 @@ class TeachersReport(BaseModel):
 class Subscription(BaseModel):
     enroll: bool
 
+class SubscriptionStatus(BaseModel):
+    subscription:str
+    user_id:int
+    course_id:int
+
+    @classmethod
+    def from_query(cls,subscription:str,user_id:int,course_id:int):
+        return cls(subscription=subscription_from_id(subscription),user_id=user_id,course_id=course_id)
+
 class Student(BaseModel):
     id: int
     first_name: constr(min_length=1, max_length=20)
@@ -388,36 +393,6 @@ class Certificate(BaseModel):
     @classmethod
     def read_from_query_result(cls, id,user_id,course_id, issued_date):
         return cls(id=id,user_id=user_id,course_id=course_id, issued_date=issued_date)
-
-# class Query(BaseModel):
-#     q: str
-
-# class Calendar(BaseModel):
-#     summary: str
-
-# class DateTime(BaseModel):
-#     dateTime: str
-
-# class TimeZone(BaseModel):
-#     timeZone: str
-
-# class Event(BaseModel):
-#     summary: str
-#     description: str | None = None
-
-#     class Dates(TypedDict):
-#         dateTime: str
-
-#     start: Dates
-#     end: Dates
-
-# class Rule(BaseModel):
-#     class Scope(TypedDict):
-#         type: str
-#         value: str
-
-#     scope: Scope
-#     role: str
 
 class Event(BaseModel):
     id:int|None=None

@@ -1,6 +1,7 @@
-import os
+import api.utils.constants as constants
+
 from fastapi import APIRouter,HTTPException,Depends, File, UploadFile,Form
-from config import settings
+from mariadb import IntegrityError
 from fastapi.responses import JSONResponse
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, TeachersReport
 from api.services.authorization import get_current_user
@@ -18,7 +19,7 @@ def get_report(current_user: Annotated[User, Depends(get_current_user)]) -> Teac
     Get Teachers Report
     '''
 
-    if current_user.role.lower() != "teacher":
+    if current_user.role.lower() != constants.TEACHER_ROLE:
         raise HTTPException(status_code=400, detail="Reports are currently only available for teachers")
 
     teachers_report = report.get_teachers_report(current_user)
@@ -28,25 +29,29 @@ def get_report(current_user: Annotated[User, Depends(get_current_user)]) -> Teac
     return teachers_report
 
 
-@teachers_router.post("/courses/")
-def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(...),  current_user: User = Depends(get_current_user)):
+@teachers_router.post("/courses/", status_code=201)
+def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(None),  current_user: User = Depends(get_current_user)):
     '''
     Create course with thumbnail attached as a file: Upload = File(...)
     '''
 
-    course = CourseCreate( title=title, description=description,  objectives=objectives, premium=premium, tags=tags, course_picture=file.filename)
+    if file:
+        course = CourseCreate( title=title, description=description,  objectives=objectives, premium=premium, tags=tags, course_picture=file.filename)
+        file_upload(file, "course_thumbnails", course)
+    else:
+        course = CourseCreate( title=title, description=description,  objectives=objectives, premium=premium, tags=tags)
 
-    file_upload(file, "course_thumbnails", course)
 
-    if current_user.role != "teacher":
-        raise HTTPException(status_code=403, detail="You don't have access to this section")
+    if current_user.role != constants.TEACHER_ROLE:
+        raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     
     if current_user.verified_email == False:
         raise HTTPException(status_code=403, detail="Your email is not verified")
     
     try:
         new_course = courses.create_course(course, current_user.id)
-    except:
+
+    except IntegrityError:
         raise HTTPException(status_code=409, detail="A course with that title already exists")
     
     if new_course != None:
@@ -74,7 +79,7 @@ def upload_photo(course_id=int, file: UploadFile = File(...)):
     course = courses.get_course_by_id(course_id)
 
     if course is None:
-        raise HTTPException(status_code=403, detail="Course with this Id does not exist")
+        raise HTTPException(status_code=403, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
     file_upload(file, "course_thumbnails", course)
 
@@ -90,9 +95,9 @@ def add_section(section: SectionCreate, course_id: int, current_user: Annotated[
     course = courses.get_course_by_id(course_id)
 
     if course is None:
-        raise HTTPException(status_code=404, detail="Course with this Id does not exist")
+        raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
-    if current_user.role != "teacher" or course.teacher.email != current_user.email:
+    if current_user.role != constants.TEACHER_ROLE or course.teacher.email != current_user.email:
         raise HTTPException(
             status_code=403,
             detail="This user does not have permission to add sections to this course")
@@ -117,13 +122,13 @@ def edit_section(course_id: int,section_id: int,new_section: SectionCreate,curre
         )
 
     if course.teacher.email != current_user.email:
-        raise HTTPException(status_code=403,detail="This user does not have permission to edit sections in this course")
+        raise HTTPException(status_code=403,detail=constants.SECTION_ACCESS_DENIED_DETAIL)
 
     if section is None:
-        raise HTTPException(status_code=404, detail="Section with this Id does not exist")
+        raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
 
     if course is None:
-        raise HTTPException(status_code=404, detail="Course with this Id does not exist")
+        raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
     if section not in course.sections:
         raise HTTPException(status_code=403, detail="This section is not part of this course")
@@ -148,13 +153,13 @@ def delete_section(course_id: int,section_id: int,current_user: Annotated[User, 
     section = courses.get_section_by_id(section_id)
 
     if course.teacher.email != current_user.email:
-        raise HTTPException(status=403, detail="This user does not have permission to add sections to this course")
+        raise HTTPException(status=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
 
     if section is None:
-        raise HTTPException(status_code=404, detail="Section with this Id does not exist")
+        raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
 
     if course is None:
-        raise HTTPException(status_code=404, detail="Course with this Id does not exist")
+        raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
     if section not in course.sections:
         raise HTTPException(status=403, detail="This section is not part of this course")
@@ -169,11 +174,11 @@ async def add_content_to_section(course_id:int, section_id:int, title:str = Form
     course = courses.get_course_by_id(course_id)
     section = courses.get_section_by_id(section_id)
 
-    if current_user.role != "teacher" or course.teacher.email != current_user.email:
+    if current_user.role != constants.TEACHER_ROLE or course.teacher.email != current_user.email:
         raise HTTPException(status_code=403, detail="This user does not have permission to add sections to this course")
 
     elif not section:
-        raise HTTPException(status_code=404, detail="Section with this Id does not exist")
+        raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
 
     else:
 

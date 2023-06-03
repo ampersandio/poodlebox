@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<h1>{{user.role}}'s Profile | Your Courses: </h1> 
+<p>{{user.first_name}} {{user.last_name}}</p>
+<hr>
+
+
+
+{% for course in courses  %}
+    {% if course.teacher.email == user.email %}
+
+    <div class="row">
+        
+        <div class="col-lg-4 col-md-6 img-container">
+          {% if course.premium %}
+          <span class="badge bg-warning text-dark">Premium Course</span>
+          {% endif %}
+          {% if course.course_picture %}
+            <a href="./courses/{{course.id}}/"><img class="thumbnail rounded img-fluid" src="{{ url_for('assets', path=course.course_picture) }}" alt="" width="400" height="auto" class="img-fluid"></a>
+          {% else %}
+            <a href="./courses/{{course.id}}/"><img class="thumbnail rounded img-fluid" src="{{ url_for('assets', path='no_thumbnail.png') }}" alt="" width="400" height="auto" class="img-fluid"></a>
+          {% endif %}      
+        </div>
+  
+        <div class="col-xl-6 col-lg-4 col-md-6">
+          <a href="./courses/{{course.id}}"><h2 class="title">{{ course.title }}</h2></a>
+          <h6>{{ course.description }}</h6>
+          <p>by {{ course.teacher.first_name }} {{ course.teacher.last_name }}</p>
+          <br>
+  
+
+          <ul style="list-style-type: none;padding-left:0!important;">
+            {% for tag in course.tags %}
+              <a href="./?tag={{tag}}"><li class="tag" style="display: inline-block!important;">{{tag}}</li></a>
+            {% endfor %}
+          </ul>
+        </div>
+  
+        <div class="col-lg-2 col-md-12 text-end">
+          <div class="Stars" style="--rating: {{course.rating}};"></div>
+        </div>
+      </div>
+  
+      
+      <hr>
+    {% endif %}
+
+{% endfor %}
+
+{% endblock content %}

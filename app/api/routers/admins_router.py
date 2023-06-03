@@ -1,12 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request, File, UploadFile
+import api.utils.constants as constants
+
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 
-from api.services.authorization import get_current_user, get_oauth2_scheme
+from api.services.authorization import get_current_user
 from api.services.students import get_profile
 from api.services.courses import get_course_by_id, get_courses_students
 from api.services.admins import student_status, course_status, pending_registrations, approve_registration
 from api.services.users import get_user_by_id
-from api.utils.utils import teacher_approval, course_deactivated
+from api.utils.utils import teacher_approval_mail, course_deactivated_mail
 
 admins_router = APIRouter(prefix="/admins", tags=["Admins"])
 
@@ -18,13 +20,14 @@ def change_student_status(student_id: int, disabled: bool, current_user = Depend
     '''
 
     student = get_profile(student_id)
-    if student is None:
-        raise HTTPException(status_code=404, detail="Student with this Id does not exist")
 
-    if current_user.role == "admin":
+    if student is None:
+        raise HTTPException(status_code=404, detail=constants.STUDENT_NOT_FOUND_DETAIL)
+
+    if current_user.role == constants.ADMIN_ROLE:
         student_status(student_id, disabled)
     else:
-        raise HTTPException(status_code=403, detail="You're not allowed in the admin section")
+        raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     
     return JSONResponse(status_code=201, content="Students status updated")
 
@@ -38,18 +41,18 @@ def change_course_status(course_id: int, disabled: bool, current_user = Depends(
     course = get_course_by_id(course_id)
 
     if course is None:
-        raise HTTPException(status_code=404, detail="Course with this Id does not exist")
+        raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
     students = get_courses_students(course_id)
 
-    if current_user.role == "admin":
+    if current_user.role == constants.ADMIN_ROLE:
         course_status(course_id, disabled)
 
         for student in students:
-            course_deactivated(student, course.title)
+            course_deactivated_mail(student, course.title)
 
     else:
-        raise HTTPException(status_code=403, detail="You're not allowed in the admin section")
+        raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     
     return JSONResponse(status_code=201, content="Course status updated")
 
@@ -62,16 +65,16 @@ def remove_student_from_course(course_id: int, student_id: int, current_user = D
 
     course = get_course_by_id(course_id)
     if course is None:
-        raise HTTPException(status_code=404, detail="Course with this Id does not exist")
+        raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
     
     student = get_profile(student_id)
     if student is None:
-        raise HTTPException(status_code=404, detail="Student with this Id does not exist")
+        raise HTTPException(status_code=404, detail=constants.STUDENT_NOT_FOUND_DETAIL)
 
-    if current_user.role == "admin":
+    if current_user.role == constants.ADMIN_ROLE:
         remove_student_from_course(course_id,student_id)
     else:
-        raise HTTPException(status_code=403, detail="You're not allowed in the admin section")
+        raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     
     return JSONResponse(status_code=201, content="Student removed")
 
@@ -82,10 +85,10 @@ def get_pending(current_user = Depends(get_current_user)):
     Get Current Pending Registrations
     '''
 
-    if current_user.role == "admin":
+    if current_user.role == constants.ADMIN_ROLE:
         return pending_registrations()
     else:
-        raise HTTPException(status_code=403, detail="You're not allowed in the admin section")
+        raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
 
 
 @admins_router.put("/registrations/{teacher_id}")
@@ -96,16 +99,16 @@ def approve(teacher_id: int, current_user = Depends(get_current_user)):
 
     teacher = get_user_by_id(teacher_id)
 
-    teacher_approval(teacher)
+    teacher_approval_mail(teacher)
 
     if teacher is None:
-        raise HTTPException(status_code=404, detail="Teacher with this Id does not exist")
+        raise HTTPException(status_code=404, detail=constants.TEACHER_NOT_FOUND_DETAIL)
 
-    if current_user.role == "admin":
+    if current_user.role == constants.ADMIN_ROLE:
         approve_registration(teacher_id)
 
     else:
-        raise HTTPException(status_code=403, detail="You're not allowed in the admin section")
+        raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
 
     return JSONResponse(status_code=201, content="Teacher registration approved")
 
