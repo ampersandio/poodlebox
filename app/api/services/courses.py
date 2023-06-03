@@ -14,7 +14,7 @@ from api.data.models import (
     CourseShow,
     User,
 )
-
+from api.data import database
 
 def get_courses_anonymous():
     '''Get all the courses for a user that doesn't have an account'''

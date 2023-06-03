@@ -78,7 +78,7 @@ class StudentsServiceShould(unittest.TestCase):
    def test_update_password(self):
     mock_db.update_query.reaturn_value=None
     expected=None
-    result=students.change_password(1,"HIHI")
+    result=students.change_password(1,"NewPassword123")
     self.assertEqual(expected,result)
 
 
