@@ -1,15 +1,21 @@
-import api.utils.constants as constants
-
-from fastapi import APIRouter, Depends, HTTPException
-from api.services.students import enroll_in_course,get_students_number_courses_premium,check_enrollment_status
-from api.services.certificates import get_certificates,get_certificate_by_course
-from api.data.models import User, Subscription, StudentEdit
+from fastapi import APIRouter, Depends, HTTPException, Response, Header, Request
+from typing import Annotated, Optional
+from api.services.students import (
+    enroll_in_course,
+    get_students_number_courses_premium,
+    check_enrollment_status,
+)
+from api.services.certificates import get_certificates, get_certificate_by_course
+from api.data.models import User, Subscription, StudentEdit, CoursesShowStudent
 from api.services.authorization import get_current_user
 from api.services.courses import get_students_courses, get_student_course_by_id, get_course_by_id
 from api.services.students import get_students_courses_id
 from api.services.students import get_profile, change_password
 from api.services.authorization import hash_password
 from fastapi.responses import JSONResponse
+from fastapi_pagination import Page, paginate
+from api.data import database
+import api.utils.constants as constants
 
 
 students_router = APIRouter(prefix="/students", tags=["Students"])
@@ -38,7 +44,7 @@ def get_certificate_of_student_for_course(
     return result
 
 
-@students_router.get("/courses")
+@students_router.get("/courses", response_model=Page[CoursesShowStudent])
 def get_courses_for_student(
     current_user: User = Depends(get_current_user),
     sort=None,
@@ -59,7 +65,7 @@ def get_courses_for_student(
             result = sorted(result, key=lambda r: r.rating, reverse=sort == "desc")
         elif sort_by == "progress":
             result = sorted(result, key=lambda r: r.progress, reverse=sort == "desc")
-    return result
+    return paginate(result)
 
 
 @students_router.get("/profiles")

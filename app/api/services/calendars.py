@@ -7,8 +7,9 @@ from api.data.models import (
     EventChange,
     CalendarChange,
     EventCreate,
+    CalendarCreate
 )
-
+from api.data import database
 
 def get_all_calendars_students(student_id):
     """Get all the calendars for the coureses the student is currently enrolled in"""
@@ -54,8 +55,13 @@ def get_all_calendars_admin():
             calendars.append(calendar)
     return calendars   
 
-def create_calendar(calendar:Calendar,user_id):
-    insert_query("insert into calendars(name,owner,course_id) values(?,?,?)",(calendar.name,user_id,calendar.course_id))
+
+def create_calendar(calendar: CalendarCreate, user_id):
+    """Create a calendar"""
+    insert_query(
+        "insert into calendars(name,owner,course_id) values(?,?,?)",
+        (calendar.name, user_id, calendar.course_id),
+    )
 
 
 def get_calendar_by_id(calendar_id):

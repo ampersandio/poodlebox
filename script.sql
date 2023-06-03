@@ -79,6 +79,53 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8mb4;
 
+-- -----------------------------------------------------
+-- Table `poodle_box`.`calendars`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `poodle_box`.`calendars` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `owner` INT(11) NOT NULL,
+  `course_id` INT(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_calendars_users1_idx` (`owner` ASC) ,
+  CONSTRAINT `fk_calendars_users1`
+    FOREIGN KEY (`owner`)
+    REFERENCES `poodle_box`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  INDEX `fk_calendars_courses1_idx` (`course_id` ASC) ,
+  CONSTRAINT `fk_calendars_courses1`
+    FOREIGN KEY (`course_id`)
+    REFERENCES `poodle_box`.`courses` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8mb4;
+
+-- -----------------------------------------------------
+-- Table `poodle_box`.`events`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `poodle_box`.`events` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `calendar_id` INT(11) NOT NULL,
+  `start` DATETIME NOT NULL,
+  `end` DATETIME NOT NULL,
+  `link` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_events_calendars1_idx` (`calendar_id` ASC) ,
+  CONSTRAINT `fk_events_calendars1`
+    FOREIGN KEY (`calendar_id`)
+    REFERENCES `poodle_box`.`calendars` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 1
+DEFAULT CHARACTER SET = utf8mb4;
 
 -- -----------------------------------------------------
 -- Table `poodle_box`.`courses`
