@@ -1,6 +1,8 @@
 from api.data.database import read_query, insert_query, update_query
+import api.utils.constants as constants
 from mariadb import IntegrityError
 from api.data.models import (
+    SubscriptionStatus,
     TeacherShow,
     CourseShow,
     Section,
@@ -115,7 +117,7 @@ def get_students_courses(student_id):
             "select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,ifnull(round((count(distinct us.sections_id)/count(distinct s.id))*100),0) as progress,uc.subscriptions_id,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id join users u on u.id=c.owner join tags_has_courses ta on ta.courses_id=c.id join tags t on t.id=ta.tags_id left join sections s on s.courses_id=c.id left join sections se on se.courses_id=c.id left join users_has_sections us on us.sections_id=se.id  and us.users_id=?  join users_has_courses uc on uc.courses_id=c.id and uc.users_id=? where c.id=?",
             (student_id, student_id, x),
         )
-        print(data_course[0][:10])
+        # print(data_course[0][:10])
         owner = TeacherShow.read_from_query_result(*data_course[0][10:])
         course = CoursesShowStudent.read_from_query_result(
             *data_course[0][:10], teacher=owner, sections=list_sections
@@ -162,7 +164,7 @@ def create_course(course: CourseCreate, owner):
             id=insert_query("insert into tags(name) values(?)",(x,))
             list_of_tags.append(id)
         else:
-         list_of_tags.append(data[0][0])
+            list_of_tags.append(data[0][0])
 
     try:
         course_id = insert_query(
@@ -337,39 +339,33 @@ def section_update(section_id: int, section: SectionCreate):
     )
 
 
-def visited_section(user_id: int, section_id: int):
-    last_section = insert_query(
-        "insert into users_has_sections(users_id,sections_id) values(?,?);",
-        (
-            user_id,
-            section_id,
-        ),
-    )
+def visit_section(user_id: int, section_id: int):
+    visited_section = read_query("select * from users_has_sections where users_id = ? and sections_id = ?;", (user_id, section_id,))
+    
+    if not visited_section:
+        last_section = insert_query("insert into users_has_sections(users_id,sections_id) values(?,?);",(user_id,section_id,))
+        return last_section
+    else:
+        return None
 
 
 def n_sections_by_course_id(course_id: int) -> int:
-    return read_query(
-        "select c.title,c.id as course_id, count(*) as number_of_sections from sections as s join courses as c on s.courses_id = c.id where c.id = ? group by courses_id;",
-        (course_id,),
-    )
+    data = read_query("select c.title,c.id as course_id, count(*) as number_of_sections from sections as s join courses as c on s.courses_id = c.id where c.id = ? group by courses_id;",(course_id,))
+
+    return data[0][2]
 
 
 def n_visited_sections(user_id: int, course_id: int) -> int:
-    return read_query(
-        "select count(*) from users_has_sections as us join sections as s on us.sections_id = s.id where us.users_id = ? and s.courses_id = ?;",
-        (
-            user_id,
-            course_id,
-        ),
-    )
+    data = read_query("select count(*) from users_has_sections as us join sections as s on us.sections_id = s.id where us.users_id = ? and s.courses_id = ?;", (user_id,course_id,))
 
+    return data[0][0]
 
 def change_subscription(subscription: int, user_id: int, course_id: int):
-    update_query(
-        "update users_has_courses set subscriptions_id = ? where users_id = ? and courses_id = ?;",
-        (
-            subscription,
-            user_id,
-            course_id,
-        ),
-    )
+
+    subscription_data = read_query("select * from users_has_courses where users_id = ? and courses_id = ?;", (user_id, course_id,))
+    subscription_status = next((SubscriptionStatus.from_query(*data) for data in subscription_data),None)
+
+    if subscription_status.subscription == "Expired":
+        return None
+    else:
+        return update_query("update users_has_courses set subscriptions_id = ? where users_id = ? and courses_id = ?;", (subscription, user_id, course_id,))

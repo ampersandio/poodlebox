@@ -323,6 +323,15 @@ class TeachersReport(BaseModel):
 class Subscription(BaseModel):
     enroll: bool
 
+class SubscriptionStatus(BaseModel):
+    subscription:str
+    user_id:int
+    course_id:int
+
+    @classmethod
+    def from_query(cls,subscription:str,user_id:int,course_id:int):
+        return cls(subscription=subscription_from_id(subscription),user_id=user_id,course_id=course_id)
+
 class Student(BaseModel):
     id: int
     first_name: constr(min_length=1, max_length=20)

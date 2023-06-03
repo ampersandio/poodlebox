@@ -1,7 +1,7 @@
 import api.utils.constants as constants
 
 from fastapi import APIRouter,HTTPException,Depends, File, UploadFile,Form
-from config import settings
+from mariadb import IntegrityError
 from fastapi.responses import JSONResponse
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, TeachersReport
 from api.services.authorization import get_current_user
@@ -29,15 +29,18 @@ def get_report(current_user: Annotated[User, Depends(get_current_user)]) -> Teac
     return teachers_report
 
 
-@teachers_router.post("/courses/")
-def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(...),  current_user: User = Depends(get_current_user)):
+@teachers_router.post("/courses/", status_code=201)
+def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(None),  current_user: User = Depends(get_current_user)):
     '''
     Create course with thumbnail attached as a file: Upload = File(...)
     '''
 
-    course = CourseCreate( title=title, description=description,  objectives=objectives, premium=premium, tags=tags, course_picture=file.filename)
+    if file:
+        course = CourseCreate( title=title, description=description,  objectives=objectives, premium=premium, tags=tags, course_picture=file.filename)
+        file_upload(file, "course_thumbnails", course)
+    else:
+        course = CourseCreate( title=title, description=description,  objectives=objectives, premium=premium, tags=tags)
 
-    file_upload(file, "course_thumbnails", course)
 
     if current_user.role != constants.TEACHER_ROLE:
         raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
@@ -47,7 +50,8 @@ def course_create(title: str = Form(...), description: str = Form(...), objectiv
     
     try:
         new_course = courses.create_course(course, current_user.id)
-    except:
+
+    except IntegrityError:
         raise HTTPException(status_code=409, detail="A course with that title already exists")
     
     if new_course != None:

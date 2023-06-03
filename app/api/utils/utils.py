@@ -1,4 +1,5 @@
 import os, requests
+import api.utils.constants as constants
 
 from api.services.authorization import create_access_token
 from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User
@@ -13,11 +14,11 @@ auth = HTTPBasicAuth(settings.video_api_key, '')
 mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
 
 
-def generate_message(to_email,to_name,subject,text_part,html_part):
+def generate_message(to_email:str, to_name:str, subject:str, text_part:str, html_part:str):
     message = {'Messages': [
                     {
                             "From": {
-                                    "Email": "anedelev@gmail.com",
+                                    "Email": constants.ADMIN_EMAIL,
                                     "Name": "Poodlebox Admin"
                             },
                             "To": [
@@ -64,7 +65,7 @@ def user_registration_mail(information:StudentRegistration, host:str):
         to_email=information.email,
         to_name=information.first_name + " " + information.last_name,
         subject="Poodlebox Mail Verification",
-        text_part="Dear PoodleBox User",
+        text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )
 
@@ -85,7 +86,7 @@ def enrollment_mail(student:Student, course:Course, teacher:TeacherShow):
         to_email=teacher.email,
         to_name=teacher.first_name + " " + teacher.last_name,
         subject="New Student Enrollment in your course {course.title}",
-        text_part="Greetings",
+        text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )
 
@@ -106,7 +107,7 @@ def teacher_registration_mail(information:TeacherRegistration):
         to_email="anedelev@gmail.com",
         to_name=information.first_name + " " + information.last_name,
         subject="New Teacher Registered At Poodlebox",
-        text_part="Greetings",
+        text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )
 
@@ -127,7 +128,7 @@ def teacher_approval_mail(teacher:TeacherShow):
         to_email=teacher.email,
         to_name=teacher.first_name + " " + teacher.last_name,
         subject="Your Registration At Poodblebox Was Approved",
-        text_part="Greetings",
+        text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )
 
@@ -148,7 +149,7 @@ def course_deactivated_mail(student:User, course_title:str):
         to_email=student.email,
         to_name=student.first_name + " " + student.last_name,
         subject="Course you've been enrolled in, is now Inactive",
-        text_part="Greetings",
+        text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )
 
@@ -204,6 +205,7 @@ def file_upload(file:File,destination:str | None = None, title:str | None = None
         finally:
             file.file.close()
 
+
 def email_certificate(student:User,course_title):
     replacements = {
     '{student_first_name}':student.first_name,
@@ -217,7 +219,7 @@ def email_certificate(student:User,course_title):
         to_email=student.email,
         to_name=student.first_name + " " + student.last_name,
         subject=f"{course_title} completion",
-        text_part="Greetings",
+        text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )
 

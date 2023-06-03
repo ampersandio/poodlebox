@@ -17,8 +17,11 @@
 <hr>
 
 {% endif %}
-
+{% if message %}
 <h4 style="color:#grey;">{{message}}:</h4>
+{% else %}
+<h4 style="color:#grey;">Courses:</h4>
+{% endif %}
 <hr>
 
 
@@ -28,7 +31,7 @@
     <div class="row">
 
       <!-- CHECK USER ROLE-->
-      {% if user.role == "student" or user.role == w or user.role == "admin" %}
+      {% if user.role == "student" or user.role == "teacher" or user.role == "admin" %}
       
       <div class="col-lg-4 col-md-6 img-container">
         {% if course.premium %}

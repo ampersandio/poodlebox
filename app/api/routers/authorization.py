@@ -93,7 +93,7 @@ def login(form_data:Annotated[OAuth2PasswordRequestForm, Depends()]) -> dict:
     
     access_token_expires = timedelta(minutes=settings.access_token_expires_minutes)
     access_token = authorization_services.create_access_token({'sub': user.email}, expires_delta=access_token_expires)
-    print(access_token)
+
     return {"access_token": access_token, "token_type": "bearer"}
 
 

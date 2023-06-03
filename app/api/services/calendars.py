@@ -6,14 +6,18 @@ def get_all_calendars_students(student_id):
     courses=read_query("select group_concat(distinct courses_id) from users_has_courses where users_id=? and subscriptions_id=1",(student_id,))
     if courses==[(None,)]:
        return []
+    
+    # print(courses)
     list_of_courses=[int(x) for x in courses[0][0].split(",")]
+
     calendars=[]
     for x in list_of_courses:
         calendar_data=read_query("select id,name,course_id,owner from calendars where course_id=?",(x,))
         if calendar_data!=[]:
-         calendar=(Calendar.read_from_query_result(*row) for row in calendar_data)
-         calendars.append(calendar)
+            calendar=(Calendar.read_from_query_result(*row) for row in calendar_data)
+            calendars.append(calendar)
     return calendars
+
 
 def get_all_callendars_teacher(teacher_id):
     courses=read_query("select group_concat(distinct id) from courses where owner=?",(teacher_id,))
@@ -24,21 +28,24 @@ def get_all_callendars_teacher(teacher_id):
     for x in list_of_courses:
         calendar_data=read_query("select id,name,course_id,owner from calendars where course_id=?",(x,))
         if calendar_data!=[]:
-         calendar=(Calendar.read_from_query_result(*row) for row in calendar_data)
-         calendars.append(calendar)
+            calendar=(Calendar.read_from_query_result(*row) for row in calendar_data)
+            calendars.append(calendar)
     return calendars 
+
 
 def get_all_calendars_admin():
     calendars=[]
     calendar_data=read_query("select id,name,course_id,owner from calendars")
     if calendar_data!=[]:
-     for x in calendar_data:
-      calendar=(Calendar.read_from_query_result(*x))
-      calendars.append(calendar)
+        for x in calendar_data: 
+            calendar=(Calendar.read_from_query_result(*x))
+            calendars.append(calendar)
     return calendars   
+
 
 def create_calendar(calendar:Calendar,user_id):
     insert_query("insert into calendars(name,owner,course_id) values(?,?,?)",(calendar.name,user_id,calendar.course_id))
+
 
 def get_calendar_by_id(calendar_id):
     calendar_and_teacher_data=read_query("select c.id,c.name,c.course_id,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from calendars c join users u on c.owner=u.id where c.id=?",(calendar_id,))

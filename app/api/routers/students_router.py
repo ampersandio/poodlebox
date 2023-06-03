@@ -87,11 +87,7 @@ def get_course_for_student_by_id(
 
 
 @students_router.put("/courses/{course_id}")
-def enroll_or_unenroll_from_course(
-    course_id:int,
-    subscription: Subscription,
-    current_user: User = Depends(get_current_user),
-):  
+def enroll_or_unenroll_from_course(course_id:int, subscription: Subscription, current_user: User = Depends(get_current_user)):  
     course=get_course_by_id(course_id)
     if course is None:
         raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)

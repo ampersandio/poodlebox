@@ -13,3 +13,10 @@ TEACHER_NOT_FOUND_DETAIL = "Student with this ID does not exist"
 CALENDAR_NOT_FOUND_DETAIL = "Calendar not found"
 EVENT_NOT_FOUND_DETAIL = "Event not found"
 
+ADMIN_EMAIL = "anedelev@gmail.com"
+
+SUBSCRIPTION_EXPIRED = 3
+SUBSCRIPTION_PENDING = 2
+SUBSCRIPTION_ACTIVE = 1
+
+MAIL_TEXT_PART = "Greetings from Poodlebox"

@@ -1,9 +1,12 @@
 import api.utils.constants as constants
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
+
 from typing import Annotated
 from api.services import courses
 from api.data.models import User
+from mariadb import IntegrityError
 from api.services.authorization import get_current_user, get_oauth2_scheme
 from api.services.students import get_students_courses_id
 from api.utils.utils import email_certificate
@@ -39,7 +42,7 @@ def get_all_courses(token: str | None = Depends(custom_oauth2_scheme), title=Non
 
     return result
 
-
+# should fix this 
 @courses_router.get("/popular")
 def get_most_popular_courses(request: Request):
     return courses.get_most_popular()
@@ -78,39 +81,26 @@ def get_course_sections(
 
 
 @courses_router.get("/{course_id}/sections/{section_id}")
-def get_section_by_id(
-    course_id: int,
-    section_id: int,
-    current_user: Annotated[User, Depends(get_current_user)],
-):
+def get_section_by_id(course_id:int, section_id:int, current_user: User = Depends(get_current_user)):
+
     course = courses.get_course_by_id(course_id)
     student_courses = get_students_courses_id(current_user.id)
-
-    if (
-        current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE]
-        and course.id not in student_courses
-    ):
-        raise HTTPException(
-            status_code=401, detail=constants.SECTION_ACCESS_DENIED_DETAIL
-        )
-
-    if course is None:
-        raise HTTPException(
-            status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL
-        )
-
     section = courses.get_section_by_id(section_id)
 
-    if section is None:raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
+    if current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE] and course.id not in student_courses:
+        raise HTTPException(status_code=401, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
+
+    if course is None:
+        raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
+
+    if section is None:
+        raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
 
     if current_user.role == constants.STUDENT_ROLE:
-        courses.visited_section(current_user.id, section.id)
+        courses.visit_section(current_user.id, section.id)
     
-    print(courses.n_visited_sections(current_user.id,course.id))
-    print(courses.n_sections_by_course_id(course.id)[0][2])
-
-    if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id)[0][0] == courses.n_sections_by_course_id(course.id)[0][2]:
-        courses.change_subscription(3, current_user.id, course.id)
-        email_certificate(current_user,course.title)
+    if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
+        if courses.change_subscription(constants.SUBSCRIPTION_EXPIRED, current_user.id, course.id) is not None:
+            email_certificate(current_user,course.title)
 
     return section

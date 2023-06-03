@@ -96,15 +96,14 @@ def form_data(request: Request, username: str = Form(...), password: str = Form(
 
         if token:
             headers["authorization"] = f"Bearer {token}"
-        popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
 
+        popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
         courses = get_courses(request, token)
-        response = templates.TemplateResponse(
-            "index.html",
-            {"request": request, "user": user, "courses": courses, "headers": headers, "most_popular": popular_courses.json()}
-        )
+        
+        response = templates.TemplateResponse("index.html",{"request": request, "user": user, "courses": courses, "headers": headers, "most_popular": popular_courses.json()})
         response.set_cookie(key="token", value=token)
         return response
+    
     else:
         return templates.TemplateResponse("message.html", {"request": request, "message": "Login Invalid"})
     
@@ -127,16 +126,16 @@ def course(request: Request, course_id:int, section_id:int):
     host = "http://" + request.headers["host"]
     course = get_course_by_id(course_id)
 
-    section = get_section_by_id(section_id)
+    # section = get_section_by_id(section_id)
 
     try:
         cookie_header = request.headers.get("cookie")[6:]
         user = get_current_user(cookie_header)
-
+        section = requests.get(f"{host}/api/courses/{course_id}/sections/{section_id}", headers={"authorization": f"Bearer {cookie_header}"})
     except:
         pass
 
-    return templates.TemplateResponse("section.html", {"request": request, "user": user, "course":course, "section":section, "host":host} )
+    return templates.TemplateResponse("section.html", {"request": request, "user": user, "course":course, "section":section.json(), "host":host} )
 
 
 
@@ -180,8 +179,8 @@ def register(
     data = user_registration_mail(username,host)
     result = mailjet.send.create(data=data)
 
-    print (result.status_code)
-    print (result.json())
+    # print (result.status_code)
+    # print (result.json())
 
     return templates.TemplateResponse("message.html", {"request": request})
 
