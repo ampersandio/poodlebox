@@ -15,6 +15,7 @@ from api.services.authorization import hash_password
 from fastapi.responses import JSONResponse
 from fastapi_pagination import Page, paginate
 from api.data import database
+import api.utils.constants as constants
 
 
 students_router = APIRouter(prefix="/students", tags=["Students"])
