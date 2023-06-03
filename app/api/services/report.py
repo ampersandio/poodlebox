@@ -29,6 +29,7 @@ def get_teachers_report(teacher: User) -> TeachersReport | None:
     teachers_report = TeachersReport(
         teacher_id=teacher.id,
         teacher_name=teacher.first_name + ' ' + teacher.last_name,
+        teacher_email=teacher.email,
         courses_users_reviews=[]
     )
 

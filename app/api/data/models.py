@@ -250,7 +250,6 @@ class CourseUserReview(BaseModel):
     user_id: int
     full_name: str
     email: EmailStr
-    email: str
     subscription: str
     role: str
     completed_sections: float
@@ -323,7 +322,52 @@ class CourseViewForReport(BaseModel):
 class TeachersReport(BaseModel):
     teacher_id: int
     teacher_name: str
+    teacher_email: str
     courses_users_reviews: list[CourseViewForReport]
+
+
+class TeacherProfile(BaseModel):
+    email: EmailStr
+    first_name: constr(min_length=1, max_length=20)
+    last_name: constr(min_length=1, max_length=20)
+    phone_number: str | None
+    date_of_birth: date
+    verified_email: bool
+    approved: bool | None
+    role: str
+    linked_in_profile: str | None
+    profile_picture: str | None
+
+    @classmethod
+    def from_user(cls, user: User):
+        return cls(
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            phone_number=user.phone_number,
+            date_of_birth=user.date_of_birth,
+            verified_email=user.verified_email,
+            approved=user.approved,
+            role=user.role,
+            linked_in_profile=user.linked_in_profile,
+            profile_picture=user.profile_picture
+        )
+
+
+class EditTeacherProfile(BaseModel):
+    new_password: str | None
+    new_password_again: str | None
+    phone_number: str | None
+    linked_in_profile: str | None
+    profile_picture: str | None
+
+    @classmethod
+    def from_user(cls, user: User):
+        return cls(
+            phone_number=user.phone_number,
+            linked_in_profile=user.linked_in_profile,
+            profile_picture=user.profile_picture
+        )
 
 
 class Review(BaseModel):

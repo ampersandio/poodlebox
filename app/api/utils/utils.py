@@ -1,5 +1,5 @@
 from api.services.authorization import create_access_token
-from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User, CourseCreate
+from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User, CourseCreate, TeachersReport
 from fastapi import File
 from config import settings
 from mailjet_rest import Client
@@ -69,6 +69,28 @@ def user_registration(information:StudentRegistration, host:str):
 
     result = mailjet.send.create(data=message)
 
+    print(result.status_code)
+    print(result.json())
+
+
+def mail_teachers_report(information:TeachersReport):
+
+    replacements = {
+        '{teacher_name}':information.teacher_name,
+        '{teachers_report}': information,
+    }
+
+    html_template = generate_template("api/utils/mail_templates/teachers_report.html", replacements)
+
+    message = generate_message(
+        to_email=information.teacher_email,
+        to_name=information.teacher_name,
+        subject="Teacher's Report",
+        text_part="Dear Teacher",
+        html_part=html_template
+    )
+
+    result = mailjet.send.create(data=message)
     print(result.status_code)
     print(result.json())
 
