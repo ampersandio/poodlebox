@@ -15,12 +15,19 @@ courses_router = APIRouter(prefix="/courses", tags=["Courses"])
 
 custom_oauth2_scheme = get_oauth2_scheme(auto_error=False)
 
-@courses_router.get("/")
-def get_all_courses(token: str | None = Depends(custom_oauth2_scheme), title=None, tag=None,  sort=None,  sort_by=None):
 
-    if token:
-        user = get_current_user(token)
-        if user.role == constants.TEACHER_ROLE:
+@courses_router.get("/")
+def get_all_courses(
+    current_user: User | None = Depends(custom_oauth2_scheme),
+    title=None,
+    tag=None,
+    sort=None,
+    sort_by=None,
+):
+    """Get all the courses that the current user has access to"""
+    if current_user:
+        user = get_current_user(current_user)
+        if user.role == "teacher":
             result = courses.get_courses_teacher()
         elif user.role == constants.STUDENT_ROLE:
             result = courses.get_courses_student(user.id)
@@ -45,11 +52,15 @@ def get_all_courses(token: str | None = Depends(custom_oauth2_scheme), title=Non
 # should fix this 
 @courses_router.get("/popular")
 def get_most_popular_courses(request: Request):
+    """Get the most popular courses"""
     return courses.get_most_popular()
 
 
 @courses_router.get("/{course_id}")
-def get_course_by_id(course_id: int, current_user: Annotated[User, Depends(get_current_user)]):
+def get_course_by_id(
+    course_id: int, current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Get a course by its id"""
     result = courses.get_course_by_id(course_id)
     if result is None:
         raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
@@ -68,6 +79,7 @@ def get_course_sections(
     current_user: Annotated[User, Depends(get_current_user)],
     search: str | None = None,
 ):
+    """Get all the sections of a particular course"""
     course = courses.get_course_by_id(course_id)
 
     if (current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE]) and (
@@ -81,8 +93,12 @@ def get_course_sections(
 
 
 @courses_router.get("/{course_id}/sections/{section_id}")
-def get_section_by_id(course_id:int, section_id:int, current_user: User = Depends(get_current_user)):
-
+def get_section_by_id(
+    course_id: int,
+    section_id: int,
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    """Get a specific section from a course by its id"""
     course = courses.get_course_by_id(course_id)
     student_courses = get_students_courses_id(current_user.id)
     section = courses.get_section_by_id(section_id)
