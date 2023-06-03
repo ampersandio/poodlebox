@@ -17,8 +17,11 @@
 <hr>
 
 {% endif %}
-
-<h4 style="color:#grey;"> Available Courses:</h4>
+{% if message %}
+<h4 style="color:#grey;">{{message}}:</h4>
+{% else %}
+<h4 style="color:#grey;">Courses:</h4>
+{% endif %}
 <hr>
 
 
@@ -76,12 +79,13 @@
         <div class="Stars" style="--rating: {{course.rating}};"></div>
       </div>
     </div>
+
+    
     <hr>
 
   {% endfor %}
 {% endif %}
 
-<hr>
 {% if most_popular %}
 <h4>Popular Courses:</h4>
 <div class="col-lg-12 mt-4">
@@ -90,18 +94,35 @@
     {% for course in most_popular %}
 
       <div>
-        <div class="card" style="width: 18rem;">
+        {% if user.role == "student" or user.role == "teacher" or user.role == "admin" %}
+
+        <div class="card" style="width: 19rem;">
             {% if course.course_picture %}
-            <img class="card-img-top" src="{{ url_for('assets', path=course.course_picture) }}" width="320" height="auto" alt="">
+            <a href="./courses/{{course.id}}" ><img class="card-img-top" src="{{ url_for('assets', path=course.course_picture) }}" width="320" height="auto" alt=""></a>
             {% else %}
-            <img class="card-img-top" src="{{ url_for('assets', path='no_thumbnail.png') }}" width="320" height="auto" alt="">
+            <a href="./courses/{{course.id}}" ><img class="card-img-top" src="{{ url_for('assets', path='no_thumbnail.png') }}" width="320" height="auto" alt=""></a>
             {% endif %}
           <div class="card-body">
             <h5 style="height: 60px;" class="card-title">{{course.title}}</h5>
             <p class="card-text">{{course.description[:22] + '...' if course.description|length > 22 else course.description}}</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+            <a href="#" class="btn btn-primary popular_btn">Take a Look</a>
           </div>
         </div>
+        {% else %}
+
+        <div class="card" style="width: 19rem;">
+          {% if course.course_picture %}
+          <a href="" ><img class="card-img-top" src="{{ url_for('assets', path=course.course_picture) }}" width="320" height="auto" alt=""></a>
+          {% else %}
+          <a href="" ><img class="card-img-top" src="{{ url_for('assets', path='no_thumbnail.png') }}" width="320" height="auto" alt=""></a>
+          {% endif %}
+        <div class="card-body">
+          <h5 style="height: 60px;" class="card-title">{{course.title}}</h5>
+          <p class="card-text">{{course.description[:22] + '...' if course.description|length > 22 else course.description}}</p>
+          <a href="#" class="btn btn-primary popular_btn">Take a Look</a>
+        </div>
+      </div>
+      {% endif %}
       </div>
 
     {% endfor %}
@@ -109,6 +130,7 @@
   <br>
   </div>
 <br>
+
 
 {% endif %}
 
