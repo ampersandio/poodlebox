@@ -3,8 +3,12 @@ from config import settings
 from fastapi.templating import Jinja2Templates
 from api.services.authorization import get_current_user, create_access_token, authenticate_user
 from api.services.courses import get_course_by_id,get_students_courses,get_section_by_id
+from api.services.users import register_student
+
 from api.utils.utils import user_registration_mail 
 from mailjet_rest import Client
+
+from api.data.models import StudentRegistration
 
 
 import requests
@@ -86,13 +90,13 @@ def index(request: Request,tag:str=None):
 
 
 @frontend_router.post("/")
-def form_data(request: Request, username: str = Form(...), password: str = Form(...)):
-    user = authenticate_user(username, password)
+def form_data(request: Request, email: str = Form(...), password: str = Form(...)):
+    user = authenticate_user(email, password)
     host = "http://" + request.headers["host"]
     headers = {}
 
     if user is not None:
-        token = create_access_token({"sub": username})
+        token = create_access_token({"sub": email})
 
         if token:
             headers["authorization"] = f"Bearer {token}"
@@ -125,7 +129,7 @@ def course(request: Request,course_id:int):
 def course(request: Request, course_id:int, section_id:int):
     host = "http://" + request.headers["host"]
     course = get_course_by_id(course_id)
-
+    
     # section = get_section_by_id(section_id)
 
     try:
@@ -168,21 +172,36 @@ def register(request:Request):
 
 
 @frontend_router.post("/register")
-def register(
-        request:Request, 
-        username: str = Form(...),
-        password: str = Form(...),
-        email: str = Form(...),
-        date_of_birth:str = Form(...)):
-    
+def register(request: Request, email: str = Form(...), first_name: str = Form(...), last_name: str = Form(...),
+             password: str = Form(...), date_of_birth: str = Form(...)):
     host = "http://" + request.headers["host"]
-    data = user_registration_mail(username,host)
-    result = mailjet.send.create(data=data)
 
-    # print (result.status_code)
-    # print (result.json())
+    # Prepare the request data
+    data = {
+        'email': email,
+        'first_name': first_name,
+        'last_name': last_name,
+        'password': password,
+        'date_of_birth': date_of_birth
+    }
 
-    return templates.TemplateResponse("message.html", {"request": request})
+    url = f'{host}/api/authorization/registration/students'
+    response = requests.post(url, json=data)
+
+    status_code = response.status_code
+    # content = response.json()
+
+    student = StudentRegistration(email=email, first_name=first_name, last_name=last_name, password=password,
+                                 date_of_birth=date_of_birth)
+
+    data = user_registration_mail(student, host)
+
+    mailjet.send.create(data=data)
+
+    if status_code == 201:
+        return templates.TemplateResponse("message.html", {"request": request})
+    else:
+        pass
 
 
 @frontend_router.get("/logout", tags=["Frontend"])
