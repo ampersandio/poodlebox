@@ -15,8 +15,8 @@ EVENT_NOT_FOUND_DETAIL = "Event not found"
 
 ADMIN_EMAIL = "anedelev@gmail.com"
 
+MAIL_TEXT_PART = "Greetings from Poodlebox"
+
 SUBSCRIPTION_EXPIRED = 3
 SUBSCRIPTION_PENDING = 2
 SUBSCRIPTION_ACTIVE = 1
-
-MAIL_TEXT_PART = "Greetings from Poodlebox"

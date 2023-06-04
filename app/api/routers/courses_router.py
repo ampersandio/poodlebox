@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from typing import Annotated
 from api.services import courses
 from api.data.models import User, Section, CourseShow
-from fastapi_pagination import Page, paginate, CourseShow
+from fastapi_pagination import Page, paginate
 from api.services.authorization import get_current_user, get_oauth2_scheme
 from api.services.students import get_students_courses_id
 from api.utils.utils import email_certificate
