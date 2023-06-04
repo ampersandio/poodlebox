@@ -7,7 +7,7 @@ from api.services import courses
 from api.data.models import User, Section, CourseShow
 from fastapi_pagination import Page, paginate
 from api.services.authorization import get_current_user, get_oauth2_scheme
-from api.services.students import get_students_courses_id
+from api.services.students import get_students_courses_id, check_enrollment_status
 from api.utils.utils import email_certificate
 from fastapi_pagination import Page,paginate
 
@@ -111,7 +111,7 @@ def get_section_by_id(course_id: int,section_id: int,current_user: Annotated[Use
         courses.visit_section(current_user.id, section.id)
     
     if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
-        if courses.change_subscription(constants.SUBSCRIPTION_EXPIRED, current_user.id, course.id) is not None:
+        if check_enrollment_status(current_user.id,course_id) == "1" and courses.change_subscription(constants.SUBSCRIPTION_EXPIRED, current_user.id, course.id) is not None:
             email_certificate(current_user,course.title)
-
+            
     return section
