@@ -26,6 +26,7 @@ test:
     - echo $API_KEY
     - echo $API_SECRET
     - echo $VIDEO_API_KEY
+    
     - python3 -m unittest tests/sections_services_test.py
     - python3 -m unittest tests/calendars_services_test.py
     - python3 -m unittest tests/certificates_service_test.py
