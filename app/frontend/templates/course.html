@@ -35,7 +35,7 @@
 </div>
 <hr>
 <ul>
-{% for section in  course.sections %}
+{% for section in  sections %}
 <div class="section">
 {% if course.id in user.subscriptions or user.role == "teacher" %}
 <a class="un" href="./sections/{{section.id}}"><li>{{section.title}}</li></a>
