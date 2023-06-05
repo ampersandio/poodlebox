@@ -76,19 +76,19 @@ def get_calendar_by_id(calendar_id,db=None):
     calendar=Calendar.read_from_query_result(*data[0])
     return calendar
 
+def get_events_by_calendar_id(calendar_id,db=None):
+    ''''Get events for a specific calendar'''
+    if db is None:
+        db=database.read_query
+    data=db("select id,name,start,end,link from events where calendar_id=?",(calendar_id,))
+    if data==[]:
+        return []
+    events=[]
+    for x in data:
+        event=Event.read_from_query_result(*x)
+        events.append(event)
+    return events
 
-# def get_events_by_calendar_id(calendar_id,db=None):
-#     ''''Get events for a specific calendar'''
-#     if db is None:
-#         db=database.read_query
-#     data=db("select id,name,start,end,link from events where calendar_id=?",(calendar_id,))
-#     if data==[]:
-#         return []
-#     events=[]
-#     for x in data:
-#         event=Event.read_from_query_result(*x)
-#         events.append(event)
-#     return events
 
 
 def create_event_in_calendar(event: EventCreate, calendar_id, db=None):
