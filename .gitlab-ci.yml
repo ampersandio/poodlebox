@@ -15,7 +15,17 @@ test:
     - pip3 install --upgrade mariadb
     - pip3 install email-validator
     - cd app/
-
+    - echo $DB_NAME
+    - echo $DB_HOST
+    - echo $DB_USER
+    - echo $DB_PASSWORD
+    - echo $DB_PORT
+    - echo $SECRET_KEY
+    - echo $ACCESS_TOKEN_EXPIRES_MINUTES
+    - echo $ALGORITHM
+    - echo $API_KEY
+    - echo $API_SECRET
+    - echo $VIDEO_API_KEY
     - python3 -m unittest tests/sections_services_test.py
     - python3 -m unittest tests/calendars_services_test.py
     - python3 -m unittest tests/certificates_service_test.py
