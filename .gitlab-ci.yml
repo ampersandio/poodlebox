@@ -1,10 +1,5 @@
 stages:
-  - setup
-  - sections
-  - calendars
-  - certificates
-  - courses
-  - students
+  - test
 
 setup:
   stage: setup
@@ -19,7 +14,7 @@ setup:
     - pip3 install mariadb==1.1.6
     - pip3 install --upgrade mariadb
     - pip3 install email-validator
-
+    - cd app/
     - echo $DB_NAME
     - echo $DB_HOST
     - echo $DB_USER
@@ -32,38 +27,8 @@ setup:
     - echo $API_SECRET
     - echo $VIDEO_API_KEY
 
-sections_test:
-  stage: sections
-  image: python:3.10
-  script:
-    - cd app/
     - python3 -m unittest tests/sections_services_test.py
-
-
-calendars_test:
-  stage: calendars
-  image: python:3.10
-  script:
-    - cd app/
     - python3 -m unittest tests/calendars_services_test.py
-
-certificates_test:
-  stage: certificates
-  image: python:3.10
-  script:
-    - cd app/
     - python3 -m unittest tests/certificates_service_test.py
-
-courses_test:
-  stage: courses
-  image: python:3.10
-  script:
-    - cd app/
     - python3 -m unittest tests/courses_service_test.py
-
-students_test:
-  stage: students
-  image: python:3.10
-  script:
-    - cd app/
     - python3 -m unittest tests/students_services_test.py
