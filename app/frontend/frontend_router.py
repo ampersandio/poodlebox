@@ -3,7 +3,7 @@ from config import settings
 from fastapi.templating import Jinja2Templates
 from api.services.authorization import get_current_user, create_access_token, authenticate_user
 from api.services.courses import get_course_by_id,get_students_courses,get_section_by_id
-from api.services.users import register_student
+from api.utils.utils import constants 
 
 from api.utils.utils import user_registration_mail 
 from mailjet_rest import Client
@@ -61,32 +61,63 @@ def index(request: Request,tag:str=None):
     return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses,  "most_popular": popular_courses.json(), "message":message} )
 
 
+'''
+@students_router.put("/courses/{course_id}")
+def enroll_or_unenroll_from_course(
+    course_id: int,
+    subscription: Subscription,
+    current_user: User = Depends(get_current_user),
+):
+'''
+
+@frontend_router.get("/courses/{course_id}/enroll")
+def enroll(request:Request, course_id:int):
+    host = "http://" + request.headers["host"]
+    token = request.cookies.get("token")
+    headers = {}
+
+    headers["authorization"] = f"Bearer {token}"
+    payload = {
+        'enroll': True
+    }
+    
+    result = requests.put(f"{host}/api/students/courses/{course_id}", json=payload, headers=headers)
+
+    if result.status_code == 201:
+        return templates.TemplateResponse("message.html", {"request": request, "message": "Your request has been sent for review"})
+    else:
+        return templates.TemplateResponse("message.html", {"request": request, "message": "You're already enrolled in this course"})
 
 
 @frontend_router.get("/profile")
-def index(request: Request,tag:str=None):
-    host = "http://" + request.headers["host"]
-    headers = {}
-    
+def index(request: Request):
     token = request.cookies.get("token")
+    host = "http://" + request.headers["host"]
+
+    headers = {}
 
     try:
         user = get_current_user(token)
-        courses = get_courses(request, token, tag=tag)
+        courses = get_courses(request, token)
     except:
-        user = None
+        user = None   
 
     if token:
         headers["authorization"] = f"Bearer {token}"
 
-    if tag:
-        message = f"Courses tagged with {tag}"
+    popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
+
+    popular_courses.json()
+
+    if user.role == constants.TEACHER_ROLE:
+        # enrollments = user.
+        courses = [course for course in courses["items"] if course["teacher"]["email"] == user.email] 
+    elif user.role == constants.STUDENT_ROLE:
+        courses = get_students_courses(user.id)
     else:
-        message = "Available Courses"
+        raise HTTPException(constants.COURSE_ACCESS_DENIED_DETAIL)
 
-    return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses, "message":message} )
-
-
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses,"most_popular": popular_courses.json()} )
 
 
 @frontend_router.post("/")
@@ -128,19 +159,21 @@ def course(request: Request,course_id:int):
 @frontend_router.get("/courses/{course_id}/sections/{section_id}")
 def course(request: Request, course_id:int, section_id:int):
     host = "http://" + request.headers["host"]
+
+    token = request.cookies.get("token")
     course = get_course_by_id(course_id)
-    
-    # section = get_section_by_id(section_id)
+    headers = {'Authorization': f'Bearer {token}'}
+    # # section = get_section_by_id(section_id)
 
     try:
-        cookie_header = request.headers.get("cookie")[6:]
-        user = get_current_user(cookie_header)
-        section = requests.get(f"{host}/api/courses/{course_id}/sections/{section_id}", headers={"authorization": f"Bearer {cookie_header}"})
+
+        user = get_current_user(token)
+        section = requests.get(f"{host}/api/courses/{course_id}/sections/{section_id}", headers=headers)
+
     except:
         pass
 
     return templates.TemplateResponse("section.html", {"request": request, "user": user, "course":course, "section":section.json(), "host":host} )
-
 
 
 @frontend_router.get("/search")
@@ -151,14 +184,15 @@ def search(request: Request, search_query: str):
         cookie_header = request.headers.get("cookie")[6:]
         user = get_current_user(cookie_header)
 
-        courses = requests.get(f"{host}/api/courses?title={search_query}", headers={"AuThoRizaTion": f"Bearer {cookie_header}"})
+        courses = requests.get(f"{host}/api/courses?title={search_query}", headers={"authorization": f"Bearer {cookie_header}"})
         courses = courses.json()
 
         return templates.TemplateResponse("index.html", {"request": request, "user":user, "courses":courses})
     
     except:
         courses = requests.get(f"{host}/api/courses?title={search_query}")
-        return templates.TemplateResponse("index.html", {"request": request, "courses":courses.json()})
+        courses = courses.json()
+        return templates.TemplateResponse("index.html", {"request": request, "courses":courses})
 
 
 @frontend_router.get("/login")

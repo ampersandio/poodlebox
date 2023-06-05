@@ -91,14 +91,18 @@ def get_course_sections(course_id: int, current_user: User = Depends(get_current
 
 
 @courses_router.get("/{course_id}/sections/{section_id}")
-def get_section_by_id(course_id: int,section_id: int,current_user: Annotated[User, Depends(get_current_user)]):
+def get_section_by_id(course_id:int ,section_id:int ,current_user:Annotated[User, Depends(get_current_user)]):
     """Get a specific section from a course by its id"""
 
     course = courses.get_course_by_id(course_id)
     student_courses = get_students_courses_id(current_user.id)
     section = courses.get_section_by_id(section_id)
 
-    if current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE] and course.id not in student_courses:
+
+    if current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE]:
+        raise HTTPException(status_code=401, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
+    
+    if current_user.role == constants.STUDENT_ROLE and course.id not in student_courses:
         raise HTTPException(status_code=401, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
 
     if course is None:
@@ -113,5 +117,5 @@ def get_section_by_id(course_id: int,section_id: int,current_user: Annotated[Use
     if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
         if check_enrollment_status(current_user.id,course_id) == "1" and courses.change_subscription(constants.SUBSCRIPTION_EXPIRED, current_user.id, course.id) is not None:
             email_certificate(current_user,course.title)
-            
+     
     return section
