@@ -87,7 +87,7 @@ def get_events_by_calendar_id(calendar_id,db=None):
     for x in data:
         event=Event.read_from_query_result(*x)
         events.append(event)
-    # return events
+    return events
 
 
 
