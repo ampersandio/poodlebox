@@ -188,3 +188,5 @@ async def add_content_to_section(course_id:int, section_id:int, title:str = Form
     courses.add_content(section_id, content)
     return JSONResponse(status_code=201, content={"msg": "Content created"})
 
+
+# Delete Content

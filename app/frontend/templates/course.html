@@ -11,8 +11,11 @@
       {% if course.teacher.email == user.email %}
         <button type="button" class="btn btn-primary mt-4">Edit</button>
       {% endif %}
-      {% if user.role == "student" and course not in student_courses%}
-        <button type="button" class="btn btn-primary mt-4">Enroll</button>
+
+      {% if user.role == "student" and course.id not in student_courses|map(attribute='id') %}
+        <form action="./enroll" method="GET">
+        <button type="submit" class="btn btn-primary mt-4">Enroll</button>
+        </form>
       {% endif %} 
     </div>
   </div>
@@ -34,9 +37,11 @@
 <ul>
 {% for section in  course.sections %}
 <div class="section">
-    
+{% if course.id in user.subscriptions or user.role == "teacher" %}
 <a class="un" href="./sections/{{section.id}}"><li>{{section.title}}</li></a>
-
+{% else %}
+<a class="un" href=""><li>{{section.title}}</li></a>
+{% endif %}
 </div>
 {% endfor %}
 </ul>
