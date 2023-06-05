@@ -56,7 +56,7 @@ class CourseServiceShould(unittest.TestCase):
         self.assertEqual(expected,result) 
     
     def test_get_course_byIdNoData(self):
-        db=lambda q,id:[]
+        db=lambda q,id:[(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)]
         expected=None
         result=courses.get_course_by_id(2,db)
         self.assertEqual(expected,result)
