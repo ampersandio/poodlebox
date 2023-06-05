@@ -13,6 +13,6 @@ test:
     - pip3 install -r requirements.txt
     - pip3 install mariadb==1.1.6
     - pip3 install --upgrade mariadb
-    - pip3 install pydantic[email]
+    - pip install pydantic[email]
     - cd app/
     - python3 -m unittest tests/sections_services_test.py
