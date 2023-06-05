@@ -10,7 +10,6 @@ from api.data.models import (
     Content,
     ContentCreate,
     Course,
-    CourseShowId,
     CoursesShowStudent,
     CourseCreate,
     CourseShow,
@@ -18,9 +17,11 @@ from api.data.models import (
 )
 from api.data import database
 
-def get_courses_anonymous():
+def get_courses_anonymous(db=None):
     '''Get all the courses for a user that doesn't have an account'''
-    data = read_query(
+    if db is None:
+        db=database.read_query
+    data = db(
         "select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,c.course_picture,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id where c.premium=0 group by c.id,c.title,c.description,c.objectives,c.price,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile,c.premium,u.id"
     )
     list_courses = []
@@ -31,9 +32,11 @@ def get_courses_anonymous():
     return list_courses
 
 
-def get_courses_teacher():
+def get_courses_teacher(db=None):
     '''Get all the courses in the database'''
-    data = read_query(
+    if db is None:
+        db=database.read_query
+    data = db(
         "select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,c.course_picture,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id group by c.id,c.title,c.description,c.objectives,c.price,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile,c.premium,u.id"
     )
     list_courses = []
@@ -44,18 +47,14 @@ def get_courses_teacher():
     return list_courses
 
 
-def get_courses_student(student_id):
+def get_courses_student(student_id,db=None):
     '''Get all the courses in the system with the one's that match 
     the tags of the courses the student's already been enrolled in being at the top,
     second are the courses that don't match the tags but the student's never been 
     enrolled in and at the bottom are the ones the student has been enrolled in'''
-    data_courses = read_query(
-        "select c.id from courses c join users_has_courses uc on uc.courses_id=c.id where uc.users_id=?",
-        (student_id,),
-    )
-    if data_courses == []:
-        return get_courses_teacher()
-    data = read_query(
+    if db is None:
+        db=database.read_query
+    data = db(
         "select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,c.course_picture,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id where t.name in (select t.name from tags t join interests i on t.id=i.tags_id where i.users_id=?) and c.id not in (select c.id from courses c left join users_has_courses uc on c.id=uc.courses_id where uc.users_id=?) group by c.id,c.title,c.description,c.objectives,c.price,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile,u.id,c.premium  union select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,c.course_picture,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id left join users_has_courses uc on uc.courses_id=c.id where t.name not in (select t.name from tags t join interests i on t.id=i.tags_id where i.users_id=?) and c.id not in (select c.id from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id where t.name in (select t.name from tags t join interests i on t.id=i.tags_id where i.users_id=?) and c.id not in (select c.id from courses c left join users_has_courses uc on c.id=uc.courses_id where uc.users_id=?) group by c.id,c.title,c.description,c.objectives,c.price,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile,u.id,c.premium )  group by c.id,c.title,c.description,c.objectives,c.price,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile,c.id,c.premium,u.id union select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0)  as rating,c.price,group_concat(distinct t.name) as tags,c.course_picture,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id where c.id in (select c.id from courses c join users_has_courses uc on c.id=uc.courses_id where uc.users_id=?) group by c.id,c.title,c.description,c.objectives,c.price,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile,u.id,c.premium",
         (student_id, student_id, student_id, student_id, student_id, student_id),
     )
@@ -67,98 +66,55 @@ def get_courses_student(student_id):
     return list_courses
 
 
-def get_course_by_id(course_id: int):
+def get_course_by_id(course_id: int,db=None):
     '''Get a course by its id'''
-    data_sections = read_query(
-        "select id,title from sections where courses_id=?", (course_id,)
-    )
-    list_sections = [
-        Section.read_from_query_result(*row, content=None) for row in data_sections
-    ]
-    for x in list_sections:
-        data_content = read_query(
-            "select c.id,c.title,c.description,c.content_types_id,link from content c join sections s on s.id=c.sections_id where s.title=?",
-            (x.title,),
-        )
-        list_content = [Content.read_from_query_result(*row) for row in data_content]
-        x.content = list_content
-    data_course = read_query(
-        "select c.id,c.title,c.description,c.objectives,c.premium,round(sum(r.rating)/count(r.id),2) as rating,c.price,group_concat(distinct t.name) as tags,c.course_picture,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id where c.id=? group by c.id",
+    if db is None:
+        db=database.read_query
+    data_course = db(
+        "select c.id,c.title,c.description,c.objectives,c.premium,round(sum(r.rating)/count(r.id),2) as rating,c.price,group_concat(distinct t.name) as tags,c.course_picture,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id left join users u on u.id=c.owner left join tags_has_courses ta on ta.courses_id=c.id left join tags t on t.id=ta.tags_id where c.id=?",
         (course_id,),
     )
     if data_course == []:
         return None
     owner = TeacherShow.read_from_query_result(*data_course[0][9:])
-    course = CourseShowId.read_from_query_result(
-        *data_course[0][:9], teacher=owner, sections=list_sections
+    course = CourseShow.read_from_query_result(
+        *data_course[0][:9], teacher=owner
     )
 
     return course
 
 
-def get_students_courses(student_id):
-    '''Get all the courses a student's been enrolled in'''
-    courses = read_query(
-        "select group_concat(distinct courses_id) from users_has_courses where users_id=?",
-        (student_id,),
-    )
-
-    list_courses = []
-    if courses == [(None,)]:
-        return []
-    
-    courses = [int(x) for x in courses[0][0].split(",")]
-    for x in courses:
-        data_sections = read_query(
-            "select id,title from sections where courses_id=?", (x,)
+def get_students_courses(student_id,db=None):
+        '''Get all the courses a student's been enrolled in'''
+        if db is None:
+            db=database.read_query
+        data_course = db(
+            "select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,ifnull(round((count(distinct us.sections_id)/count(distinct s.id))*100),0) as progress,uc.subscriptions_id,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id join users u on u.id=c.owner join tags_has_courses ta on ta.courses_id=c.id join tags t on t.id=ta.tags_id left join sections s on s.courses_id=c.id left join sections se on se.courses_id=c.id left join users_has_sections us on us.sections_id=se.id  and us.users_id=? join users_has_courses uc on uc.courses_id=c.id and uc.users_id=? group by c.id",
+            (student_id, student_id),
         )
-        list_sections = [
-            Section.read_from_query_result(*row, content=None) for row in data_sections
-        ]
-        for j in list_sections:
-            data_content = read_query(
-                "select c.id,c.title,c.description,c.content_types_id,c.link from content c join sections s on s.id=c.sections_id where s.title=?",
-                (j.title,),
-            )
-            list_content = [
-                Content.read_from_query_result(*row) for row in data_content
-            ]
-            j.content = list_content
-        data_course = read_query(
-            "select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,ifnull(round((count(distinct us.sections_id)/count(distinct s.id))*100),0) as progress,uc.subscriptions_id,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id join users u on u.id=c.owner join tags_has_courses ta on ta.courses_id=c.id join tags t on t.id=ta.tags_id left join sections s on s.courses_id=c.id left join sections se on se.courses_id=c.id left join users_has_sections us on us.sections_id=se.id  and us.users_id=?  join users_has_courses uc on uc.courses_id=c.id and uc.users_id=? where c.id=?",
-            (student_id, student_id, x),
-        )
+        if data_course==[]:
+            return []
+        list_courses=[]
         # print(data_course[0][:10])
         owner = TeacherShow.read_from_query_result(*data_course[0][10:])
         course = CoursesShowStudent.read_from_query_result(
-            *data_course[0][:10], teacher=owner, sections=list_sections
+            *data_course[0][:10], teacher=owner
         )
         list_courses.append(course)
 
-    return list_courses
+        return list_courses
 
 
-def get_student_course_by_id(student_id, course_id):
+def get_student_course_by_id(student_id, course_id,db=None):
     '''Get a course a student's been enrolled in by its id'''
-    data_sections = read_query(
-        "select id,title from sections where courses_id=?", (course_id,)
-    )
-    list_sections = [
-        Section.read_from_query_result(*row, content=None) for row in data_sections
-    ]
-    for x in list_sections:
-        data_content = read_query(
-            "select c.id,c.title,c.description,c.content_types_id from content c join sections s on s.id=c.sections_id where s.title=?",
-            (x.title,),
-        )
-        list_content = [Content.read_from_query_result(*row) for row in data_content]
-        x.content = list_content
-    data_course = read_query(
+    if db is None:
+        db=database.read_query
+    data_course = db(
         "select c.id,c.title,c.description,c.objectives,c.premium,ifnull(round(sum(r.rating)/count(r.id),2),0) as rating,c.price,group_concat(distinct t.name) as tags,ifnull(round((count(distinct us.sections_id)/count(distinct s.id))*100),0) as progress,uc.subscriptions_id,u.id,u.first_name,u.last_name,u.phone_number,u.email,u.linked_in_profile from courses c left join reviews r on r.courses_id=c.id join users u on u.id=c.owner join tags_has_courses ta on ta.courses_id=c.id join tags t on t.id=ta.tags_id left join sections s on s.courses_id=c.id left join sections se on se.courses_id=c.id left join users_has_sections us on us.sections_id=se.id  and us.users_id=?  join users_has_courses uc on uc.courses_id=c.id and uc.users_id=? where c.id=?",
         (student_id, student_id, course_id),
     )
     owner = TeacherShow.read_from_query_result(*data_course[0][10:])
-    course = CoursesShowStudent.read_from_query_result(*data_course[0][:10], teacher=owner, sections=list_sections)
+    course = CoursesShowStudent.read_from_query_result(*data_course[0][:10], teacher=owner)
 
     return course
 
