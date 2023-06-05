@@ -14,4 +14,4 @@ test:
     - pip3 install mariadb==1.1.6
     - pip3 install --upgrade mariadb
     - echo "Running Tests..."
-    - python3 -m unittest tests/sections_services_test.py
+    - python3 -m unittest app/tests/sections_services_test.py
