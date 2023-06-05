@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 from fastapi_pagination import Page, paginate
 from api.data import database
 import api.utils.constants as constants
+from api.utils.utils import enrollment_mail
 
 
 students_router = APIRouter(prefix="/students", tags=["Students"])
@@ -124,6 +125,10 @@ def enroll_or_unenroll_from_course(
             enroll_in_course(current_user.id,course_id,subscription,False)
         else:
             enroll_in_course(current_user.id,course_id,subscription,True) 
+        student = get_profile(current_user.id)
+        course = get_course_by_id(course_id)
+        teacher = course.teacher
+        enrollment_mail(student,course,teacher)
         return JSONResponse(
             status_code=201, content={"msg": "Your request has been sent for review"}
         )
@@ -132,6 +137,10 @@ def enroll_or_unenroll_from_course(
             enroll_in_course(current_user.id,course_id,subscription,False)
         else:
             enroll_in_course(current_user.id,course_id,subscription,True) 
+        student = get_profile(current_user.id)
+        course = get_course_by_id(course_id)
+        teacher = course.teacher
+        enrollment_mail(student,course,teacher)
         return JSONResponse(
             status_code=201, content={"msg": "Your request has been sent for review"}
         )
@@ -147,6 +156,11 @@ def enroll_or_unenroll_from_course(
             content={"msg": "You have successfully unenrolled from the course"},
         )
     enroll_in_course(current_user.id, course_id, subscription, False)
+    student = get_profile(current_user.id)
+    course = get_course_by_id(course_id)
+    teacher = course.teacher
+    enrollment_mail(student,course,teacher)
     return JSONResponse(
         status_code=201, content={"msg": "Your request has been sent for review"}
     )
+

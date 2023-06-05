@@ -20,6 +20,7 @@ from api.services.calendars import (
     delete_event,
     get_calendar_by_id,
     get_event_by_id,
+    get_events_by_calendar_id
 )
 from api.services.courses import get_course_by_id
 from api.services.students import get_students_active_courses
@@ -75,12 +76,35 @@ def get_calendar_by_calendar_id(
         )
     if (
         current_user.role == constants.TEACHER_ROLE
-        and result.owner.id != current_user.id
+        and result.owner_id != current_user.id
     ):
         raise HTTPException(
             status_code=403, detail={"msg": constants.SECTION_ACCESS_DENIED_DETAIL}
         )
     return result
+
+@calendar_router.get("/{calendar_id}/events")
+def get_events_for_calendar(calendar_id:int,current_user: User = Depends(get_current_user)):
+    result = get_calendar_by_id(calendar_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail=constants.CALENDAR_NOT_FOUND_DETAIL)
+    if (
+        current_user.role == constants.STUDENT_ROLE
+        and result.course_id not in get_students_active_courses(current_user.id)
+    ):
+        raise HTTPException(
+            status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL
+        )
+    if (
+        current_user.role == constants.TEACHER_ROLE
+        and result.owner_id != current_user.id
+    ):
+        raise HTTPException(
+            status_code=403, detail={"msg": constants.SECTION_ACCESS_DENIED_DETAIL}
+        )
+    
+    return get_events_by_calendar_id(calendar_id)
+
 
 
 @calendar_router.put("/{calendar_id}")
@@ -101,7 +125,7 @@ def change_calendar_owner(
         )
     if (
         current_user.role == constants.TEACHER_ROLE
-        and result.owner.id != current_user.id
+        and result.owner_id != current_user.id
     ):
         raise HTTPException(
             status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL
@@ -126,7 +150,7 @@ def add_event(
         )
     if (
         current_user.role == constants.TEACHER_ROLE
-        and result.owner.id != current_user.id
+        and result.owner_id != current_user.id
     ):
         raise HTTPException(
             status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL
@@ -150,7 +174,7 @@ def get_event_by_event_id(
         )
     if (
         current_user.role == constants.TEACHER_ROLE
-        and result.owner.id != current_user.id
+        and result.owner_id != current_user.id
     ):
         raise HTTPException(
             status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL
@@ -180,7 +204,7 @@ def change_event(
         )
     if (
         current_user.role == constants.TEACHER_ROLE
-        and result.owner.id != current_user.id
+        and result.owner_id != current_user.id
     ):
         raise HTTPException(
             status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL
@@ -208,7 +232,7 @@ def delete_an_event(
         )
     if (
         current_user.role == constants.TEACHER_ROLE
-        and result.owner.id != current_user.id
+        and result.owner_id != current_user.id
     ):
         raise HTTPException(
             status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL
