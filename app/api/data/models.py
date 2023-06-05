@@ -179,29 +179,29 @@ class CourseShow(BaseCourse):
             teacher=teacher,
         )
 
-class CourseShowId(CourseShow):
-    sections: list[Section] | None = None
+# class CourseShowId(CourseShow):
+#     sections: list[Section] | None = None
 
-    @classmethod
-    def read_from_query_result(cls, id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], course_picture:str, teacher:TeacherShow, sections:list[Section]):
+#     @classmethod
+#     def read_from_query_result(cls, id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], course_picture:str, teacher:TeacherShow, sections:list[Section]):
 
-        if tags is not None:
-            tags = [x for x in tags.split(",")]
+#         if tags is not None:
+#             tags = [x for x in tags.split(",")]
 
-        # premium = bool(premium)
-        return cls(
-            id=id,
-            title=title,
-            description=description,
-            objectives=objectives,
-            premium=premium,
-            rating=rating,
-            price=price,
-            tags=tags,
-            course_picture=course_picture,
-            teacher=teacher,
-            sections=sections,
-        )
+#         # premium = bool(premium)
+#         return cls(
+#             id=id,
+#             title=title,
+#             description=description,
+#             objectives=objectives,
+#             premium=premium,
+#             rating=rating,
+#             price=price,
+#             tags=tags,
+#             course_picture=course_picture,
+#             teacher=teacher,
+#             sections=sections,
+#         )
 
 class CoursesShowStudent(BaseModel):
     id: int
@@ -215,10 +215,9 @@ class CoursesShowStudent(BaseModel):
     progress: int
     subscription_status: str
     teacher: TeacherShow | None = None
-    sections: list[Section] | None = None
 
     @classmethod
-    def read_from_query_result(cls,id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], progress:int, subscription_status:str, teacher:TeacherShow, sections:list[Section]):
+    def read_from_query_result(cls,id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], progress:int, subscription_status:str, teacher:TeacherShow):
 
         if tags is not None:
             tags = [x for x in tags.split(",")]
@@ -237,7 +236,6 @@ class CoursesShowStudent(BaseModel):
             progress=progress,
             subscription_status=subscription_from_id((subscription_status)),
             teacher=teacher,
-            sections=sections,
         )
 
 class CourseUserReview(BaseModel):
