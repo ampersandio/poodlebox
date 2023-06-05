@@ -25,7 +25,7 @@ def get_certificates(student_id,db=None):
     )
     if data == []:
         return []
-    # return [(Certificate.read_from_query_result(*row) for row in data)]
+    return [(Certificate.read_from_query_result(*row) for row in data)]
 
 
 def get_certificate_by_course(student_id, course_id,db=None):
