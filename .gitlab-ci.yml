@@ -20,7 +20,7 @@ test:
     - echo $DB_USER
     - echo $DB_PASSWORD
     - echo $DB_PORT
-    - echo $SECRET_KEY
+    - echo $secret_key
     - echo $ACCESS_TOKEN_EXPIRES_MINUTES
     - echo $ALGORITHM
     - echo $API_KEY
