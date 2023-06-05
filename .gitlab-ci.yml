@@ -1,8 +1,8 @@
 stages:
   - test
 
-setup:
-  stage: setup
+test:
+  stage: test
   image: python:3.10
   script:
     - set -e  # Enable exit on non-zero status
