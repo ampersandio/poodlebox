@@ -1,9 +1,7 @@
 variables:
   IMAGE_NAME: ampersandio/poodlebox
   IMAGE_TAG: python-app-1.0
-
-# stages:
-#   - test
+  NEW_TAG: latest
 
 build_image:
   image: docker:24.0
@@ -12,10 +10,13 @@ build_image:
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
   before_script:
-    - echo docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_PASS docker.io
+    - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
   script:
     - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$NEW_TAG
     - docker push $IMAGE_NAME:$IMAGE_TAG
+
+
     # - set -e  # Enable exit on non-zero status
     # - echo "Installing dependencies..."
     # - apt-get update && apt-get install -y gcc wget
