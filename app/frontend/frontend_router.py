@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Request,  Form, Depends, HTTPException
+from fastapi import APIRouter, Request, Form, HTTPException
 from config import settings
 from fastapi.templating import Jinja2Templates
 from api.services.authorization import get_current_user, create_access_token, authenticate_user
-from api.services.courses import get_course_by_id,get_students_courses,get_section_by_id
+from api.services.courses import get_course_by_id,get_students_courses, get_course_sections
 from api.utils.utils import constants 
 
 from api.utils.utils import user_registration_mail 
@@ -150,10 +150,10 @@ def course(request: Request,course_id:int):
 
     user = get_current_user(token)
     course = get_course_by_id(course_id)
-
+    sections = get_course_sections(course_id)
     student_courses = get_students_courses(user.id)
 
-    return templates.TemplateResponse("course.html", {"request": request, "course":course, "user":user, "student_courses":student_courses})
+    return templates.TemplateResponse("course.html", {"request": request, "course":course, "sections":sections, "user":user, "student_courses":student_courses})
 
 
 @frontend_router.get("/courses/{course_id}/sections/{section_id}")
@@ -163,8 +163,6 @@ def course(request: Request, course_id:int, section_id:int):
     token = request.cookies.get("token")
     course = get_course_by_id(course_id)
     headers = {'Authorization': f'Bearer {token}'}
-    # # section = get_section_by_id(section_id)
-
     try:
 
         user = get_current_user(token)

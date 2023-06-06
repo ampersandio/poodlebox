@@ -115,6 +115,7 @@ def edit_section(course_id: int,section_id: int,new_section: SectionCreate,curre
 
     course = courses.get_course_by_id(course_id)
     section = courses.get_section_by_id(section_id)
+    sections = courses.get_course_sections(course_id)
 
     if new_section.title == section.title:
         raise HTTPException(
@@ -130,7 +131,7 @@ def edit_section(course_id: int,section_id: int,new_section: SectionCreate,curre
     if course is None:
         raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
-    if section not in course.sections:
+    if section not in sections:
         raise HTTPException(status_code=403, detail="This section is not part of this course")
 
     if new_section.content:
@@ -151,6 +152,8 @@ def delete_section(course_id: int,section_id: int,current_user: Annotated[User, 
 
     course = courses.get_course_by_id(course_id)
     section = courses.get_section_by_id(section_id)
+    sections = courses.get_course_sections(course_id)
+
 
     if course.teacher.email != current_user.email:
         raise HTTPException(status=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)

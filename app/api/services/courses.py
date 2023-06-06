@@ -340,3 +340,19 @@ def change_subscription(subscription: int, user_id: int, course_id: int):
         return None
     else:
         return update_query("update users_has_courses set subscriptions_id = ? where users_id = ? and courses_id = ?;", (subscription, user_id, course_id,))
+
+def get_course_sections(course_id:int):
+    data_sections = read_query(
+        "select id,title from sections where courses_id=?", (course_id,)
+    )
+    list_sections = [Section.read_from_query_result(*row, content=None) for row in data_sections]
+
+    for x in list_sections:
+        data_content = read_query(
+            "select c.id,c.title,c.description,c.content_types_id,link from content c join sections s on s.id=c.sections_id where s.title=?",
+            (x.title,),
+        )
+        list_content = [Content.read_from_query_result(*row) for row in data_content]
+        x.content = list_content
+
+    return(list_sections)

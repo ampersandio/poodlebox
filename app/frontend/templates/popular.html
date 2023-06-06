@@ -11,9 +11,9 @@
 
         <div class="card" style="width: 19rem;">
             {% if course.course_picture %}
-            <a href="./courses/{{course.id}}" ><img class="card-img-top" src="{{ url_for('assets', path=course.course_picture) }}" width="320" height="auto" alt=""></a>
+            <a href="./courses/{{course.id}}" ><img class="card-img-top" src="/assets/{{course.course_picture}}" width="320" height="auto" alt=""></a>
             {% else %}
-            <a href="./courses/{{course.id}}" ><img class="card-img-top" src="{{ url_for('assets', path='no_thumbnail.png') }}" width="320" height="auto" alt=""></a>
+            <a href="./courses/{{course.id}}" ><img class="card-img-top" src="/assets/no_thumbnail.png" width="320" height="auto" alt=""></a>
             {% endif %}
           <div class="card-body">
             <h5 style="height: 60px;" class="card-title">{{course.title}}</h5>
@@ -25,9 +25,9 @@
 
         <div class="card" style="width: 19rem;">
           {% if course.course_picture %}
-          <a href="" ><img class="card-img-top" src="{{ url_for('assets', path=course.course_picture) }}" width="320" height="auto" alt=""></a>
+          <a href="" ><img class="card-img-top" src="/assets/{{course.course_picture}}" width="320" height="auto" alt=""></a>
           {% else %}
-          <a href="" ><img class="card-img-top" src="{{ url_for('assets', path='no_thumbnail.png') }}" width="320" height="auto" alt=""></a>
+          <a href="" ><img class="card-img-top" src="/assets/no_thumbnail.png" width="320" height="auto" alt=""></a>
           {% endif %}
         <div class="card-body">
           <h5 style="height: 60px;" class="card-title">{{course.title}}</h5>
