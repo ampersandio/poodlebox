@@ -1,9 +1,11 @@
+import os, requests
+import api.utils.constants as constants
+
 from api.services.authorization import create_access_token
-from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User, CourseCreate, TeachersReport
+from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User, TeachersReport
 from fastapi import File
 from config import settings
 from mailjet_rest import Client
-import os, requests
 from requests.auth import HTTPBasicAuth
 
 
@@ -12,11 +14,11 @@ auth = HTTPBasicAuth(settings.video_api_key, '')
 mailjet = Client(auth=(settings.api_key, settings.api_secret), version='v3.1')
 
 
-def generate_message(to_email,to_name,subject,text_part,html_part):
+def generate_message(to_email:str, to_name:str, subject:str, text_part:str, html_part:str):
     message = {'Messages': [
                     {
                             "From": {
-                                    "Email": "anedelev@gmail.com",
+                                    "Email": constants.ADMIN_EMAIL,
                                     "Name": "Poodlebox Admin"
                             },
                             "To": [
@@ -46,7 +48,7 @@ def generate_template(template_path,replacements):
     return ready_template
 
 
-def user_registration(information:StudentRegistration, host:str):
+def user_registration_mail(information:StudentRegistration, host:str):
 
     token = create_access_token({"sub":information.email})
 
@@ -63,14 +65,32 @@ def user_registration(information:StudentRegistration, host:str):
         to_email=information.email,
         to_name=information.first_name + " " + information.last_name,
         subject="Poodlebox Mail Verification",
-        text_part="Dear PoodleBox User",
+        text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )
 
-    result = mailjet.send.create(data=message)
+    mailjet.send.create(data=message)
 
-    print(result.status_code)
-    print(result.json())
+
+def enrollment_mail(student:Student, course:Course, teacher:TeacherShow):
+
+    replacements = {
+        '{student_first_name}': student.first_name,
+        '{student_last_name}': student.last_name,
+        '{course_title}': course.title,
+    }
+
+    html_template = generate_template("api/utils/mail_templates/enrollment_notification.html", replacements)
+
+    message = generate_message(
+        to_email=teacher.email,
+        to_name=teacher.first_name + " " + teacher.last_name,
+        subject="New Student Enrollment in your course {course.title}",
+        text_part=constants.MAIL_TEXT_PART,
+        html_part=html_template
+    )
+
+    mailjet.send.create(data=message)
 
 
 def mail_teachers_report(information:TeachersReport):
@@ -95,31 +115,7 @@ def mail_teachers_report(information:TeachersReport):
     print(result.json())
 
 
-def enrollment_mail(student:Student, course:Course, teacher:TeacherShow):
-
-    replacements = {
-        '{student_first_name}': student.first_name,
-        '{student_last_name}': student.last_name,
-        '{course_title}': course.title,
-    }
-
-    html_template = generate_template("api/utils/mail_templates/enrollment_notification.html", replacements)
-
-    message = generate_message(
-        to_email=teacher.email,
-        to_name=teacher.first_name + " " + teacher.last_name,
-        subject="New Student Enrollment in your course {course.title}",
-        text_part="Greetings",
-        html_part=html_template
-    )
-
-    result = mailjet.send.create(data=message)
-
-    print(result.status_code)
-    print(result.json())
-
-
-def teacher_registration(information:TeacherRegistration):
+def teacher_registration_mail(information:TeacherRegistration):
 
     replacements = {
     '{teacher_first_name}': information.first_name,
@@ -133,17 +129,14 @@ def teacher_registration(information:TeacherRegistration):
         to_email="anedelev@gmail.com",
         to_name=information.first_name + " " + information.last_name,
         subject="New Teacher Registered At Poodlebox",
-        text_part="Greetings",
+        text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )
 
-    result = mailjet.send.create(data=message)
-
-    print(result.status_code)
-    print(result.json())
+    mailjet.send.create(data=message)
 
 
-def teacher_approval(teacher:TeacherShow):
+def teacher_approval_mail(teacher:TeacherShow):
 
     replacements = {
     '{teacher_first_name}': teacher.first_name,
@@ -157,17 +150,14 @@ def teacher_approval(teacher:TeacherShow):
         to_email=teacher.email,
         to_name=teacher.first_name + " " + teacher.last_name,
         subject="Your Registration At Poodblebox Was Approved",
-        text_part="Greetings",
+        text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )
 
-    result = mailjet.send.create(data=message)
-
-    print(result.status_code)
-    print(result.json())
+    mailjet.send.create(data=message)
 
 
-def course_deactivated(student:User, course_title:str):
+def course_deactivated_mail(student:User, course_title:str):
     replacements = {
     '{student_first_name}':student.first_name,
     '{student_last_name}':student.last_name,
@@ -181,14 +171,11 @@ def course_deactivated(student:User, course_title:str):
         to_email=student.email,
         to_name=student.first_name + " " + student.last_name,
         subject="Course you've been enrolled in, is now Inactive",
-        text_part="Greetings",
+        text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )
 
-    result = mailjet.send.create(data=message)
-
-    print(result.status_code)
-    print(result.json())
+    mailjet.send.create(data=message)
 
 
 def file_upload(file:File,destination:str | None = None, title:str | None = None):
@@ -196,9 +183,8 @@ def file_upload(file:File,destination:str | None = None, title:str | None = None
     video_extensions = ['.mp4', '.avi', '.mov', '.wmv', '.flv']
 
     if file.filename[-4:] in video_extensions:    
-
         url = 'https://ws.api.video/videos'
-        token = requests.get("https://sandbox.api.video/upload-tokens", auth=auth)
+        token = requests.get("https://ws.api.video/upload-tokens", auth=auth)
 
         payload = {
             "public": True,
@@ -213,14 +199,12 @@ def file_upload(file:File,destination:str | None = None, title:str | None = None
         url = f'https://ws.api.video/videos/{video_id}/source'
 
         headers = {'Authorization': f'Bearer {token}'}
-
-        contents = file.file.read()  # Read the file contents
+        contents = file.file.read()
 
         files = {'file': (file.filename, contents)}
         response = requests.post(url, headers=headers, files=files, auth=auth)
 
         link = response.json()["assets"]["iframe"]
-
         return link
     
     else:
@@ -243,3 +227,22 @@ def file_upload(file:File,destination:str | None = None, title:str | None = None
         finally:
             file.file.close()
 
+
+def email_certificate(student:User,course_title):
+    replacements = {
+    '{student_first_name}':student.first_name,
+    '{student_last_name}':student.last_name,
+    '{student_email}':student.email,
+    '{course_title}':course_title
+    }
+    html_template = generate_template("api/utils/mail_templates/course_completion_notification.html", replacements)
+
+    message = generate_message(
+        to_email=student.email,
+        to_name=student.first_name + " " + student.last_name,
+        subject=f"{course_title} completion",
+        text_part=constants.MAIL_TEXT_PART,
+        html_part=html_template
+    )
+
+    mailjet.send.create(data=message)

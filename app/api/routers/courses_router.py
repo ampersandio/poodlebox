@@ -1,8 +1,9 @@
 import api.utils.constants as constants
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Form
+from fastapi.responses import JSONResponse
 
-from typing import Annotated
+from typing import Annotated, Optional
 from api.services import courses
 from api.data.models import User, Section, CourseShow
 from fastapi_pagination import Page, paginate
