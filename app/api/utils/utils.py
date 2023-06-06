@@ -109,10 +109,8 @@ def mail_teachers_report(information:TeachersReport):
         text_part="Dear Teacher",
         html_part=html_template
     )
-
-    result = mailjet.send.create(data=message)
-    print(result.status_code)
-    print(result.json())
+    
+    mailjet.send.create(data=message)
 
 
 def teacher_registration_mail(information:TeacherRegistration):
