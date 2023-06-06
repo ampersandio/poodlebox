@@ -9,8 +9,8 @@ build_image:
 
   script:
     - docker build -t fastapi:poodlebox .
-    - docker tag poodlebox-api:latest ampersandio/poodlebox:tagname  
-    - docker push ampersandio/poodlebox:tagname     
+    - docker tag poodlebox-api:latest ampersandio/poodlebox:latest  
+    - docker push ampersandio/poodlebox:latest     
 
 
     # - set -e  # Enable exit on non-zero status
