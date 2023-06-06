@@ -5,7 +5,7 @@ test:
   stage: test
   image: python:3.10
   script:
-    - ssh -i $POODLEBOX_PEM ubuntu@ec2-13-49-137-204.eu-north-1.compute.amazonaws.com
+    - ssh -i $"POODLEBOX_PEM" ubuntu@ec2-13-49-137-204.eu-north-1.compute.amazonaws.com
     - cd poodlebox
     - cd app
     # - set -e  # Enable exit on non-zero status
