@@ -6,9 +6,10 @@ build_image:
     DOCKER_TLS_CERTDIR: "/certs"
 
   script:
+    - docker build -t fastapi:poodlebox .
     - docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_PASS
 
-    # - docker build -t fastapi:poodlebox .
+
     # - docker tag fastapi:poodlebox ampersandio/poodlebox:tagname
     # - docker push ampersandio/poodlebox:tagname
 
