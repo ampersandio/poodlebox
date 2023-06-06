@@ -1,8 +1,3 @@
-variables:
-  IMAGE_NAME: ampersandio/poodlebox
-  IMAGE_TAG: python-app-1.0
-  NEW_TAG: latest
-
 build_image:
   image: docker:24.0
   services:
@@ -11,11 +6,11 @@ build_image:
     DOCKER_TLS_CERTDIR: "/certs"
   before_script:
     - echo docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_PASS docker.io  
-    
+
   script:
-    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:$NEW_TAG
-    - docker push $IMAGE_NAME:$IMAGE_TAG
+    - docker build -t fastapi:poodlebox .
+    - docker tag poodlebox-api:latest ampersandio/poodlebox:tagname  
+    - docker push ampersandio/poodlebox:tagname     
 
 
     # - set -e  # Enable exit on non-zero status
