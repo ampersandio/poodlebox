@@ -92,7 +92,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
         raise HTTPException(401)
     
     user = get_user(token_data.email)
-    
     return user
 
 
