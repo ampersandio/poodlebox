@@ -19,6 +19,8 @@ class Settings(BaseSettings):
 
     video_api_key: str
 
+    # class Config:
+    #     env_file = '../.env'
 
 @lru_cache
 def get_settings() -> Settings:
