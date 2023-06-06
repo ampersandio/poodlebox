@@ -5,11 +5,10 @@ test:
   stage: test
   image: python:3.10
   script:
-    - echo $POODLEBOX_PEM
-    - echo $POODLEBOX_PEM > poodlebox.pem  
-    - chmod 600 poodlebox.pem  
-    - ssh -i poodlebox.pem ubuntu@ec2-13-49-137-204.eu-north-1.compute.amazonaws.com
-    - cd poodlebox
+    - mkdir -p ~/.ssh
+    - echo "$CI_PROJECT_DIR/poodlebox.pem" | base64 -d > ~/.ssh/poodlebox.pem  # Decode and save the secure file
+    - chmod 600 ~/.ssh/poodlebox.pem  # Set appropriate permissions on the PEM file
+    - ssh -i ~/.ssh/poodlebox.pem ubuntu@ec2-13-49-137-204.eu-north-1.compute.amazonaws.com "cd poodlebox/app && <your_commands_here>"
     # - set -e  # Enable exit on non-zero status
     # - echo "Installing dependencies..."
     # - apt-get update && apt-get install -y gcc wget
