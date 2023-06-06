@@ -19,9 +19,6 @@ class Settings(BaseSettings):
 
     video_api_key: str
 
-    class Config:
-        env_file = '../.env'
-
 
 @lru_cache
 def get_settings() -> Settings:
@@ -30,4 +27,15 @@ def get_settings() -> Settings:
 
 settings = get_settings()
 
-
+# Manually load the environmental variables
+settings.secret_key = os.getenv("SECRET_KEY")
+settings.access_token_expires_minutes = int(os.getenv("ACCESS_TOKEN_EXPIRES_MINUTES"))
+settings.algorithm = os.getenv("ALGORITHM")
+settings.db_name = os.getenv("DB_NAME")
+settings.db_host = os.getenv("DB_HOST")
+settings.db_user = os.getenv("DB_USER")
+settings.db_password = os.getenv("DB_PASSWORD")
+settings.db_port = int(os.getenv("DB_PORT"))
+settings.api_key = os.getenv("API_KEY")
+settings.api_secret = os.getenv("API_SECRET")
+settings.video_api_key = os.getenv("VIDEO_API_KEY")
