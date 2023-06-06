@@ -1,4 +1,4 @@
-FROM python:3.11.0
+FROM python:3.10.0
 WORKDIR /poodlebox-api
 COPY . .
 RUN apt-get update && apt-get install -y gcc wget
@@ -6,5 +6,3 @@ RUN wget https://dlm.mariadb.com/2319727/Connectors/c/connector-c-3.3.1/mariadb-
 RUN pip install -r ./requirements.txt
 WORKDIR /poodlebox-api/app
 CMD uvicorn main:app --host 0.0.0.0 --port 8000
-
-
