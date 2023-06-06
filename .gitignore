@@ -141,5 +141,4 @@ cython_debug/
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Python
 .vscode/settings.json
 app/.vscode/settings.json
-
 app/config.py

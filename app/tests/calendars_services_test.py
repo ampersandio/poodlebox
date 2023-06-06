@@ -2,7 +2,6 @@ import unittest
 from api.services import calendars
 from api.data.models import Calendar, Event, CalendarChange, CalendarCreate, EventChange, EventCreate
 
-#HHHAHAHAHAA
 
 class CalendarServiceShould(unittest.TestCase):
     def test_get_all_calendars_studentsWithData(self):
