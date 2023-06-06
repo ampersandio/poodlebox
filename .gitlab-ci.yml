@@ -6,10 +6,9 @@ test:
   image: python:3.10
   script:
     - mkdir -p ~/.ssh
-    - cp "$CI_PROJECT_DIR/poodlebox.pem" ~/.ssh/poodlebox.pem  # Copy the secure file
-    - chmod 600 ~/.ssh/poodlebox.pem  # Set appropriate permissions on the PEM file
-    - ssh -i ~/.ssh/poodlebox.pem ubuntu@ec2-13-49-137-204.eu-north-1.compute.amazonaws.com 
-    - cd poodlebox
+    - gitlab-runner exec docker --image alpine:latest --entrypoint "cp" -- /builds/poodlebox-project-team-12/poodlebox/poodlebox.pem ~/.ssh/poodlebox.pem
+    - chmod 600 ~/.ssh/poodlebox.pem
+    - ssh -i ~/.ssh/poodlebox.pem ubuntu@ec2-13-49-137-204.eu-north-1.compute.amazonaws.com
     # - set -e  # Enable exit on non-zero status
     # - echo "Installing dependencies..."
     # - apt-get update && apt-get install -y gcc wget
