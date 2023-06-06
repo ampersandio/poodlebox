@@ -142,4 +142,3 @@ cython_debug/
 .vscode/settings.json
 app/.vscode/settings.json
 app/config.py
-app/config.py
