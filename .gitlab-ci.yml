@@ -8,10 +8,8 @@ build_image:
   script:
     - docker build -t fastapi:poodlebox .
     - docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_PASS
-
-
-    # - docker tag fastapi:poodlebox ampersandio/poodlebox:tagname
-    # - docker push ampersandio/poodlebox:tagname
+    - docker tag fastapi:poodlebox ampersandio/poodlebox:tagname
+    - docker push ampersandio/poodlebox:tagname
 
 
     # - set -e  # Enable exit on non-zero status
