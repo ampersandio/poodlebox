@@ -5,7 +5,8 @@ test:
   stage: test
   image: python:3.10
   script:
-    - echo "$POODLEBOX_PEM" > poodlebox.pem  
+    - echo $POODLEBOX_PEM
+    - echo $POODLEBOX_PEM > poodlebox.pem  
     - chmod 600 poodlebox.pem  
     - ssh -i poodlebox.pem ubuntu@ec2-13-49-137-204.eu-north-1.compute.amazonaws.com
     - cd poodlebox
