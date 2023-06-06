@@ -18,15 +18,19 @@
 
 {% endif %}
 
-<h4 style="color:#grey;"> Available Courses:</h4>
+{% if message %}
+<h4 style="color:#grey;">{{message}}:</h4>
+{% else %}
+<h4 style="color:#grey;">Courses:</h4>
+{% endif %}
 <hr>
 
 
 {% if courses %}
-  {% for course in courses %}
+  {% for course in courses["items"] %}
 
     <div class="row">
-
+      {% if user %}
       <!-- CHECK USER ROLE-->
       {% if user.role == "student" or user.role == "teacher" or user.role == "admin" %}
       
@@ -35,9 +39,9 @@
         <span class="badge bg-warning text-dark">Premium Course</span>
         {% endif %}
         {% if course.course_picture %}
-          <a href="./courses/{{course.id}}/"><img class="thumbnail rounded img-fluid" src="{{ url_for('assets', path=course.course_picture) }}" alt="" width="400" height="auto" class="img-fluid"></a>
+        <a href="./courses/{{course.id}}/"><img class="thumbnail rounded img-fluid" src="/assets/{{course.course_picture}}" alt="" width="400" height="auto" class="img-fluid"></a>
         {% else %}
-          <a href="./courses/{{course.id}}/"><img class="thumbnail rounded img-fluid" src="{{ url_for('assets', path='no_thumbnail.png') }}" alt="" width="400" height="auto" class="img-fluid"></a>
+        <a href="./courses/{{course.id}}/"><img class="thumbnail rounded img-fluid" src="/assets/no_thumbnail.png" alt="" width="400" height="auto" class="img-fluid"></a>
         {% endif %}      
       </div>
 
@@ -46,15 +50,15 @@
         <h6>{{ course.description }}</h6>
         <p>by {{ course.teacher.first_name }} {{ course.teacher.last_name }}</p>
         <br>
-
+      {% endif %}
       {% else %}
 
       <div class="col-lg-4 col-md-6">
         {% if course.course_picture %}
           <a href=" ">      
-            <img class="thumbnail rounded img-fluid" src="{{ url_for('assets', path=course.course_picture) }}" alt="" width="400" height="auto" class="img-fluid"></a>
+            <img class="thumbnail rounded img-fluid" src="/assets/{{course.course_picture}}" alt="" width="400" height="auto" class="img-fluid"></a>
         {% else %}
-          <a href=""><img class="thumbnail rounded img-fluid" src="{{ url_for('assets', path='no_thumbnail.png') }}" alt="" width="400" height="auto" class="img-fluid"></a>
+        <a href=""><img class="thumbnail rounded img-fluid" src="/assets/no_thumbnail.png" alt="" width="400" height="auto" class="img-fluid"></a>
         {% endif %}      
       </div>
 
@@ -75,42 +79,19 @@
       <div class="col-lg-2 col-md-12 text-end">
         <div class="Stars" style="--rating: {{course.rating}};"></div>
       </div>
+      
     </div>
+
+    
     <hr>
 
   {% endfor %}
 {% endif %}
 
-<hr>
 {% if most_popular %}
 <h4>Popular Courses:</h4>
-<div class="col-lg-12 mt-4">
-
-  <div class="d-flex justify-content-between">
-    {% for course in most_popular %}
-
-      <div>
-        <div class="card" style="width: 18rem;">
-            {% if course.course_picture %}
-            <img class="card-img-top" src="{{ url_for('assets', path=course.course_picture) }}" width="320" height="auto" alt="">
-            {% else %}
-            <img class="card-img-top" src="{{ url_for('assets', path='no_thumbnail.png') }}" width="320" height="auto" alt="">
-            {% endif %}
-          <div class="card-body">
-            <h5 style="height: 60px;" class="card-title">{{course.title}}</h5>
-            <p class="card-text">{{course.description[:22] + '...' if course.description|length > 22 else course.description}}</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-          </div>
-        </div>
-      </div>
-
-    {% endfor %}
-  </div>
-  <br>
-  </div>
-<br>
-
 {% endif %}
+{% include 'popular.html' %} 
 
 <script>
 

@@ -1,6 +1,5 @@
 from functools import lru_cache
 from fastapi.staticfiles import StaticFiles
-import uvicorn
 
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
@@ -8,7 +7,6 @@ from fastapi_pagination import add_pagination
 from config import Settings
 from api.api_router import api_router
 from frontend.frontend_router import frontend_router
-import uvicorn
 
 @lru_cache
 def get_settings() -> Settings:

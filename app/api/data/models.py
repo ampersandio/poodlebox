@@ -1,7 +1,5 @@
 from pydantic import BaseModel, validator, EmailStr,  constr, conint
-from typing import TypedDict
-from datetime import date
-
+from datetime import date,datetime 
 
 class StudentRegistration(BaseModel):
     email: EmailStr
@@ -117,10 +115,10 @@ class Section(SectionCreate):
     def read_from_query_result(cls, id: int, title: str, content: list[Content] | None = None):
         return cls(id=id, title=title, content=content or [])
 
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, Section):
-            return self.id == other.id
-        return False
+    # def __eq__(self, other: object) -> bool:
+    #     if isinstance(other, Section):
+    #         return self.id == other.id
+    #     return False
 
 class BaseCourse(BaseModel):
     title: str
@@ -181,29 +179,29 @@ class CourseShow(BaseCourse):
             teacher=teacher,
         )
 
-class CourseShowId(CourseShow):
-    sections: list[Section] | None = None
+# class CourseShowId(CourseShow):
+#     sections: list[Section] | None = None
 
-    @classmethod
-    def read_from_query_result(cls, id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], course_picture:str, teacher:TeacherShow, sections:list[Section]):
+#     @classmethod
+#     def read_from_query_result(cls, id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], course_picture:str, teacher:TeacherShow, sections:list[Section]):
 
-        if tags is not None:
-            tags = [x for x in tags.split(",")]
+#         if tags is not None:
+#             tags = [x for x in tags.split(",")]
 
-        # premium = bool(premium)
-        return cls(
-            id=id,
-            title=title,
-            description=description,
-            objectives=objectives,
-            premium=premium,
-            rating=rating,
-            price=price,
-            tags=tags,
-            course_picture=course_picture,
-            teacher=teacher,
-            sections=sections,
-        )
+#         # premium = bool(premium)
+#         return cls(
+#             id=id,
+#             title=title,
+#             description=description,
+#             objectives=objectives,
+#             premium=premium,
+#             rating=rating,
+#             price=price,
+#             tags=tags,
+#             course_picture=course_picture,
+#             teacher=teacher,
+#             sections=sections,
+#         )
 
 class CoursesShowStudent(BaseModel):
     id: int
@@ -215,12 +213,11 @@ class CoursesShowStudent(BaseModel):
     price: float | None = None
     tags: list[str]
     progress: int
-    subscripton_status: str
+    subscription_status: str
     teacher: TeacherShow | None = None
-    sections: list[Section] | None = None
 
     @classmethod
-    def read_from_query_result(cls,id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], progress:int, subscription_status:str, teacher:TeacherShow, sections:list[Section]):
+    def read_from_query_result(cls,id:int, title:str, description:str, objectives:str, premium:bool, rating:float, price:float, tags:list[str], progress:int, subscription_status:str, teacher:TeacherShow):
 
         if tags is not None:
             tags = [x for x in tags.split(",")]
@@ -237,9 +234,8 @@ class CoursesShowStudent(BaseModel):
             price=price,
             tags=tags,
             progress=progress,
-            subscription_status=subscription_from_id(subscription_status),
+            subscription_status=subscription_from_id((subscription_status)),
             teacher=teacher,
-            sections=sections,
         )
 
 class CourseUserReview(BaseModel):
@@ -381,6 +377,14 @@ class Review(BaseModel):
 class Subscription(BaseModel):
     enroll: bool
 
+class SubscriptionStatus(BaseModel):
+    subscription:str
+    user_id:int
+    course_id:int
+
+    @classmethod
+    def from_query(cls,subscription:str,user_id:int,course_id:int):
+        return cls(subscription=subscription_from_id(subscription),user_id=user_id,course_id=course_id)
 
 class Student(BaseModel):
     id: int
@@ -461,35 +465,63 @@ class Certificate(BaseModel):
     def read_from_query_result(cls, id,user_id,course_id, issued_date):
         return cls(id=id,user_id=user_id,course_id=course_id, issued_date=issued_date)
 
-class Query(BaseModel):
-    q: str
+class Event(BaseModel):
+    id:int|None=None
+    name:str
+    start:datetime
+    end:datetime
+    link_to_event:str
+
+    @classmethod
+    def read_from_query_result(cls,id,name,start,end,link_to_event):
+        return cls(id=id,name=name,start=start,end=end,link_to_event=link_to_event)
+
+class EventChange(BaseModel):
+    name:str|None=None
+    start:datetime|None=None
+    end:datetime|None=None
+    link_to_event:str|None=None
+
+class EventCreate(BaseModel):
+    name:str
+    start:datetime
+    end:datetime
+    link_to_event:str
+    @classmethod
+    def read_from_query_result(cls,name,start,end,link_to_event):
+        return cls(name=name,start=start,end=end,link_to_event=link_to_event)
 
 class Calendar(BaseModel):
-    summary: str
+    id:int|None=None
+    name:str
+    course_id:int
+    owner_id:int
 
-class DateTime(BaseModel):
-    dateTime: str
+    @classmethod
+    def read_from_query_result(cls,id,name,course_id,owner_id):
+        return cls(id=id,name=name,course_id=course_id,owner_id=owner_id)
+    
+class CalendarCreate(BaseModel):
+    name:str
+    course_id:int
 
-class TimeZone(BaseModel):
-    timeZone: str
+    @classmethod
+    def read_from_query_result(cls,name,course_id):
+        return cls(name=name,course_id=course_id)
 
-class Event(BaseModel):
-    summary: str
-    description: str | None = None
+class CalendarById(BaseModel):
+    id:int
+    name:str
+    course_id:int
+    owner:TeacherShow
+    events:list[Event]|None=None
 
-    class Dates(TypedDict):
-        dateTime: str
+    @classmethod
+    def read_from_query_result(cls,id,name,course_id,owner,events):
+        return cls(id=id,name=name,course_id=course_id,owner=owner,events=events)
 
-    start: Dates
-    end: Dates
 
-class Rule(BaseModel):
-    class Scope(TypedDict):
-        type: str
-        value: str
-
-    scope: Scope
-    role: str
-
+class CalendarChange(BaseModel):
+    owner_id:int
 
 

@@ -21,16 +21,24 @@
 }
 
 
-
-
 * {
     padding:0;
     margin:0;
     font-family: 'Saymore-Medium', monospace !important;
 }
 
+.card:hover {
+  transform: scale(1.01);
+  transition: .2s ease-in-out 0s;
+  border: 1px solid #dde9f7;
+  border-radius: 10px;
+  box-shadow: 0 12px 20px 0 rgba(4,20,43,.12);
+  cursor: pointer;
+}
+
 .card-body {
     margin-bottom: 0;
+    box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.1);
   }
 
 .navbar {
@@ -40,6 +48,13 @@
 .card-title :hover {
     color:#2F5DFF
 }
+
+/* .card-img-top:hover {
+  transform: scale(1.01);
+  transition: .2s ease-in-out 0s;
+  box-shadow: 0 2px 9px 0px #e3e3e3c4;
+  opacity: 80%;
+} */
 
 .categories {
     height:60px;
@@ -81,6 +96,14 @@ h3 {
       padding: 1px 10px !important;
   }
 
+
+.container {
+  min-height: 100%;
+  margin-bottom: 0px;
+}
+
+
+
 html, body {
     height: 100%;
   }
@@ -88,14 +111,20 @@ html, body {
   body {
     display: flex;
     flex-direction: column;
+    margin-bottom: -10px;
   }
   
-  main {
+  /* main {
     flex: 1;
-  }
-  
+  } */
+
+
+
   footer {
-    margin-top: auto;
+    height:90px;
+    background-color:#e7eaf4;
+    margin-bottom: -12500px;
+
   }
   
   header {
@@ -103,6 +132,23 @@ html, body {
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
     margin-bottom: 20px;
+
+  }
+
+  .tag {
+    padding: 5px 15px 7px 15px;
+    border-radius: 25px;
+    background-color:#e1e1e1;
+    color:rgb(94, 79, 79);
+    margin-right:5px;
+    border:2px solid black;
+  }
+
+  .tag:hover{
+    color:white;
+    background: linear-gradient(45deg, #cf69da, #3c75e7);
+    background-size: 300% 300%;
+    animation: gradient 10s ease infinite;
 
   }
   
@@ -130,21 +176,9 @@ a {
 }
 
 
-.tag {
-  padding: 5px 10px 5px 10px;
-  border-radius: 5px;
-  background-color:#e1e1e1;
-  color:rgb(94, 79, 79);
-}
 
-.tag:hover{
-  color:#0742cd;
-  background-color:#ffc107;
-  transform: scale(1.01);
-  transition: .2s ease-in-out 0s;
-  cursor: pointer;
-  opacity: 80%;
-}
+
+
 
 .title {
   font-family: 'Seemore-Bold' !important;
@@ -181,10 +215,6 @@ li a:visited {
   transform: scale(1.10);
   transition: .2s ease-in-out 0s;
 }
-textarea, input {
-  font-family: 'IBM Plex Mono', monospace !important;
-}
-
 
 .right-column {
   background-color: #d7d7d7 !important;
@@ -304,15 +334,7 @@ ul {
   overflow: hidden;
   z-index: -1;
   width: 100%;
-}
-
-.Background
-{
-    position:absolute;
-    left:0px;
-    top:0px;
-    z-index:-1;
-    opacity:30%;
+  opacity: 20%;
 }
 
 :root {
@@ -353,4 +375,30 @@ ul {
   padding: 5px;
   color: #FFFFFF;
   font-weight: bold;
+}
+
+
+.header-logo:hover {
+  transform: scale(1.02);
+  transition: .2s ease-in-out 0s;
+  filter: brightness(0.95);
+}
+
+.popular_btn {
+  color: white!important;;
+}
+
+.popular_btn:hover {
+  color: rgb(71, 152, 238)!important;;
+}
+
+.footer-image {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: -200;
+  width: 100%;
+
 }
