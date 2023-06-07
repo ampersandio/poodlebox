@@ -29,7 +29,7 @@ def change_student_status(student_id: int, disabled: bool, current_user = Depend
     else:
         raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     
-    return JSONResponse(status_code=201, content="Students status updated")
+    return JSONResponse(status_code=201, content=constants.STUDENT_UPDATED)
 
 
 @admins_router.put("/courses/{course_id}/status/{disabled}")
@@ -54,7 +54,7 @@ def change_course_status(course_id: int, disabled: bool, current_user = Depends(
     else:
         raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     
-    return JSONResponse(status_code=201, content="Course status updated")
+    return JSONResponse(status_code=201, content=constants.COURSE_UPDATED)
 
 
 @admins_router.put("/courses/{course_id}/students/{student_id}")
@@ -76,7 +76,7 @@ def remove_student_from_course(course_id: int, student_id: int, current_user = D
     else:
         raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     
-    return JSONResponse(status_code=201, content="Student removed")
+    return JSONResponse(status_code=201, content=constants.STUDENT_REMOVED)
 
 
 @admins_router.get("/registrations/")
@@ -110,7 +110,7 @@ def approve(teacher_id: int, current_user = Depends(get_current_user)):
     else:
         raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
 
-    return JSONResponse(status_code=201, content="Teacher registration approved")
+    return JSONResponse(status_code=201, content=constants.TEACHER_APPROVED)
 
 # Probably would go in the courses section as and would check for admin privileges 
 # @admins_router.get("/courses")
