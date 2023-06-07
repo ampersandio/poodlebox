@@ -151,7 +151,7 @@ def course(request: Request,course_id:int):
     user = get_current_user(token)
     course = get_course_by_id(course_id)
     sections = get_course_sections(course_id)
-    student_courses = get_students_courses(user.id)
+    student_courses = [course.id for course in get_students_courses(user.id)]
 
     return templates.TemplateResponse("course.html", {"request": request, "course":course, "sections":sections, "user":user, "student_courses":student_courses})
 

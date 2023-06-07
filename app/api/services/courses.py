@@ -163,8 +163,13 @@ def create_course(course: CourseCreate, owner):
 
 def add_course_photo(course_picture: str, course_id: int):
     '''Add a photo for a particular course'''
-    insert_query("update courses set course_picture = ? where id = ?", (course_picture, course_id,))
 
+    course = get_course_by_id(course_id)
+    if course:
+        insert_query("update courses set course_picture = ? where id = ?", (course_picture, course_id,))
+    else:
+        return None
+    
 
 def get_section_by_id(section_id: int) -> Section:
     section_data = read_query(
@@ -188,38 +193,43 @@ def get_section_by_id(section_id: int) -> Section:
 
 
 def create_section(course_id: int, section: SectionCreate):
-    last_section_id = insert_query("insert into sections(title,courses_id) values(?,?);",(section.title,course_id,),)
+    last_section_id = insert_section(section.title, course_id)
 
     if section.content:
         for content in section.content:
-            content_type_id = read_query("select id from content_types where type = ?;", (content.content_type,))[0][0]
+            content_type_id = get_content_type_id(content.content_type)
 
             if content_type_id:
-                insert_query(
-                    "insert into content(title,description,content_types_id,sections_id) values(?,?,?,?);",
-                    (
-                        content.title,
-                        content.description,
-                        content_type_id,
-                        last_section_id,
-                    ),
-                )
+                insert_content(content.title, content.description, content_type_id, last_section_id)
             else:
-                last_content_type_id = insert_query(
-                    "insert into content_types(type) values(?);",
-                    (content.content_type,),
-                )
-                insert_query(
-                    "insert into content(title,description,content_types_id,sections_id) values(?,?,?,?);",
-                    (
-                        content.title,
-                        content.description,
-                        last_content_type_id,
-                        last_section_id,
-                    ),
-                )
+                last_content_type_id = insert_content_type(content.content_type)
+                insert_content(content.title, content.description, last_content_type_id, last_section_id)
 
     return get_section_by_id(last_section_id)
+
+
+def insert_section(title: str, course_id: int) -> int:
+    query = "INSERT INTO sections (title, courses_id) VALUES (?, ?);"
+    section_id = insert_query(query, (title, course_id))
+    return section_id
+
+
+def get_content_type_id(content_type: str) -> int:
+    query = "SELECT id FROM content_types WHERE type = ?;"
+    result = read_query(query, (content_type,))
+    if result:
+        return result[0][0]
+    
+
+def insert_content(title: str, description: str, content_type_id: int, section_id: int, link: str | None):
+    query = "INSERT INTO content (title, description, content_types_id, sections_id, link) VALUES (?, ?, ?, ?, ?);"
+    insert_query(query, (title, description, content_type_id, section_id, link))
+
+
+def insert_content_type(content_type: str) -> int:
+    query = "INSERT INTO content_types (type) VALUES (?);"
+    content_type_id = insert_query(query, (content_type,))
+    return content_type_id
 
 
 def update_section(section_id: int, new_section: SectionCreate):
@@ -235,56 +245,47 @@ def update_section(section_id: int, new_section: SectionCreate):
 
 
 def get_content_by_id(content_id: int) -> Content:
+
     content_data = read_query(
-        "select id, title, description, content_types_id from content where id = ?;",
+        "select id, title, description, content_types_id, link from content where id = ?;",
         (content_id,),
     )
-    content = [(Content.read_from_query_result(*row) for row in content_data)]
+    
+    content = [Content.read_from_query_result(*row) for row in content_data]
 
     return content
 
 
 def add_content(section_id: int, content: ContentCreate) -> Content:
-    content_type_id = read_query(
-        "select id from content_types where type = ?;", (content.content_type,)
-    )
+
+    content_type_id = read_query("select id from content_types where type = ?;", (content.content_type,))
 
     if not content_type_id:
-        last_content_type_id = insert_query(
-            "insert into content_types(type) values(?);", (content.content_type,)
-        )
-        content_type_id = last_content_type_id
+        content_type_id = insert_content_type(content.content_type)
     else:
         content_type_id = content_type_id[0][0]
 
-    last_content_id = insert_query(
-        "insert into content(title, description, content_types_id, sections_id, link) values(?,?,?,?,?);",
-        (
-            content.title,
-            content.description,
-            content_type_id,
-            section_id,
-            content.link
-        ),
-    )
-
+    last_content_id = insert_content(content.title, content.description, content_type_id, section_id, content.link)
+    
     return get_content_by_id(last_content_id)
 
 
 def get_most_popular(role: str | None = None):
-    all_courses = get_courses_teacher()
+
     if role is None:
         query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id where c.premium = 0 group by c.id order by count(u.users_id) desc limit 5;"
     else:
         query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id group by c.id order by count(u.users_id) desc limit 5;"
 
     courses_data = read_query(query)
+
     courses = [Course.read_from_query_result(*data) for data in courses_data]
 
     return courses
 
 
-def get_courses_students(course_id: int):
+def get_course_students(course_id: int):
+
     data = read_query(
         "select u.* from courses as c join users_has_courses as uc on c.id = uc.courses_id join users as u on uc.users_id = u.id where c.id = ?;",
         (course_id,),
@@ -297,7 +298,13 @@ def get_courses_students(course_id: int):
 
 
 def delete_section(section_id: int):
-    update_query("delete from sections where id = ?;", (section_id,))
+    
+    section = get_section_by_id(section_id)
+
+    if section:
+        update_query("delete from sections where id = ?;", (section_id,))
+    else:
+        return None
 
 
 def section_update(section_id: int, section: SectionCreate):
@@ -332,6 +339,7 @@ def n_visited_sections(user_id: int, course_id: int) -> int:
 
     return data[0][0]
 
+
 def change_subscription(subscription: int, user_id: int, course_id: int):
 
     subscription_data = read_query("select * from users_has_courses where users_id = ? and courses_id = ?;", (user_id, course_id,))
@@ -341,6 +349,7 @@ def change_subscription(subscription: int, user_id: int, course_id: int):
         return None
     else:
         return update_query("update users_has_courses set subscriptions_id = ? where users_id = ? and courses_id = ?;", (subscription, user_id, course_id,))
+
 
 def get_course_sections(course_id:int):
     data_sections = read_query(
