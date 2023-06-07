@@ -3,7 +3,6 @@ from mariadb.connections import Connection
 from config import settings
 
 
-
 DATABASE = settings.db_name
 USER = settings.db_user
 PASSWORD = settings.db_password
@@ -43,6 +42,7 @@ def update_query(sql: str, sql_params: tuple = ()) -> list:
         cursor.execute(sql, sql_params)
         connection.commit()
 
+        return cursor.lastrowid
     
 def delete_query(sql: str, sql_params: tuple = ()) -> list:
     with _get_connection() as connection:

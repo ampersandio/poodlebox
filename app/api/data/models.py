@@ -115,10 +115,6 @@ class Section(SectionCreate):
     def read_from_query_result(cls, id: int, title: str, content: list[Content] | None = None):
         return cls(id=id, title=title, content=content or [])
 
-    # def __eq__(self, other: object) -> bool:
-    #     if isinstance(other, Section):
-    #         return self.id == other.id
-    #     return False
 
 class BaseCourse(BaseModel):
     title: str
