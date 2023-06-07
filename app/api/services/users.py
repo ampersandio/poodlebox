@@ -1,7 +1,8 @@
 from api.data.database import read_query, insert_query
-from api.data.models import User, StudentRegistration, TeacherRegistration
+from api.data.models import User, StudentRegistration, TeacherRegistration, EditTeacherProfile
+from pydantic import ValidationError
 import random
-from api.services import courses
+from api.services import courses, authorization
 
 
 def get_user(email: str) -> User | None:
@@ -44,6 +45,7 @@ def register_teacher(teacher_info: TeacherRegistration) -> None:
         )
     )
 
+
 def view_ad(users_id):
     '''Generate a random course ad for a user that has a random tag from the 3 most relevant tags for this user'''
     tags_with_highest_interest=read_query("select distinct tags_id from interests where users_id=? order by relevance desc limit 3",(users_id,))
@@ -77,6 +79,7 @@ def view_ad(users_id):
     course=random.choice(list_courses)
     return courses.get_course_by_id(course)
 
+
 def get_user_by_id(user_id) -> User | None:
     user_data = read_query('SELECT * FROM users WHERE id=?;', (user_id,))
 
@@ -85,3 +88,15 @@ def get_user_by_id(user_id) -> User | None:
     
     user = User.from_query(*user_data[0])
     return user
+
+
+def edit_teacher_profile(new_information: EditTeacherProfile, user: User) -> None:
+    new_hashed_password = authorization.hash_password(new_information.new_password)
+
+    insert_query('UPDATE users SET password=?, phone_number=?, linked_in_profile=?, profile_picture=? WHERE email=?', (
+        new_hashed_password, 
+        new_information.phone_number, 
+        new_information.linked_in_profile, 
+        new_information.profile_picture,
+        user.email)
+        )

@@ -3,10 +3,10 @@ import api.utils.constants as constants
 from fastapi import APIRouter,HTTPException,Depends, File, UploadFile,Form
 from mariadb import IntegrityError
 from fastapi.responses import JSONResponse
-from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, TeachersReport
-from api.services.authorization import get_current_user
-from api.services import courses, report
-from api.utils.utils import file_upload
+from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, TeachersReport, TeacherProfile, EditTeacherProfile
+from api.services.authorization import get_current_user, validate_password
+from api.services import courses, report, users
+from api.utils.utils import file_upload, mail_teachers_report
 from typing import Annotated, Optional
 
 
@@ -14,7 +14,7 @@ teachers_router = APIRouter(prefix="/teachers", tags=["Teachers"])
 
 
 @teachers_router.get("/courses/reports")
-def get_report(current_user: Annotated[User, Depends(get_current_user)]) -> TeachersReport:
+def get_report(current_user: Annotated[User, Depends(get_current_user)], send_email: bool = False) -> TeachersReport:
     '''
     Get Teachers Report
     '''
@@ -24,13 +24,40 @@ def get_report(current_user: Annotated[User, Depends(get_current_user)]) -> Teac
 
     teachers_report = report.get_teachers_report(current_user)
     if teachers_report is None:
-        raise HTTPException(status_code=204, detail="You either currently own no courses, or there are no students enrolled in any of your courses")
+        raise HTTPException(status_code=200, detail="You either currently own no courses, or there are no students enrolled in any of your courses")
+    
+    if send_email:
+        mail_teachers_report(teachers_report)
 
     return teachers_report
 
 
-@teachers_router.post("/courses/", status_code=201)
-def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(None),  current_user: User = Depends(get_current_user)):
+@teachers_router.get('/profiles/')
+def view_profile(user: User = Depends(get_current_user)) -> TeacherProfile:
+    '''
+    View profile
+    '''
+    profile = TeacherProfile.from_user(user)
+    return profile
+
+
+@teachers_router.put('/profiles/')
+def edit_profile(new_information: EditTeacherProfile, user: User = Depends(get_current_user)) -> JSONResponse:
+    '''
+    Edit profile
+    '''
+    if new_information.new_password != new_information.new_password_again:
+        raise HTTPException(status_code=409, detail='Password does not match')
+    
+    validate_password(new_information.new_password)
+
+    users.edit_teacher_profile(new_information, user)
+
+    return JSONResponse(status_code=200, content={'msg': 'Profile updated'})
+
+
+@teachers_router.post("/courses/")
+def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(...),  current_user: User = Depends(get_current_user)):
     '''
     Create course with thumbnail attached as a file: Upload = File(...)
     '''

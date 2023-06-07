@@ -92,4 +92,6 @@ def change_password(student_id, new_pass,db=None):
     db("update users set password=? where id=?", (new_pass, student_id))
 
 
+def update_interest(student_id: int, course_id: int) -> None:
+    update_query('UPDATE interests SET relevance = relevance + 1 WHERE users_id=? AND tags_id IN (SELECT tags_id FROM tags_has_courses WHERE courses_id=?)', (student_id, course_id))
 
