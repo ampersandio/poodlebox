@@ -22,16 +22,16 @@ def register_student(request:Request, information: StudentRegistration) -> JSONR
     host = "http://" + request.headers["host"]
 
     if user_services.get_user(information.email) is not None:
-        raise HTTPException(status_code=400, detail=f'There already is a registered user with email: {information.email}')
+        raise HTTPException(status_code=400, detail=f'{constants.EMAIL_EXISTS} {information.email}')
 
     if not information.first_name:
-        raise  HTTPException(status_code=400, detail='First name cannot be empty')
+        raise  HTTPException(status_code=400, detail=constants.FIRST_NAME_EMPTY)
 
     if not information.last_name:
-        raise  HTTPException(status_code=400, detail='Last name cannot be empty')
+        raise  HTTPException(status_code=400, detail=constants.LAST_NAME_EMPTY)
     
     if not information.date_of_birth:
-        raise HTTPException(status_code=400, detail='Date of birth cannot be empty')
+        raise HTTPException(status_code=400, detail=constants.DATE_OF_BIRTH_EMPTY)
 
     authorization_services.validate_email(information.email)
     authorization_services.validate_password(information.password)
@@ -41,32 +41,32 @@ def register_student(request:Request, information: StudentRegistration) -> JSONR
     user_services.register_student(information)
     user_registration_mail(information,host)
 
-    return JSONResponse(status_code=201, content={'msg': 'Student registered successfully'})
+    return JSONResponse(status_code=201, content={'msg': constants.STUDENT_REGISTRATION_SUCCESS})
 
 
 @authorization_router.post('/registration/teachers', tags=['Authentication'])
 def register_teacher(request:Request, information: TeacherRegistration, current_user: Annotated[User, Depends(authorization_services.get_current_user)]) -> JSONResponse:
     host = "http://" + request.headers["host"]
     if current_user.role != constants.ADMIN_ROLE:
-        raise HTTPException(status_code=400, detail='Only an admin can register a teacher')
+        raise HTTPException(status_code=400, detail=constants.ONLY_ADMIN_TEACHER)
 
     if user_services.get_user(information.email) is not None:
-        raise HTTPException(status_code=400, detail=f'There already is a registered user with email: {information.email}')
+        raise HTTPException(status_code=400, detail=f'{constants.EMAIL_EXISTS} {information.email}')
 
     if not information.first_name:
-        raise  HTTPException(status_code=400, detail='First name cannot be empty')
+        raise  HTTPException(status_code=400, detail=constants.FIRST_NAME_EMPTY)
 
     if not information.last_name:
-        raise  HTTPException(status_code=400, detail='Last name cannot be empty')
+        raise  HTTPException(status_code=400, detail=constants.LAST_NAME_EMPTY)
     
     if not information.date_of_birth:
-        raise HTTPException(status_code=400, detail='Date of birth cannot be empty')
+        raise HTTPException(status_code=400, detail=constants.DATE_OF_BIRTH_EMPTY)
     
     if not information.phone_number:
-        raise HTTPException(status_code=400, detail='Phone number cannot be empty')
+        raise HTTPException(status_code=400, detail=constants.PHONE_EMPTY)
     
     if not information.linked_in_profile:
-        raise HTTPException(status_code=400, detail='Linked in profile cannot be empty')
+        raise HTTPException(status_code=400, detail=constants.LINKED_IN_PROFILE)
 
     authorization_services.validate_email(information.email)
 
@@ -80,7 +80,7 @@ def register_teacher(request:Request, information: TeacherRegistration, current_
     teacher_registration_mail(information)
 
 
-    return JSONResponse(status_code=201, content={'msg': 'Teacher registered successfully'})
+    return JSONResponse(status_code=201, content={'msg': constants.TEACHER_REGISTRATION_SUCCESS})
 
 
 @authorization_router.post('/login', tags=['Authentication'])
@@ -89,7 +89,7 @@ def login(form_data:Annotated[OAuth2PasswordRequestForm, Depends()]) -> dict:
     user = authorization_services.authenticate_user(form_data.username, form_data.password)
 
     if not user:
-        raise HTTPException(status_code=401, detail='Wrong username or password')
+        raise HTTPException(status_code=401, detail=constants.WRONG_AUTHENTICATION)
     
     access_token_expires = timedelta(minutes=settings.access_token_expires_minutes)
     access_token = authorization_services.create_access_token({'sub': user.email}, expires_delta=access_token_expires)
@@ -110,6 +110,6 @@ def get_user(token:str):
 
     if user is not None:
         authorization_services.verify_mail(user)
-        return JSONResponse(status_code=201, content={'msg': 'email validation successfull'})
+        return JSONResponse(status_code=201, content={'msg': constants.EMAIL_VALIDATION_SUCCEESS})
     else:
-        raise HTTPException(status_code=401, detail="Could not validate mail")
+        raise HTTPException(status_code=401, detail=constants.EMAIL_VALIDATION_FAIL)

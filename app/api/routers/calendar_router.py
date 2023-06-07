@@ -56,7 +56,7 @@ def create_calendars(
         )
     create_calendar(calendar, current_user.id)
     return JSONResponse(
-        status_code=201, content={"msg": "Calendar created successfully"}
+        status_code=201, content={"msg": constants.CALENDAR_CREATED}
     )
 
 
@@ -131,7 +131,7 @@ def change_calendar_owner(
             status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL
         )
     change_calendar_owner(calendar_id, calendar)
-    return JSONResponse(status_code=200, content={"msg": "Owner changed successfully"})
+    return JSONResponse(status_code=200, content={"msg": constants.OWNER_CHANGE})
 
 
 @calendar_router.post("/{calendar_id}/events")
@@ -213,7 +213,7 @@ def change_event(
     if event is None:
         raise HTTPException(status_code=404, detail=constants.EVENT_NOT_FOUND_DETAIL)
     modify_event(event_id, event)
-    return JSONResponse(status_code=200, content={"msg": "Event changed successfully"})
+    return JSONResponse(status_code=200, content={"msg": constants.EVENT_CHANGE})
 
 
 @calendar_router.delete("{calendar_id}/events/{event_id}")

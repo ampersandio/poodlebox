@@ -131,7 +131,7 @@ def edit_section(course_id: int,section_id: int,new_section: SectionCreate,curre
     if course is None:
         raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
-    if section not in sections:
+    if section.id not in [section.id for section in sections]:
         raise HTTPException(status_code=403, detail="This section is not part of this course")
 
     if new_section.content:
@@ -184,9 +184,11 @@ async def add_content_to_section(course_id:int, section_id:int, title:str = Form
         raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
 
     else:
-
-        link = file_upload(file,"documents",title)
-        content = ContentCreate(title=title, description=description, content_type=content_type, link=link)
+        if file:
+            link = file_upload(file,"documents",title)
+            content = ContentCreate(title=title, description=description, content_type=content_type, link=link)
+        else:
+            content = ContentCreate(title=title, description=description, content_type=content_type)
 
     courses.add_content(section_id, content)
     return JSONResponse(status_code=201, content={"msg": "Content created"})
