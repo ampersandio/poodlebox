@@ -69,7 +69,6 @@ def register_teacher(request:Request, information: TeacherRegistration, current_
         raise HTTPException(status_code=400, detail=constants.LINKED_IN_PROFILE)
 
     authorization_services.validate_email(information.email)
-
     authorization_services.validate_password(information.password)
 
     information.password = authorization_services.hash_password(information.password)

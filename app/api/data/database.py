@@ -42,7 +42,8 @@ def update_query(sql: str, sql_params: tuple = ()) -> list:
         cursor.execute(sql, sql_params)
         connection.commit()
 
-        return cursor.lastrowid
+        return cursor.rowcount
+
     
 def delete_query(sql: str, sql_params: tuple = ()) -> list:
     with _get_connection() as connection:
@@ -50,4 +51,5 @@ def delete_query(sql: str, sql_params: tuple = ()) -> list:
         cursor.execute(sql, sql_params)
         connection.commit()
 
+        return cursor.rowcount
 

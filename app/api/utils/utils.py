@@ -2,7 +2,7 @@ import os, requests
 import api.utils.constants as constants
 
 from api.services.authorization import create_access_token
-from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User
+from api.data.models import Student, Course, TeacherShow, TeacherRegistration, StudentRegistration, User, TeachersReport
 from fastapi import File
 from config import settings
 from mailjet_rest import Client
@@ -90,6 +90,26 @@ def enrollment_mail(student:Student, course:Course, teacher:TeacherShow):
         html_part=html_template
     )
 
+    mailjet.send.create(data=message)
+
+
+def mail_teachers_report(information:TeachersReport):
+
+    replacements = {
+        '{teacher_name}':information.teacher_name,
+        '{teachers_report}': information,
+    }
+
+    html_template = generate_template("api/utils/mail_templates/teachers_report.html", replacements)
+
+    message = generate_message(
+        to_email=information.teacher_email,
+        to_name=information.teacher_name,
+        subject="Teacher's Report",
+        text_part="Dear Teacher",
+        html_part=html_template
+    )
+    
     mailjet.send.create(data=message)
 
 
@@ -224,4 +244,3 @@ def email_certificate(student:User,course_title):
     )
 
     mailjet.send.create(data=message)
-
