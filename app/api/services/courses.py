@@ -367,6 +367,7 @@ def get_course_sections(course_id:int):
 
     return(list_sections)
 
+
 def leave_review(user_id: int, course_id: int, rating: float, description: str) -> bool:
     try:
         insert_query('INSERT INTO reviews(users_id, courses_id, rating, description) VALUES(?,?,?,?)', (user_id, course_id, rating, description))
