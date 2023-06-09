@@ -1,24 +1,13 @@
-# build_image:
-#   image: docker:24.0
-#   services:
-#     - docker:24.0.2-dind
-#   variables:
-#     DOCKER_TLS_CERTDIR: "/certs"
-
-#   script:
-#     - docker build -t fastapi:poodlebox .
-#     - docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_PASS
-#     - docker tag fastapi:poodlebox ampersandio/poodlebox:tagname
-#     - docker push ampersandio/poodlebox:tagname
-
 stages:
   - test
+  # - build
+  # - deploy
 
 test:
   stage: test
   image: python:3.10
   script:
-    - set -e  # Enable exit on non-zero status
+    - set -e  
     - echo "Installing dependencies..."
     - apt-get update && apt-get install -y gcc wget
     - wget https://dlm.mariadb.com/2678574/Connectors/c/connector-c-3.3.3/mariadb-connector-c-3.3.3-debian-bullseye-amd64.tar.gz -O - | tar -zxf - --strip-components=1 -C /usr
@@ -45,3 +34,43 @@ test:
     - python3 -m unittest tests/certificates_service_test.py
     - python3 -m unittest tests/courses_service_test.py
     - python3 -m unittest tests/students_services_test.py
+
+
+# build_image:
+#   stage: build
+#   image: docker:24.0
+#   services:
+#     - docker:24.0.2-dind
+#   variables:
+#     DOCKER_TLS_CERTDIR: "/certs"
+  
+#   before_script:
+#     - echo "$DOCKER_PASS" | docker login --username $DOCKER_USERNAME --password-stdin
+#   script:
+#     - export DB_NAME=poodle_box
+#     - export DB_HOST=poodlebox-db.mariadb.database.azure.com
+#     - export DB_USER=poodblebox_admin@poodlebox-db
+#     - export DB_PORT=3306
+#     - export SECRET_KEY=4bnCXC99JAmi9qeTWon9cJejuGrdJgwidrcTf3hEG4tAArFtq4Yq4ZJmdvvUGSw
+#     - export ACCESS_TOKEN_EXPIRES_MINUTES=60
+#     - export ALGORITHM=HS256
+#     - export API_KEY=7f259c3186fa49274fdb2b5209a34e36
+#     - export API_SECRET=2028888c9576f2ba14c932d91ab9778f
+#     - export VIDEO_API_KEY=hlrCk9qLZDs91CgWecna1kW54sdNi7R5JxPZA30Sy0h
+#     - export DB_PASSWORD=manchester\!united84
+#     - docker build --tag $DOCKER_USERNAME/poodlebox:tagname .
+#     - docker push $DOCKER_USERNAME/poodlebox:tagname
+
+
+# deploy:
+#   stage: deploy
+#   before_script:
+#     - chmod 400 $SSH_KEY
+#   script:
+#     - echo "$DOCKER_TOKEN" | ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@164.92.206.29 "
+#         docker login -u $DOCKER_USERNAME --password-stdin &&
+#         docker pull ampersandio/poodlebox:tagname &&
+#         docker stop $(docker ps -a -q) &&
+#         docker rm $(docker ps -a -q) &&
+#         docker run -d -p 8000:8000 -e DB_NAME=poodle_box -e DB_HOST=poodlebox-db.mariadb.database.azure.com -e DB_USER=poodblebox_admin@poodlebox-db -e DB_PORT=3306 -e SECRET_KEY=4bnCXC99JAmi9qeTWon9cJejuGrdJgwidrcTf3hEG4tAArFtq4Yq4ZJmdvvUGSw -e ACCESS_TOKEN_EXPIRES_MINUTES=60 -e ALGORITHM=HS256 -e API_KEY=7f259c3186fa49274fdb2b5209a34e36 -e API_SECRET=2028888c9576f2ba14c932d91ab9778f -e VIDEO_API_KEY=hlrCk9qLZDs91CgWecna1kW54sdNi7R5JxPZA30Sy0h -e DB_PASSWORD=manchester\!united84 ampersandio/poodlebox:tagname"
+

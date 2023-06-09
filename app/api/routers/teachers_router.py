@@ -57,7 +57,7 @@ def edit_profile(new_information: EditTeacherProfile, user: User = Depends(get_c
 
 
 @teachers_router.post("/courses/")
-def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(...),  current_user: User = Depends(get_current_user)):
+def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(None), current_user: User = Depends(get_current_user)):
     '''
     Create course with thumbnail attached as a file: Upload = File(...)
     '''
@@ -191,7 +191,7 @@ def delete_section(course_id: int,section_id: int,current_user: Annotated[User, 
     if course is None:
         raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
-    if section not in course.sections:
+    if section not in sections:
         raise HTTPException(status=403, detail="This section is not part of this course")
 
     courses.delete_section(section_id)

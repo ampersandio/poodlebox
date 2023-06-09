@@ -56,7 +56,7 @@ def user_registration_mail(information:StudentRegistration, host:str):
         '{student_first_name}':str(information.first_name),
         '{student_last_name}':information.last_name,
         '{student_email}':information.email,
-        '{approval_link}':f"{host}/api/authorization/token/{token}/"
+        '{approval_link}':f"{host}/poodlebox/token/{token}/"
     }
 
     html_template = generate_template("api/utils/mail_templates/user_registration.html", replacements)
@@ -91,7 +91,7 @@ def enrollment_mail(student:Student, course:Course, teacher:TeacherShow):
     )
 
     mailjet.send.create(data=message)
-
+    
 
 def mail_teachers_report(information:TeachersReport):
 
@@ -124,7 +124,7 @@ def teacher_registration_mail(information:TeacherRegistration):
     html_template = generate_template("api/utils/mail_templates/teacher_registration.html", replacements)
 
     message = generate_message(
-        to_email="anedelev@gmail.com",
+        to_email=constants.ADMIN_EMAIL,
         to_name=information.first_name + " " + information.last_name,
         subject="New Teacher Registered At Poodlebox",
         text_part=constants.MAIL_TEXT_PART,
@@ -132,6 +132,8 @@ def teacher_registration_mail(information:TeacherRegistration):
     )
 
     mailjet.send.create(data=message)
+
+
 
 
 def teacher_approval_mail(teacher:TeacherShow):
@@ -244,3 +246,5 @@ def email_certificate(student:User,course_title):
     )
 
     mailjet.send.create(data=message)
+    
+    result = mailjet.send.create(data=message)
