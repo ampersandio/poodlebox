@@ -437,6 +437,32 @@ class PendingEnrollment(BaseModel):
             user_id=user_id,
             course_id=course_id
         )
+    
+
+class NicePendingEnrollment(BaseModel):
+    user_id: int
+    first_name: str
+    last_name: str
+    course_id: int
+    course_name: str
+
+    @classmethod
+    def from_query(
+        cls,
+        user_id: int,
+        first_name: str,
+        last_name: str,
+        course_id: int,
+        course_name: str
+    ):
+        return cls(
+            user_id = user_id,
+            first_name = first_name,
+            last_name = last_name,
+            course_id = course_id,
+            course_name = course_name
+        )
+
 
 
 class StudentEdit(BaseModel):

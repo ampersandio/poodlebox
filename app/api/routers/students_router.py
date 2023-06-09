@@ -105,7 +105,6 @@ def get_course_for_student_by_id(
     result = get_student_course_by_id(current_user.id, course_id)
     return result
 
-
 @students_router.put("/courses/{course_id}")
 def enroll_or_unenroll_from_course(
     course_id: int,
@@ -113,54 +112,50 @@ def enroll_or_unenroll_from_course(
     current_user: User = Depends(get_current_user),
 ):
     """Enroll or unenroll a student from a particular course"""
+
     course = get_course_by_id(course_id)
-    if course == None:
+    if course is None:
         raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
+
     result = check_enrollment_status(current_user.id, course_id)
     number = get_students_number_courses_premium(current_user.id)
-    if (result == "No status" or result == 3) and subscription.enroll == False:
-        raise HTTPException(status_code=400, detail=constants.NOTHING_TO_UPDATE)
-    elif (result is None or result==3) and subscription.enroll==True and number<5:
-        if result is None:
-            enroll_in_course(current_user.id,course_id,subscription,False)
-        else:
-            enroll_in_course(current_user.id,course_id,subscription,True) 
-        student = get_profile(current_user.id)
-        course = get_course_by_id(course_id)
-        teacher = course.teacher
-        enrollment_mail(student,course,teacher)
-        return JSONResponse(
-            status_code=201, content={"msg": constants.REVIEW_REQUEST}
-        )
-    elif (result is None or result==3) and subscription.enroll==True and number==5 and course.premium==False:
-        if result is None:
-            enroll_in_course(current_user.id,course_id,subscription,False)
-        else:
-            enroll_in_course(current_user.id,course_id,subscription,True) 
-        student = get_profile(current_user.id)
-        course = get_course_by_id(course_id)
-        teacher = course.teacher
-        enrollment_mail(student,course,teacher)
-        return JSONResponse(
-            status_code=201, content={"msg": constants.REVIEW_REQUEST}
-        )
-    elif (result is None or result==3)  and subscription.enroll==True and number==5 and course.premium==True:
-        raise HTTPException(status_code=400,detail=constants.NO_MORE_PREMIUM)
-    elif result in [1,2] and subscription.enroll==True:
-        raise HTTPException(status_code=400, detail=constants.NOTHING_TO_UPDATE)
 
-    elif result in [1, 2] and subscription.enroll == False:
-        enroll_in_course(current_user.id, course_id, subscription, False)
-        return JSONResponse(
-            status_code=200,
-            content={"msg": constants.SUCCESSFULL_UNENROLLMENT},
-        )
+    if result == None or result == 3:
+        if subscription.enroll == False:
+            raise HTTPException(status_code=400, detail=constants.NOTHING_TO_UPDATE)
+        elif subscription.enroll == True and number < 5:
+            enroll_in_course(current_user.id, course_id, subscription, result is not None)
+            student = get_profile(current_user.id)
+            teacher = course.teacher
+            enrollment_mail(student, course, teacher)
+            return JSONResponse(
+                status_code=201, content={"msg": constants.REVIEW_REQUEST}
+            )
+        elif subscription.enroll == True and number == 5 and course.premium == False:
+            enroll_in_course(current_user.id, course_id, subscription, result is not None)
+            student = get_profile(current_user.id)
+            teacher = course.teacher
+            enrollment_mail(student, course, teacher)
+            return JSONResponse(
+                status_code=201, content={"msg": constants.REVIEW_REQUEST}
+            )
+        elif subscription.enroll == True and number == 5 and course.premium == True:
+            raise HTTPException(status_code=400, detail=constants.NO_MORE_PREMIUM)
+
+    elif result in [1, 2]:
+        if subscription.enroll == True:
+            raise HTTPException(status_code=400, detail=constants.NOTHING_TO_UPDATE)
+        else:
+            enroll_in_course(current_user.id, course_id, subscription, False)
+            return JSONResponse(
+                status_code=200,
+                content={"msg": constants.SUCCESSFULL_UNENROLLMENT},
+            )
+
     enroll_in_course(current_user.id, course_id, subscription, False)
     student = get_profile(current_user.id)
-    course = get_course_by_id(course_id)
     teacher = course.teacher
-    enrollment_mail(student,course,teacher)
+    enrollment_mail(student, course, teacher)
     return JSONResponse(
         status_code=201, content={"msg": constants.REVIEW_REQUEST}
     )
-

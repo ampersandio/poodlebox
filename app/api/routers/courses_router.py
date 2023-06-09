@@ -116,10 +116,14 @@ def get_section_by_id(course_id:int ,section_id:int ,current_user:Annotated[User
     if current_user.role == constants.STUDENT_ROLE:
         courses.visit_section(current_user.id, section.id)
     
+
     if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
-        if check_enrollment_status(current_user.id,course_id) == "1" and courses.change_subscription(constants.SUBSCRIPTION_EXPIRED, current_user.id, course.id) is not None:
+            
+        if check_enrollment_status(current_user.id,course_id) == "1":
             email_certificate(current_user,course.title)
-     
+        else:
+            pass
+
     return section
 
 

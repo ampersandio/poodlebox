@@ -56,7 +56,7 @@ LINKED_IN_PROFILE = "LinkedIn profile cannot be empty"
 # Miscellaneous
 
 MAIL_TEXT_PART = "Greetings from Poodlebox"
-ADMIN_EMAIL = "anedelev@gmail.com"
+ADMIN_EMAIL = "poodleboxing@gmail.com"
 REVIEW_REQUEST = "Your request has been sent for review"
 NOTHING_TO_UPDATE = "There is nothing to update"
 CERTIFICATE_NOT_FOUND_DETAIL = "Certificate for this course not found"

@@ -216,6 +216,11 @@ li a:visited {
   transition: .2s ease-in-out 0s;
 }
 
+.btn-warning:hover {
+  transform: scale(1.10);
+  transition: .2s ease-in-out 0s;
+}
+
 .right-column {
   background-color: #d7d7d7 !important;
 }
@@ -308,7 +313,7 @@ ul {
 .un:after {
   content: '';
   width: 0px;
-  height: 2px;
+  height: 3px;
   display: block;
   background: black;
   transition: 300ms;
@@ -363,6 +368,11 @@ ul {
 
 .img-container {
   position: relative;
+}
+
+.pending:hover {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0), rgb(242, 242, 242), rgba(0, 0, 0, 0))
+
 }
 
 .badge {

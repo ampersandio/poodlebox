@@ -14,7 +14,8 @@ from api.data.models import (
     CourseCreate,
     CourseShow,
     User,
-    PendingEnrollment
+    PendingEnrollment,
+    NicePendingEnrollment
 )
 from api.data import database
 
@@ -273,9 +274,9 @@ def add_content(section_id: int, content: ContentCreate) -> Content:
 def get_most_popular(role: str | None = None):
 
     if role is None:
-        query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id where c.premium = 0 group by c.id order by count(u.users_id) desc limit 5;"
+        query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id where c.premium = 0 group by c.id order by count(u.users_id) desc limit 4;"
     else:
-        query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id group by c.id order by count(u.users_id) desc limit 5;"
+        query = "select c.id, c.title, c.description, c.objectives, c.premium, c.active, c.owner, c.price, c.course_picture from courses as c join users_has_courses as u on c.id = u.courses_id group by c.id order by count(u.users_id) desc limit 4;"
 
     courses_data = read_query(query)
 
@@ -345,7 +346,7 @@ def change_subscription(subscription: int, user_id: int, course_id: int):
     subscription_data = read_query("select * from users_has_courses where users_id = ? and courses_id = ?;", (user_id, course_id,))
     subscription_status = next((SubscriptionStatus.from_query(*data) for data in subscription_data),None)
 
-    if subscription_status.subscription == "Expired":
+    if subscription_status.subscription == "2":
         return None
     else:
         return update_query("update users_has_courses set subscriptions_id = ? where users_id = ? and courses_id = ?;", (subscription, user_id, course_id,))
@@ -401,6 +402,18 @@ def get_pending_enrollments(owner_id: int) -> list[PendingEnrollment] | None:
         return None
     
     return pending_enrollments
+
+
+def get_nice_pending_enrollments(owner_id: int) -> list[PendingEnrollment] | None:
+    data = read_query('SELECT u.id,u.first_name,u.last_name,c.id,c.title from users as u join users_has_courses as uc on u.id = uc.users_id join courses as c on c.id = uc.courses_id where uc.subscriptions_id = 2 and c.id in (SELECT id FROM courses WHERE owner = 2);'), (owner_id,) 
+    pending_enrollments = [NicePendingEnrollment.from_query(*row) for row in data[0]]
+
+    print(pending_enrollments)
+    if not pending_enrollments:
+        return None
+    
+    return pending_enrollments
+
 
 
 def approve_enrollment(user_id: int, course_id: int) -> bool:
