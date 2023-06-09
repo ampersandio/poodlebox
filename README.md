@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href=""><img src="app/assets/poodlebox.png" alt="Markdownify" width="200"></a>
+  <a href=""><img src="app/assets/poodlebox.png" alt="Markdownify" width="300"></a>
 </h1>
 
 
