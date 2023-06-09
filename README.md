@@ -1,21 +1,58 @@
-
 <h1 align="center">
   <br>
   <a href=""><img src="app/assets/poodlebox.png" alt="Markdownify" width="200"></a>
 </h1>
 
-## API Documentation
 
-This API documentation provides details about the available endpoints and their functionalities.
+## **Introduction**
 
-## Database Schema
+The Poodlebox API provides a platform for managing online courses, student profiles, user authentication, calendars, and more. It allows students, teachers, and admins to interact with the system and perform various actions.This API documentation provides details about the available endpoints and their functionalities.
+
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Technologies](#technologies-used)
+- [Configuration](#configuration)
+- [Authentication](#authentication)
+- [Authentication](#authentication)
+- [Courses](#courses)
+- [Students](#students)
+- [Admins](#admins)
+- [Ads](#ads)
+- [Teachers](#teachers)
+- [Calendars](#calendars)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Contributing](#contributing)
+- [License](#license)
+
+
+## **Installation**
+
+Clone this repository using
+```sh
+$ git clone https://gitlab.com/poodlebox-project-team-12/poodlebox
+```
+Enter the directory and install all the requirements using
+```sh
+$ pip3 install -r requirements.txt
+```
+Run the app using
+```sh
+$ python3 uvicorn main:app --reload
+```
+Navigate to 127.0.0.1:8000/docs to see the Homepage
 
 <h1 align="center">
   <br>
-  <a href=""><img src="app/assets/schema_diagram.png" alt="Markdownify" width=auto></a>
+  <a href=""><img src="app/assets/clone.gif" alt="Markdownify" width=auto></a>
 </h1>
 
-## Technologies Used
+
+## **Technologies Used**
 
 The API is built using the following technologies:
 
@@ -23,9 +60,31 @@ The API is built using the following technologies:
 - Database: MariaDB
 - Authentication: JWT (JSON Web Tokens)
 - Mail Client: MailJet API
+- Video Handling: video-api 
 
-## Authentication
+## **Configuration**
 
+The API can be configured using environment variables. The following variables need to be set:
+
+- `DB_NAME` - The name of the database.
+- `DB_HOST` - The host address of the database.
+- `DB_USER` - The username for connecting to the database.
+- `DB_PASSWORD` - The password for connecting to the database.
+- `DB_PORT` - The port number for the database connection.
+
+- `SECRET_KEY` - A secret key for securing sensitive information and generating tokens.
+- `ACCESS_TOKEN_EXPIRES_MINUTES` - The expiration time for access tokens in minutes.
+- `ALGORITHM` - The algorithm used for token generation.
+
+- `API_KEY` - The API key for accessing external services.
+- `API_SECRET` - The secret key for accessing external services.
+
+- `VIDEO_API_KEY` - The API key for video-related functionality.
+
+- `DOCKER_TOKEN` - The token for authenticating with Docker registry.
+
+
+## **Authentication**
 
 The authentication section handles user registration and login. The authentication service includes the following components:
 
@@ -36,161 +95,114 @@ The authentication section handles user registration and login. The authenticati
 - **User Verification**: Users can be marked as verified by updating their profile. This verification can be used to control access to certain endpoints or features.
 
 
-## Authentication
+## **Routers**
 
-The authentication section handles user registration and login.
-
-| Method | Endpoint                                 | Description                     |
-|--------|------------------------------------------|---------------------------------|
-| POST   | `/api/authorization/registration/students` | Register Student       |
-| POST   | `/api/authorization/registration/teachers` | Register Teacher       |
-| POST   | `/api/authorization/login`                 | Login                  |
-
-## Courses
-
-The courses section provides endpoints for managing courses and their sections.
-
-| Method | Endpoint                                 | Description                     |
-|--------|------------------------------------------|---------------------------------|
-| GET    | `/api/courses/`                        | Get All Courses           |
-| POST   | `/api/courses/`                        | Create Course             |
-| GET    | `/api/courses/{course_id}`              | Get Course By Id          |
-| GET    | `/api/courses/{course_id}/sections/`    | Get Course Sections       |
-| POST   | `/api/courses/{course_id}/sections/`    | Add Section               |
-| GET    | `/api/courses/{course_id}/sections/{section_id}` | Get Section By Id |
-| POST   | `/api/courses/{course_id}/sections/{section_id}` | Add Content To Section |
-
-## Students
-
-The students section includes endpoints related to student profiles and course enrollment.
-
-| Method | Endpoint                                 | Description                     |
-|--------|------------------------------------------|---------------------------------|
-| GET    | `/api/students/courses`                   | Get Courses For Student         |
-| GET    | `/api/students/profiles`                  | Get Student Profile             |
-| PUT    | `/api/students/profiles`                  | Change Student Profile          |
-| GET    | `/api/students/courses/{course_id}`       | Get Course For Student By Id    |
-| PUT    | `/api/students/courses/{course_id}`       | Enroll Or Unenroll From Course  |
-
-Please refer to the API documentation for specific details about each endpoint.
+### Authentication
 
 
+| Method | Endpoint                                          | Description             | 
+|--------|---------------------------------------------------|-------------------------|
+| POST   | `/api/authorization/registration/students`         | Register Student        |
+| POST   | `/api/authorization/registration/teachers`         | Register Teacher        |
+| POST   | `/api/authorization/login`                         | Login                   |
 
-<!-- 
-<h4 align="center">E-Learning Portal of the Future<a href="" target="_blank"></a>.</h4>
+### Courses
 
-<p align="center">
-  <a href="https://badge.fury.io/js/electron-markdownify">
-    <img src="https://badge.fury.io/js/electron-markdownify.svg"
-         alt="Gitter">
-  </a>
-  <a href="https://gitter.im/amitmerchant1990/electron-markdownify"><img src="https://badges.gitter.im/amitmerchant1990/electron-markdownify.svg"></a>
-  <a href="https://saythanks.io/to/bullredeyes@gmail.com">
-      <img src="https://img.shields.io/badge/SayThanks.io-%E2%98%BC-1EAEDB.svg">
-  </a>
-  <a href="https://www.paypal.me/AmitMerchant">
-    <img src="https://img.shields.io/badge/$-donate-ff69b4.svg?maxAge=2592000&amp;style=flat">
-  </a>
-</p>
+| Method | Endpoint                                          | Description             |
+|--------|---------------------------------------------------|-------------------------|
+| GET    | `/api/courses/`                                   | Get All Courses         |
+| GET    | `/api/courses/popular`                            | Get Most Popular Courses|
+| GET    | `/api/courses/{course_id}`                         | Get Course By Id        |
+| GET    | `/api/courses/{course_id}/sections/`               | Get Course Sections     |
+| GET    | `/api/courses/{course_id}/sections/{section_id}`   | Get Section By Id       |
+| POST   | `/api/courses/{course_id}/reviews`                 | Post Review             |
+| PUT    | `/api/courses/{course_id}/status`                  | Change Course Status    |
+| GET    | `/api/courses/pending_enrollments/reports`         | Get Pending Enrollments |
+| PUT    | `/api/courses/pending_enrollments`                 | Judge Enrollment        |
 
-<p align="center">
-  <a href="#key-features">Key Features</a> •
-  <a href="#how-to-use">How To Use</a> •
-  <a href="#download">Download</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#related">Related</a> •
-  <a href="#license">License</a>
-</p>
+### Students
 
-![screenshot](https://raw.githubusercontent.com/amitmerchant1990/electron-markdownify/master/app/img/markdownify.gif)
+| Method | Endpoint                                          | Description             |
+|--------|---------------------------------------------------|-------------------------|
+| GET    | `/api/students/courses/certificates`               | Get Certificates Of Student                |
+| GET    | `/api/studentscourses/{course_id}/certificates`    | Get Certificate Of Student For Course       |
+| GET    | `/api/students/courses`                            | Get Courses For Student                    |
+| GET    | `/api/students/profiles`                           | Get Student Profile                        |
+| PUT    | `/api/students/profiles`                           | Change Student Profile                     |
+| GET    | `/api/students/courses/{course_id}`                 | Get Course For Student By Id               |
+| PUT    | `/api/students/courses/{course_id}`                 | Enroll Or Unenroll From Course             |
 
-## Key Features
+### Admins
 
-* LivePreview - Make changes, See changes
-  - Instantly see what your Markdown documents look like in HTML as you create them.
-* Sync Scrolling
-  - While you type, LivePreview will automatically scroll to the current location you're editing.
-* GitHub Flavored Markdown  
-* Syntax highlighting
-* [KaTeX](https://khan.github.io/KaTeX/) Support
-* Dark/Light mode
-* Toolbar for basic Markdown formatting
-* Supports multiple cursors
-* Save the Markdown preview as PDF
-* Emoji support in preview :tada:
-* App will keep alive in tray for quick usage
-* Full screen mode
-  - Write distraction free.
-* Cross platform
-  - Windows, macOS and Linux ready.
+| Method | Endpoint                                          | Description             |
+|--------|---------------------------------------------------|-------------------------|
+| PUT    | `/api/admins/students/{student_id}/status/{disabled}` | Change Student Status |
+| PUT    | `/api/admins/courses/{course_id}/status/{disabled}`  | Change Course Status  |
+| PUT    | `/api/admins/courses/{course_id}/students/{student_id}` | Remove Student From Course |
+| GET    | `/api/admins/registrations/`                       | Get Pending             |
+| PUT    | `/api/admins/registrations/{teacher_id}`           | Approve                 |
+| GET    | `/api/admins/ratings/traceback`                    | Traceback Ratings       |
 
-## How To Use
+### Ads
 
-To clone and run this application, you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
+| Method | Endpoint                                          | Description             |
+|--------|---------------------------------------------------|-------------------------|
+| GET    | `/api/ads/`                                       | Get Users Ad            |
 
-```bash
-# Clone this repository
-$ git clone https://github.com/amitmerchant1990/electron-markdownify
+### Teachers
 
-# Go into the repository
-$ cd electron-markdownify
+| Method | Endpoint                                          | Description             |
+|--------|---------------------------------------------------|-------------------------|
+| GET    | `/api/teachers/courses/reports`                    | Get Report              |
+| GET    | `/api/teachers/profiles/`                          | View Profile            |
+| PUT    | `/api/teachers/profiles/`                          | Edit Profile            |
+| POST   | `/api/teachers/courses/`                           | Course Create           |
+| POST   | `/api/teachers/courses/{course_id}/thumbnail`       | Upload Photo            |
+| POST   | `/api/teachers/courses/{course_id}/sections/`       | Add Section             |
+| PUT    | `/api/teachers/courses/{course_id}/sections/{section_id}` | Edit Section      |
+| DELETE | `/api/teachers/courses/{course_id}/sections/{section_id}` | Delete Section    |
+| POST   | `/api/teachers/courses/{course_id}/sections/{section_id}/content` | Add Content To Section |
 
-# Install dependencies
-$ npm install
+### Calendars
 
-# Run the app
-$ npm start
-```
+| Method | Endpoint                                          | Description             |
+|--------|---------------------------------------------------|-------------------------|
+| GET    | `/api/calendars/`                                 | Get All Calendars        |
+| POST   | `/api/calendars/`                                 | Create Calendars         |
+| GET    | `/api/calendars/{calendar_id}`                     | Get Calendar By Calendar Id |
+| PUT    | `/api/calendars/{calendar_id}`                     | Change Calendar Owner    |
+| GET    | `/api/calendars/{calendar_id}/events`              | Get Events For Calendar  |
+| POST   | `/api/calendars/{calendar_id}/events`              | Add Event                |
+| GET    | `/api/calendars/{calendar_id}/events/{event_id}`   | Get Event By Event Id    |
+| PUT    | `/api/calendars{calendar_id}/events/{event_id}`    | Change Event             |
+| DELETE | `/api/calendars/{calendar_id}/events/{event_id}`   | Delete Event             |
 
-> **Note**
-> If you're using Linux Bash for Windows, [see this guide](https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/) or use `node` from the command prompt.
+
+## **Requirements**
+
+The following are the important packages and dependencies required for this project:
+
+- fastapi==0.95.0
+- fastapi-jwt-auth==0.5.0
+- mariadb==1.1.6
+- pydantic==1.10.7
+- uvicorn==0.21.1
+- requests==2.31.0
+- python-dotenv==1.0.0
+- email-validator==1.1.3
+- api.video==1.2.8
+- mailjet==1.4.1
+
+Make sure to have these dependencies installed in your environment before running the project. You can install them using the package manager of your choice (e.g., pip).
 
 
-## Download
 
-You can [download](https://github.com/amitmerchant1990/electron-markdownify/releases/tag/v1.2.0) the latest installable version of Markdownify for Windows, macOS and Linux.
 
-## Emailware
+## **Live Demo**
+If you want to see how Redoc will render your OpenAPI definition, you can try it out online at http://13.49.137.204/poodlebox/.
+The default Poodlebox E-learning platform is displayed by default. Please feel free to test it 
 
-Markdownify is an [emailware](https://en.wiktionary.org/wiki/emailware). Meaning, if you liked using this app or it has helped you in any way, I'd like you send me an email at <bullredeyes@gmail.com> about anything you'd want to say about this software. I'd really appreciate it!
+## Database Schema
 
-## Credits
+[Link to Schema Diagram](app/assets/schema_diagram.png)
 
-This software uses the following open source packages:
-
-- [Electron](http://electron.atom.io/)
-- [Node.js](https://nodejs.org/)
-- [Marked - a markdown parser](https://github.com/chjj/marked)
-- [showdown](http://showdownjs.github.io/showdown/)
-- [CodeMirror](http://codemirror.net/)
-- Emojis are taken from [here](https://github.com/arvida/emoji-cheat-sheet.com)
-- [highlight.js](https://highlightjs.org/)
-
-## Related
-
-[markdownify-web](https://github.com/amitmerchant1990/markdownify-web) - Web version of Markdownify
-
-## Support
-
-<a href="https://www.buymeacoffee.com/5Zn8Xh3l9" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-
-<p>Or</p> 
-
-<a href="https://www.patreon.com/amitmerchant">
-	<img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
-</a>
-
-## You may also like...
-
-- [Pomolectron](https://github.com/amitmerchant1990/pomolectron) - A pomodoro app
-- [Correo](https://github.com/amitmerchant1990/correo) - A menubar/taskbar Gmail App for Windows and macOS
-
-## License
-
-MIT
-
----
-
-> [amitmerchant.com](https://www.amitmerchant.com) &nbsp;&middot;&nbsp;
-> GitHub [@amitmerchant1990](https://github.com/amitmerchant1990) &nbsp;&middot;&nbsp;
-> Twitter [@amit_merchant](https://twitter.com/amit_merchant) -->

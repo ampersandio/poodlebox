@@ -50,9 +50,9 @@
 {% endfor %}
 
 <br>
-<br>
-
 {% if user.role == "teacher" %}
+{% if pending_enrollments %}
+
 <h1>Pending Subscriptions for your courses:</h1>
 <hr>
 {% for enrollment in pending_enrollments %}
@@ -81,6 +81,13 @@
   <hr>
 </ul>
 {% endfor %}
+
+{% else %}
+
+<h1>Currently there are no Pending Subscriptions for your courses</h1>
+<hr>
+
+{% endif %}
 <br>
 <h1>Add New Course:</h1>
 <hr>
