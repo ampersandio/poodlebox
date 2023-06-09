@@ -1,6 +1,6 @@
 import api.utils.constants as constants
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from api.services.authorization import get_current_user
@@ -92,14 +92,15 @@ def get_pending(current_user = Depends(get_current_user)):
 
 
 @admins_router.put("/registrations/{teacher_id}")
-def approve(teacher_id: int, current_user = Depends(get_current_user)):
+def approve(request:Request, teacher_id: int, current_user = Depends(get_current_user)):
     '''
     Approve Teachers Registration
     '''
+    host = "http://" + request.headers["host"]
 
     teacher = get_user_by_id(teacher_id)
 
-    teacher_approval_mail(teacher)
+    teacher_approval_mail(teacher,host)
 
     if teacher is None:
         raise HTTPException(status_code=404, detail=constants.TEACHER_NOT_FOUND_DETAIL)

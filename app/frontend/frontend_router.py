@@ -216,9 +216,6 @@ def register(request: Request, email: str = Form(...), first_name: str = Form(..
     student = StudentRegistration(email=email, first_name=first_name, last_name=last_name, password=password,
                                  date_of_birth=date_of_birth)
 
-    data = user_registration_mail(student, host)
-
-    # mailjet.send.create(data=data)
 
     if status_code == 201:
         return templates.TemplateResponse("message.html", {"request": request, "message":"Successfully Registered to Poodlebox!"})
@@ -251,11 +248,24 @@ def judge_enrollment(
                'course_id':course_id
                }
     
+    try:
+        user = get_current_user(token)
+        courses = get_courses(request, token)
+    except:
+        user = None
+        courses = get_courses(request)
+
+    if token:
+        headers["authorization"] = f"Bearer {token}"
+
+    pending_courses = get_nice_pending_enrollments(user.id)
+
+    popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
+    
     result = requests.put(f"{host}/api/courses/pending_enrollments", data=payload, headers=headers) 
 
-    print(result)
     if result.status_code == 200:
-        return templates.TemplateResponse("profile.html", {"request": request})
+        return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses,  "most_popular": popular_courses.json(),"pending_enrollments":pending_courses})
     else:
         return templates.TemplateResponse("message.html", {"request": request, "message": "Something Went Wrong"})
 
