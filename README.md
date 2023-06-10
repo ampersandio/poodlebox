@@ -8,8 +8,13 @@
 
 The Poodlebox API provides a platform for managing online courses, student profiles, user authentication, calendars, and more. It allows students, teachers, and admins to interact with the system and perform various actions.This API documentation provides details about the available endpoints and their functionalities.
 
+## **Team Members**
 
-## Table of Contents
+- [Alexander Nedelev](https://gitlab.com/anedelev)
+- [Blagovesta Alexandrova](https://gitlab.com/newcopernicus)
+- [Nikolai Dimitrov](https://gitlab.com/Nikolaisyl)
+
+## **Table of Contents**
 
 - [Installation](#installation)
 - [Technologies](#technologies-used)
