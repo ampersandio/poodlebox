@@ -34,6 +34,7 @@ def get_courses(request: Request, token: str | None  = None, tag:str = None):
     else:
         courses = requests.get(f"{host}/api/courses/", headers=headers)
 
+
     return courses.json()
 
 
@@ -44,6 +45,8 @@ def index(request: Request,tag:str=None):
     
     token = request.cookies.get("token")
 
+    courses = get_courses(request, tag=tag)
+    
     try:
         user = get_current_user(token)
         courses = get_courses(request, token, tag=tag)
@@ -107,6 +110,7 @@ def index(request: Request):
         courses = get_students_courses(user.id)
     else:
         raise HTTPException(constants.COURSE_ACCESS_DENIED_DETAIL)
+    
 
     return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses,"most_popular": popular_courses.json(), "pending_enrollments":pending_courses} )
 
@@ -264,6 +268,15 @@ def judge_enrollment(
     
     result = requests.put(f"{host}/api/courses/pending_enrollments", data=payload, headers=headers) 
 
+
+    if user.role == constants.TEACHER_ROLE:
+        courses = [course for course in courses["items"] if course["teacher"]["email"] == user.email] 
+    elif user.role == constants.STUDENT_ROLE:
+        courses = get_students_courses(user.id)
+    else:
+        raise HTTPException(constants.COURSE_ACCESS_DENIED_DETAIL)
+    
+
     if result.status_code == 200:
         return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses,  "most_popular": popular_courses.json(),"pending_enrollments":pending_courses})
     else:
@@ -292,7 +305,7 @@ def course_create(
     popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
     pending_courses = get_nice_pending_enrollments(user.id)
 
-    print(popular_courses)
+    # print(popular_courses)
     # Form data as a dictionary
     form_data = {
         "title": title,
