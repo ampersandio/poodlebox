@@ -26,8 +26,14 @@ def pending_registrations():
     return users
 
 
-def approve_registration(teacher_id:int):
-    update_query("update users set approved = 1 where id = ?;", (teacher_id,))
+def judge_registration(teacher_id:int, approve:bool):
+    if approve:
+        update_query("update users set approved = 1 where id = ?;", (teacher_id,))
+    else:
+        update_query("delete from users where approved = 0 and id = ?;", (teacher_id,))
+
+
+
 
 def search_courses():
     # search through courses filtered by teacher and/or by student

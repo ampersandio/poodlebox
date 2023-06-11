@@ -415,7 +415,6 @@ def get_nice_pending_enrollments(owner_id: int) -> list[PendingEnrollment] | Non
     return pending_enrollments
 
 
-
 def approve_enrollment(user_id: int, course_id: int) -> bool:
     enrolled = update_query('UPDATE users_has_courses SET subscriptions_id = 1 WHERE users_id=? AND courses_id=?', (user_id, course_id))
     return bool(enrolled)
