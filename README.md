@@ -18,9 +18,14 @@ The Poodlebox API provides a platform for managing online courses, student profi
 
 ## **Table of Contents**
 
+Essentials
 - [Installation](#installation)
 - [Technologies](#technologies-used)
 - [Configuration](#configuration)
+- [Requirements](#requirements)
+- [Database Schema](#database-schema)
+
+Endpoints
 - [Authentication](#authentication)
 - [Courses](#courses)
 - [Students](#students)
@@ -28,9 +33,9 @@ The Poodlebox API provides a platform for managing online courses, student profi
 - [Ads](#ads)
 - [Teachers](#teachers)
 - [Calendars](#calendars)
-- [Requirements](#requirements)
+
+Frontend
 - [Live Demo](#live-demo)
-- [Database Schema](#database-schema)
 
 
 ## **Installation**
@@ -105,6 +110,11 @@ The authentication section handles user registration and login. The authenticati
 - **User Verification**: Users can be marked as verified by updating their profile. This verification can be used to control access to certain endpoints or features.
 
 
+## Database Schema
+
+[Link to Schema Diagram](app/assets/schema_diagram.png)
+
+
 ## **Routers**
 
 
@@ -140,12 +150,15 @@ The authentication section handles user registration and login. The authenticati
 
 <p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
 
-
-|` Method `|` Endpoint                                                                                          `|` Description             `|
+|` Method `|` Endpoint                                                                                     `|` Description             `|
 |--------|---------------------------------------------------|-----------------------------|
-| GET    | `/api/students/courses/certificates`               | Get All Student Certificates               |
-| GET    | `/api/students/courses/{course_id}/certificates`    | Get Student Certificate        |
-| GET    | `/api/students/courses`                            | Get All Student Courses                   |
+<p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
+
+|` Method `|` Endpoint                                                                                     `|` Description             `|
+|--------|---------------------------------------------------|-----------------------------|
+| GET    | `/api/students/courses/certificates`               | Get Certificates Of Student                |
+| GET    | `/api/students/courses/{course_id}/certificates`    | Get Certificate Of Student For Course       |
+| GET    | `/api/students/courses`                            | Get Courses For Student                    |
 | GET    | `/api/students/profiles`                           | Get Student Profile                        |
 | PUT    | `/api/students/profiles`                           | Change Student Profile                     |
 | GET    | `/api/students/courses/{course_id}`                 | Get Course For Student By Id               |
@@ -154,7 +167,6 @@ The authentication section handles user registration and login. The authenticati
 ### Admins
 
 <p> The admins router is in charge of managing all administrative privileges, including tasks such as changing the status of students or courses, removing students from courses, and retrieving pending teacher registrations. It is specifically designed to handle actions and functionalities related to administrative tasks and responsibilities. </p>
-
 
 |` Method `|` Endpoint                                                                                          `|` Description             `|
 |--------|---------------------------------------------------|-------------------------|
@@ -166,7 +178,6 @@ The authentication section handles user registration and login. The authenticati
 <!-- | GET    | `/api/admins/ratings/traceback`                    | Traceback Ratings       | -->
 
 ### Ads
-
 
 <p>Advertisement composed of three courses curated based on the most popular tags among students who have enrolled in or completed courses.</p>
 
@@ -194,7 +205,6 @@ The authentication section handles user registration and login. The authenticati
 ### Calendars
 
 <p>The calendar router is a powerful tool for managing calendars and events within the system. It provides a collection of endpoints that enable various operations related to calendars and events. </p>
-
 
 |` Method `|` Endpoint                                                                                          `|` Description             `|
 |--------|---------------------------------------------------|-------------------------|
@@ -267,9 +277,4 @@ We've provided live demo with custom frontend you can see here: http://13.49.137
   <a href=""><img src="app/assets/screen_3.png" alt="Markdownify" width="100%"></a>
 </h1>
 
-
-
-## Database Schema
-
-[Link to Schema Diagram](app/assets/schema_diagram.png)
 
