@@ -75,20 +75,30 @@ The API is built using the following technologies:
 
 The API can be configured using environment variables or .env file. The following variables need to be set:
 
+Database Variables:
+
 - `DB_NAME` - The name of the database.
 - `DB_HOST` - The host address of the database.
 - `DB_USER` - The username for connecting to the database.
 - `DB_PASSWORD` - The password for connecting to the database.
 - `DB_PORT` - The port number for the database connection.
 
+Authentication Variables:
+
 - `SECRET_KEY` - A secret key for securing sensitive information and generating tokens.
 - `ACCESS_TOKEN_EXPIRES_MINUTES` - The expiration time for access tokens in minutes.
 - `ALGORITHM` - The algorithm used for token generation.
 
-- `API_KEY` - The API key for accessing external services.
-- `API_SECRET` - The secret key for accessing external services.
+Mailjet Variables:
+
+- `API_KEY` - Mailjet API key for secure authentication.
+- `API_SECRET` - Mailjet API key.
+
+Video-Api Variables:
 
 - `VIDEO_API_KEY` - The API key for video-related functionality.
+
+Docker Variables:
 
 - `DOCKER_TOKEN` - The token for authenticating with Docker registry.
 
@@ -207,6 +217,12 @@ The authentication section handles user registration and login. The authenticati
 | PUT    | `/api/calendars{calendar_id}/events/{event_id}`    | Change Event             |
 | DELETE | `/api/calendars/{calendar_id}/events/{event_id}`   | Delete Event             |
 
+### More detailed information available through Open Api documentation at /docs or /redoc
+```
+Swagger Ui - http://127.0.0.1:8000/docs
+Redoc - http://127.0.0.1:8000/redoc
+
+```
 
 ## **Requirements**
 
