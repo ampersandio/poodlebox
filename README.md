@@ -1,3 +1,9 @@
+<h1 align="center">
+  <br>
+  <a href=""><img src="app/assets/poodlebox.png" alt="Markdownify"></a>
+</h1>
+
+
 ## **Introduction**
 
 The Poodlebox API provides a platform for managing online courses, student profiles, user authentication, calendars, and more. It allows students, teachers, and admins to interact with the system and perform various actions.This API documentation provides details about the available endpoints and their functionalities.
@@ -7,7 +13,13 @@ The Poodlebox API provides a platform for managing online courses, student profi
 - [Alexander Nedelev](https://gitlab.com/anedelev)
 - [Blagovesta Alexandrova](https://gitlab.com/newcopernicus)
 - [Nikolai Dimitrov](https://gitlab.com/Nikolaisyl)
+## **Team Members**
 
+- [Alexander Nedelev](https://gitlab.com/anedelev)
+- [Blagovesta Alexandrova](https://gitlab.com/newcopernicus)
+- [Nikolai Dimitrov](https://gitlab.com/Nikolaisyl)
+
+## **Table of Contents**
 ## **Table of Contents**
 
 - [Installation](#installation)
@@ -44,10 +56,9 @@ Run the app using
 $ python3 uvicorn main:app --reload
 ```
 Navigate to 127.0.0.1:8000/docs to see the Homepage
-
 <h1 align="center">
   <br>
-  <a href=""><img src="app/assets/git_clone.webp" alt="Markdownify" ></a>
+  <a href=""><img src="app/assets/clone.gif" alt="Markdownify" style="width: 150%;">
 </h1>
 
 ## **Technologies Used**
@@ -126,6 +137,10 @@ The authentication section handles user registration and login. The authenticati
 
 ### Students
 
+<p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
+
+|` Method `|` Endpoint                                                                                     `|` Description             `|
+|--------|---------------------------------------------------|-----------------------------|
 <p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
 
 |` Method `|` Endpoint                                                                                     `|` Description             `|

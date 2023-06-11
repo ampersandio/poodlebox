@@ -41,6 +41,7 @@ test:
       - "*.md"
       - "*.yml"
       when: never
+    - python3 -m unittest tests/admins_services_test.py
 
     - when: always
     
