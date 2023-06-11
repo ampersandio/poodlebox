@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href=""><img src="app/assets/poodlebox.png" alt="Markdownify" width="350"></a>
+  <a href=""><img src="app/assets/poodlebox.png" alt="Markdownify"></a>
 </h1>
 
 
@@ -13,7 +13,13 @@ The Poodlebox API provides a platform for managing online courses, student profi
 - [Alexander Nedelev](https://gitlab.com/anedelev)
 - [Blagovesta Alexandrova](https://gitlab.com/newcopernicus)
 - [Nikolai Dimitrov](https://gitlab.com/Nikolaisyl)
+## **Team Members**
 
+- [Alexander Nedelev](https://gitlab.com/anedelev)
+- [Blagovesta Alexandrova](https://gitlab.com/newcopernicus)
+- [Nikolai Dimitrov](https://gitlab.com/Nikolaisyl)
+
+## **Table of Contents**
 ## **Table of Contents**
 
 - [Installation](#installation)
@@ -52,7 +58,7 @@ $ python3 uvicorn main:app --reload
 Navigate to 127.0.0.1:8000/docs to see the Homepage
 <h1 align="center">
   <br>
-  <a href=""><img src="app/assets/clone.gif" alt="Markdownify" style="width: 150%;">
+  <a href=""><img src="app/assets/git_clone.webp" alt="Markdownify">
 </h1>
 
 ## **Technologies Used**
@@ -131,6 +137,10 @@ The authentication section handles user registration and login. The authenticati
 
 ### Students
 
+<p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
+
+|` Method `|` Endpoint                                                                                     `|` Description             `|
+|--------|---------------------------------------------------|-----------------------------|
 <p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
 
 |` Method `|` Endpoint                                                                                     `|` Description             `|
