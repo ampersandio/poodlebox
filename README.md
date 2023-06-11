@@ -53,7 +53,7 @@ Navigate to 127.0.0.1:8000/docs to see the Homepage
 
 <h1 align="center">
   <br>
-  <a href=""><img src="app/assets/clone.gif" alt="Markdownify" style="width: 100%;">
+  <a href=""><img src="app/assets/clone.gif" alt="Markdownify" style="width: 150%;">
 </h1>
 
 ## **Technologies Used**
