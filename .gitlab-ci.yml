@@ -34,8 +34,15 @@ test:
     - python3 -m unittest tests/certificates_service_test.py
     - python3 -m unittest tests/courses_service_test.py
     - python3 -m unittest tests/students_services_test.py
+    - python3 -m unittest tests/admins_services_test.py
 
+  rules:
+    - changes:
+      - "*.md"
+      - "*.yml"
+      when: never
 
+    - when: always
 # build_image:
 #   stage: build
 #   image: docker:24.0
