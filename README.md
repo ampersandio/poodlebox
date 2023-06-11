@@ -230,7 +230,7 @@ We've provided live demo with custom frontend you can see here: http://13.49.137
   Profile Page
   <p>Teachers profile page with pending enrollments and course creation form</p>
   <br>
-  <a href=""><img src="app/assets/screen_2.png" alt="Markdownify" width="100%"></a>
+  <a href=""><img src="app/assets/screen_3.png" alt="Markdownify" width="100%"></a>
 </h1>
 
 
