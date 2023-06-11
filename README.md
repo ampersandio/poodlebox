@@ -22,7 +22,6 @@ The Poodlebox API provides a platform for managing online courses, student profi
 - [Technologies](#technologies-used)
 - [Configuration](#configuration)
 - [Authentication](#authentication)
-- [Authentication](#authentication)
 - [Courses](#courses)
 - [Students](#students)
 - [Admins](#admins)
@@ -30,11 +29,8 @@ The Poodlebox API provides a platform for managing online courses, student profi
 - [Teachers](#teachers)
 - [Calendars](#calendars)
 - [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-- [License](#license)
+- [Live Demo](#live-demo)
+- [Database Schema](#database-schema)
 
 
 ## **Installation**
