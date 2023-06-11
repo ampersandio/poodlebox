@@ -1,15 +1,14 @@
-<h1 align="center">
-  <br>
-  <a href=""><img src="app/assets/poodlebox.png" alt="Markdownify" width="200"></a>
-</h1>
-
-
 ## **Introduction**
 
 The Poodlebox API provides a platform for managing online courses, student profiles, user authentication, calendars, and more. It allows students, teachers, and admins to interact with the system and perform various actions.This API documentation provides details about the available endpoints and their functionalities.
 
+## **Team Members**
 
-## Table of Contents
+- [Alexander Nedelev](https://gitlab.com/anedelev)
+- [Blagovesta Alexandrova](https://gitlab.com/newcopernicus)
+- [Nikolai Dimitrov](https://gitlab.com/Nikolaisyl)
+
+## **Table of Contents**
 
 - [Installation](#installation)
 - [Technologies](#technologies-used)
@@ -48,7 +47,7 @@ Navigate to 127.0.0.1:8000/docs to see the Homepage
 
 <h1 align="center">
   <br>
-  <a href=""><img src="app/assets/clone.gif" alt="Markdownify" style="width: 100%;">
+  <a href=""><img src="app/assets/git_clone.webp" alt="Markdownify" ></a>
 </h1>
 
 ## **Technologies Used**
@@ -96,10 +95,13 @@ The authentication section handles user registration and login. The authenticati
 
 ## **Routers**
 
-### Authentication
+
+<h3>Authentication</h3>
+
+<p> The authentication router manages the registration and login process for both teachers and students. Only an administrator has the authority to register a teacher, and the database is the only place where administrator privileges can be assigned. Registration of teachers can only be done by administrators. </p>
 
 
-| Method | Endpoint                                          | Description             |
+|` Method `|` Endpoint                                                                                          `|` Description             `|
 |--------|---------------------------------------------------|-------------------------|
 | POST   | `/api/authorization/registration/students`         | Register Student        |
 | POST   | `/api/authorization/registration/teachers`         | Register Teacher        |
@@ -107,7 +109,10 @@ The authentication section handles user registration and login. The authenticati
 
 ### Courses
 
-| Method | Endpoint                                          | Description             |
+<p> The courses router is responsible for handling all actions related to viewing courses, such as viewing the course itself and the available sections. These actions are available to both students and teachers. However, the modifying actions, such as creating (POST), updating (PUT), and deleting (DELETE), are separated into different routers for teachers and students. </p>
+
+
+|` Method `|` Endpoint                                                                                          `|` Description             `|
 |--------|---------------------------------------------------|-------------------------|
 | GET    | `/api/courses/`                                   | Get All Courses         |
 | GET    | `/api/courses/popular`                            | Get Most Popular Courses|
@@ -121,10 +126,12 @@ The authentication section handles user registration and login. The authenticati
 
 ### Students
 
-| Method | Endpoint                                          | Description             |
-|--------|---------------------------------------------------|-------------------------|
+<p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
+
+|` Method `|` Endpoint                                                                                     `|` Description             `|
+|--------|---------------------------------------------------|-----------------------------|
 | GET    | `/api/students/courses/certificates`               | Get Certificates Of Student                |
-| GET    | `/api/studentscourses/{course_id}/certificates`    | Get Certificate Of Student For Course       |
+| GET    | `/api/students/courses/{course_id}/certificates`    | Get Certificate Of Student For Course       |
 | GET    | `/api/students/courses`                            | Get Courses For Student                    |
 | GET    | `/api/students/profiles`                           | Get Student Profile                        |
 | PUT    | `/api/students/profiles`                           | Change Student Profile                     |
@@ -133,24 +140,31 @@ The authentication section handles user registration and login. The authenticati
 
 ### Admins
 
-| Method | Endpoint                                          | Description             |
+<p> The admins router is in charge of managing all administrative privileges, including tasks such as changing the status of students or courses, removing students from courses, and retrieving pending teacher registrations. It is specifically designed to handle actions and functionalities related to administrative tasks and responsibilities. </p>
+
+|` Method `|` Endpoint                                                                                          `|` Description             `|
 |--------|---------------------------------------------------|-------------------------|
 | PUT    | `/api/admins/students/{student_id}/status/{disabled}` | Change Student Status |
 | PUT    | `/api/admins/courses/{course_id}/status/{disabled}`  | Change Course Status  |
 | PUT    | `/api/admins/courses/{course_id}/students/{student_id}` | Remove Student From Course |
 | GET    | `/api/admins/registrations/`                       | Get Pending             |
 | PUT    | `/api/admins/registrations/{teacher_id}`           | Approve                 |
-| GET    | `/api/admins/ratings/traceback`                    | Traceback Ratings       |
+<!-- | GET    | `/api/admins/ratings/traceback`                    | Traceback Ratings       | -->
 
 ### Ads
 
-| Method | Endpoint                                          | Description             |
+<p>Advertisement composed of three courses curated based on the most popular tags among students who have enrolled in or completed courses.</p>
+
+|` Method `|` Endpoint                                                                                          `|` Description             `|
 |--------|---------------------------------------------------|-------------------------|
 | GET    | `/api/ads/`                                       | Get Users Ad            |
 
 ### Teachers
 
-| Method | Endpoint                                          | Description             |
+<p>The router for teachers encompasses various actions such as editing courses, managing teacher profiles, generating course reports, modifying course sections and content.</p>
+
+
+|` Method `|` Endpoint                                                                                          `|` Description             `|
 |--------|---------------------------------------------------|-------------------------|
 | GET    | `/api/teachers/courses/reports`                    | Get Report              |
 | GET    | `/api/teachers/profiles/`                          | View Profile            |
@@ -164,7 +178,9 @@ The authentication section handles user registration and login. The authenticati
 
 ### Calendars
 
-| Method | Endpoint                                          | Description             |
+<p>The calendar router is a powerful tool for managing calendars and events within the system. It provides a collection of endpoints that enable various operations related to calendars and events. </p>
+
+|` Method `|` Endpoint                                                                                          `|` Description             `|
 |--------|---------------------------------------------------|-------------------------|
 | GET    | `/api/calendars/`                                 | Get All Calendars        |
 | POST   | `/api/calendars/`                                 | Create Calendars         |
@@ -225,7 +241,7 @@ We've provided live demo with custom frontend you can see here: http://13.49.137
   Profile Page
   <p>Teachers profile page with pending enrollments and course creation form</p>
   <br>
-  <a href=""><img src="app/assets/screen_2.png" alt="Markdownify" width="100%"></a>
+  <a href=""><img src="app/assets/screen_3.png" alt="Markdownify" width="100%"></a>
 </h1>
 
 
