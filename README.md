@@ -139,9 +139,6 @@ The authentication section handles user registration and login. The authenticati
 
 <p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
 
-|` Method `|` Endpoint                                                                                     `|` Description             `|
-|--------|---------------------------------------------------|-----------------------------|
-<p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
 
 |` Method `|` Endpoint                                                                                     `|` Description             `|
 |--------|---------------------------------------------------|-----------------------------|
@@ -157,6 +154,7 @@ The authentication section handles user registration and login. The authenticati
 
 <p> The admins router is in charge of managing all administrative privileges, including tasks such as changing the status of students or courses, removing students from courses, and retrieving pending teacher registrations. It is specifically designed to handle actions and functionalities related to administrative tasks and responsibilities. </p>
 
+
 |` Method `|` Endpoint                                                                                          `|` Description             `|
 |--------|---------------------------------------------------|-------------------------|
 | PUT    | `/api/admins/students/{student_id}/status/{disabled}` | Change Student Status |
@@ -167,6 +165,7 @@ The authentication section handles user registration and login. The authenticati
 <!-- | GET    | `/api/admins/ratings/traceback`                    | Traceback Ratings       | -->
 
 ### Ads
+
 
 <p>Advertisement composed of three courses curated based on the most popular tags among students who have enrolled in or completed courses.</p>
 
@@ -194,6 +193,7 @@ The authentication section handles user registration and login. The authenticati
 ### Calendars
 
 <p>The calendar router is a powerful tool for managing calendars and events within the system. It provides a collection of endpoints that enable various operations related to calendars and events. </p>
+
 
 |` Method `|` Endpoint                                                                                          `|` Description             `|
 |--------|---------------------------------------------------|-------------------------|
