@@ -136,7 +136,7 @@ def teacher_registration_mail(information:TeacherRegistration):
 
 
 
-def teacher_approval_mail(teacher:TeacherShow):
+def teacher_approval_mail(teacher:TeacherShow,approve):
 
     replacements = {
     '{teacher_first_name}': teacher.first_name,
@@ -144,12 +144,14 @@ def teacher_approval_mail(teacher:TeacherShow):
     '{teacher_email}': teacher.email
     }
 
+    subject_status = "Approved" if approve else "Rejected"
+
     html_template = generate_template("api/utils/mail_templates/teacher_approved.html", replacements)
 
     message = generate_message(
         to_email=teacher.email,
         to_name=teacher.first_name + " " + teacher.last_name,
-        subject="Your Registration At Poodblebox Was Approved",
+        subject=f"Your Registration At Poodblebox Was {subject_status}",
         text_part=constants.MAIL_TEXT_PART,
         html_part=html_template
     )

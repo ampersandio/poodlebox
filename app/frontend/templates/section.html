@@ -34,7 +34,7 @@
 
     <div id="collapse_{{content.id}}" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
       <div class="accordion-body">
-        <span style="margin-left:20px!important;">{{content.description}}</span>
+        <span >{{content.description}}</span>
         <hr>        
         {% if content.link and content.content_type != "video" %}
         <p>DOWNLOAD:</p><a href="{{ url_for('documents', path=content.link) }}">{{content.title}} {{ url_for('documents', path=content.link) }}</a>

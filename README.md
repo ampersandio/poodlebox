@@ -48,7 +48,7 @@ Navigate to 127.0.0.1:8000/docs to see the Homepage
 
 <h1 align="center">
   <br>
-  <a href=""><img src="app/assets/clone.gif" alt="Markdownify" style="width: 100%; max-width: 100%;">
+  <a href=""><img src="app/assets/clone.gif" alt="Markdownify" style="width: 100%;">
 </h1>
 
 ## **Technologies Used**
@@ -63,7 +63,7 @@ The API is built using the following technologies:
 
 ## **Configuration**
 
-The API can be configured using environment variables. The following variables need to be set:
+The API can be configured using environment variables or .env file. The following variables need to be set:
 
 - `DB_NAME` - The name of the database.
 - `DB_HOST` - The host address of the database.
@@ -99,7 +99,7 @@ The authentication section handles user registration and login. The authenticati
 ### Authentication
 
 
-| Method | Endpoint                                          | Description             | 
+| Method | Endpoint                                          | Description             |
 |--------|---------------------------------------------------|-------------------------|
 | POST   | `/api/authorization/registration/students`         | Register Student        |
 | POST   | `/api/authorization/registration/teachers`         | Register Teacher        |
@@ -195,11 +195,40 @@ The following are the important packages and dependencies required for this proj
 Make sure to have these dependencies installed in your environment before running the project. You can install them using the package manager of your choice (e.g., pip).
 
 
-
-
 ## **Live Demo**
-If you want to see how Redoc will render your OpenAPI definition, you can try it out online at http://13.49.137.204/poodlebox/.
-The default Poodlebox E-learning platform is displayed by default. Please feel free to test it 
+If you want to see how Swagger will render your OpenAPI definition, you can try it out online at http://13.49.137.204/docs/.
+We've provided live demo with custom frontend you can see here: http://13.49.137.204/poodlebox/.
+
+
+<h1 align="center" >
+  Index Page
+  <p>Listing all courses</p>
+  <br>
+  <a href=""><img src="app/assets/screen_1.png" alt="Markdownify" width="100%"></a>
+</h1>
+
+<h1 align="center" >
+  Course Page
+  <p>Selected course details and sections</p>
+  <br>
+  <a href=""><img src="app/assets/screen_2.png" alt="Markdownify" width="100%"></a>
+</h1>
+
+<h1 align="center" >
+  Section Page
+  <p>Selected section details and contents</p>
+  <br>
+  <a href=""><img src="app/assets/screen_2.png" alt="Markdownify" width="100%"></a>
+</h1>
+
+<h1 align="center" >
+  Profile Page
+  <p>Teachers profile page with pending enrollments and course creation form</p>
+  <br>
+  <a href=""><img src="app/assets/screen_2.png" alt="Markdownify" width="100%"></a>
+</h1>
+
+
 
 ## Database Schema
 
