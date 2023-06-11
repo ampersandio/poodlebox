@@ -18,9 +18,14 @@ The Poodlebox API provides a platform for managing online courses, student profi
 
 ## **Table of Contents**
 
+Essentials
 - [Installation](#installation)
 - [Technologies](#technologies-used)
 - [Configuration](#configuration)
+- [Requirements](#requirements)
+- [Database Schema](#database-schema)
+
+Endpoints
 - [Authentication](#authentication)
 - [Courses](#courses)
 - [Students](#students)
@@ -28,9 +33,9 @@ The Poodlebox API provides a platform for managing online courses, student profi
 - [Ads](#ads)
 - [Teachers](#teachers)
 - [Calendars](#calendars)
-- [Requirements](#requirements)
+
+Frontend
 - [Live Demo](#live-demo)
-- [Database Schema](#database-schema)
 
 
 ## **Installation**
@@ -103,6 +108,11 @@ The authentication section handles user registration and login. The authenticati
 - **Token-based Authentication**: JWT (JSON Web Tokens) are used for token-based authentication. When a user logs in successfully, an access token is generated and returned. This access token must be included in the `Authorization` header of subsequent requests to authenticate the user.
 - **Access Token Expiration**: Access tokens have an expiration time, typically set to 360 minutes (6 hours) by default. Users need to obtain a new access token after it expires.
 - **User Verification**: Users can be marked as verified by updating their profile. This verification can be used to control access to certain endpoints or features.
+
+
+## Database Schema
+
+[Link to Schema Diagram](app/assets/schema_diagram.png)
 
 
 ## **Routers**
@@ -267,9 +277,4 @@ We've provided live demo with custom frontend you can see here: http://13.49.137
   <a href=""><img src="app/assets/screen_3.png" alt="Markdownify" width="100%"></a>
 </h1>
 
-
-
-## Database Schema
-
-[Link to Schema Diagram](app/assets/schema_diagram.png)
 
