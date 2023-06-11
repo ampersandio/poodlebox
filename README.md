@@ -8,24 +8,19 @@
 
 The Poodlebox API provides a platform for managing online courses, student profiles, user authentication, calendars, and more. It allows students, teachers, and admins to interact with the system and perform various actions.This API documentation provides details about the available endpoints and their functionalities.
 
+
 ## **Team Members**
 
 - [Alexander Nedelev](https://gitlab.com/anedelev)
 - [Blagovesta Alexandrova](https://gitlab.com/newcopernicus)
 - [Nikolai Dimitrov](https://gitlab.com/Nikolaisyl)
-## **Team Members**
 
-- [Alexander Nedelev](https://gitlab.com/anedelev)
-- [Blagovesta Alexandrova](https://gitlab.com/newcopernicus)
-- [Nikolai Dimitrov](https://gitlab.com/Nikolaisyl)
 
-## **Table of Contents**
 ## **Table of Contents**
 
 - [Installation](#installation)
 - [Technologies](#technologies-used)
 - [Configuration](#configuration)
-- [Authentication](#authentication)
 - [Authentication](#authentication)
 - [Courses](#courses)
 - [Students](#students)
@@ -34,11 +29,8 @@ The Poodlebox API provides a platform for managing online courses, student profi
 - [Teachers](#teachers)
 - [Calendars](#calendars)
 - [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-- [License](#license)
+- [Live Demo](#live-demo)
+- [Database Schema](#database-schema)
 
 
 ## **Installation**
@@ -55,9 +47,8 @@ Run the app using
 ```sh
 $ python3 uvicorn main:app --reload
 ```
-Navigate to 127.0.0.1:8000/docs to see the Homepage
+Navigate to 127.0.0.1:8000/docs to see the Swagger documentation
 <h1 align="center">
-  <br>
   <a href=""><img src="app/assets/git_clone.webp" alt="Markdownify">
 </h1>
 
@@ -218,6 +209,7 @@ The authentication section handles user registration and login. The authenticati
 | DELETE | `/api/calendars/{calendar_id}/events/{event_id}`   | Delete Event             |
 
 ### More detailed information available through Open Api documentation at /docs or /redoc
+
 ```
 Swagger Ui - http://127.0.0.1:8000/docs
 Redoc - http://127.0.0.1:8000/redoc
