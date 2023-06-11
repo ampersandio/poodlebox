@@ -150,9 +150,6 @@ The authentication section handles user registration and login. The authenticati
 
 <p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
 
-|` Method `|` Endpoint                                                                                     `|` Description             `|
-|--------|---------------------------------------------------|-----------------------------|
-<p> The students router exclusively handles actions related to students' profiles, such as course enrollment, profile updates, and viewing the courses in which they are enrolled. It focuses on providing functionalities specifically for student users.</p>
 
 |` Method `|` Endpoint                                                                                     `|` Description             `|
 |--------|---------------------------------------------------|-----------------------------|
