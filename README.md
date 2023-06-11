@@ -58,7 +58,7 @@ $ python3 uvicorn main:app --reload
 Navigate to 127.0.0.1:8000/docs to see the Homepage
 <h1 align="center">
   <br>
-  <a href=""><img src="app/assets/clone.gif" alt="Markdownify" style="width: 150%;">
+  <a href=""><img src="app/assets/git_clone.webp" alt="Markdownify">
 </h1>
 
 ## **Technologies Used**
