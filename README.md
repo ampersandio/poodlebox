@@ -142,9 +142,9 @@ The authentication section handles user registration and login. The authenticati
 
 |` Method `|` Endpoint                                                                                     `|` Description             `|
 |--------|---------------------------------------------------|-----------------------------|
-| GET    | `/api/students/courses/certificates`               | Get Certificates Of Student                |
-| GET    | `/api/students/courses/{course_id}/certificates`    | Get Certificate Of Student For Course       |
-| GET    | `/api/students/courses`                            | Get Courses For Student                    |
+| GET    | `/api/students/courses/certificates`               | Get All Student Certificates               |
+| GET    | `/api/students/courses/{course_id}/certificates`    | Get Student Certificate        |
+| GET    | `/api/students/courses`                            | Get All Student Courses                   |
 | GET    | `/api/students/profiles`                           | Get Student Profile                        |
 | PUT    | `/api/students/profiles`                           | Change Student Profile                     |
 | GET    | `/api/students/courses/{course_id}`                 | Get Course For Student By Id               |
