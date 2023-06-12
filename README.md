@@ -6,8 +6,15 @@
 
 ## **Introduction**
 
-The Poodlebox API provides a platform for managing online courses, student profiles, user authentication, calendars, and more. It allows students, teachers, and admins to interact with the system and perform various actions.This API documentation provides details about the available endpoints and their functionalities.
+Poodlebox is an e-learning platform API meticulously crafted as a showcase project for the Telerik Academy bootcamp. Developed with Python and FastAPI, Poodlebox exemplifies our proficiency in these technologies by delivering a functional API backend for efficient data processing in the realm of e-learning. Through this project, we demonstrate our ability to create a robust and scalable platform while showcasing the skills we have acquired during the bootcamp.
 
+The Poodlebox project has been an invaluable learning experience, providing us with insights into the entire production cycle. Collaborating effectively as a team, we have tackled every stage, from initial planning and implementation to thorough testing and successful deployment. This hands-on approach has equipped us with the knowledge and expertise needed to build comprehensive web applications.
+
+In addition to the API backend, we have developed a captivating live demo that combines HTML, CSS, Bootstrap, and Jinja to create an immersive user interface. This demo provides a glimpse into the features and functionality of Poodlebox, showcasing its potential as an e-learning solution.
+
+Throughout the project, we have explored various aspects of web development, including the use of cloud databases in Azure and hosting our servers on platforms such as AWS and DigitalOcean. This has broadened our understanding of the entire process, from setting up the infrastructure to managing databases and deploying applications.
+
+Poodlebox embodies our unwavering dedication to learning and our passion for technology. Join us as we unveil this showcase project, which not only demonstrates the possibilities of Python and FastAPI in e-learning but also highlights our growth as developers in the dynamic field of web development.
 
 ## **Team Members**
 
@@ -53,19 +60,16 @@ Run the app using
 $ python3 uvicorn main:app --reload
 ```
 Navigate to 127.0.0.1:8000/docs to see the Swagger documentation
+
 <h1 align="center">
   <a href=""><img src="app/assets/git_clone.webp" alt="Markdownify">
 </h1>
 
-## **Technologies Used**
+## **Technologies**
 
-The API is built using the following technologies:
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white) ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white) ![Bootstrap](https://img.shields.io/badge/bootstrap-%238511FA.svg?style=for-the-badge&logo=bootstrap&logoColor=white) ![Jinja](https://img.shields.io/badge/jinja-ffdd54.svg?style=for-the-badge&logo=jinja&logoColor=black)  ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens) ![Azure](https://img.shields.io/badge/azure-%230072C6.svg?style=for-the-badge&logo=microsoftazure&logoColor=white) ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white) ![GitLab CI](https://img.shields.io/badge/gitlab%20ci-%23181717.svg?style=for-the-badge&logo=gitlab&logoColor=white)
 
-- Framework: FastAPI
-- Database: MariaDB
-- Authentication: JWT (JSON Web Tokens)
-- Mail Client: MailJet API
-- Video Handling: video-api 
 
 ## **Configuration**
 
