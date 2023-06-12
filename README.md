@@ -245,8 +245,8 @@ Make sure to have these dependencies installed in your environment before runnin
 
 
 ## **Live Demo**
-If you want to see how Swagger will render your OpenAPI definition, you can try it out online at http://13.49.137.204/docs/.
-We've provided live demo with custom frontend you can see here: http://13.49.137.204/poodlebox/.
+If you want to see how Swagger will render your OpenAPI definition, you can try it out online at hhttp://164.92.206.29:8000/docs/.
+We've provided live demo with custom frontend you can see here: http://164.92.206.29:8000/poodlebox/.
 
 
 <h1 align="center" >
