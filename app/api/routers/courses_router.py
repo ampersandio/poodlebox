@@ -10,7 +10,7 @@ from api.data.models import User, Section, CourseShow, CourseEdit
 from fastapi_pagination import Page, paginate
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, PendingEnrollment
 from api.services.authorization import get_current_user, get_oauth2_scheme
-from api.services.students import get_students_courses_id, check_enrollment_status, update_interest, check_enrollment_status
+from api.services.students import get_students_courses_id, check_enrollment_status, update_interest, check_enrollment_status, get_students_active_courses
 from api.utils.utils import email_certificate
 from fastapi_pagination import Page,paginate
 
@@ -92,7 +92,7 @@ def edit_course(course_id: int, new_information: CourseEdit, current_user: User 
     return JSONResponse(status_code=200, content={'msg': f'Course with ID: {course_id} edited successfully'})
 
 @courses_router.get("/{course_id}/sections/", response_model=Page[Section])
-def get_course_sections(course_id: int, current_user: User = Depends(get_current_user), search: str = None, sort_by: str = None) -> Page[Section]:
+def get_all_course_sections(course_id: int, current_user: User = Depends(get_current_user), search: str = None, sort_by: str = None) -> Page[Section]:
     """Get all the sections of a particular course with pagination and sorting"""
 
     course = courses.get_course_by_id(course_id)
@@ -100,7 +100,7 @@ def get_course_sections(course_id: int, current_user: User = Depends(get_current
     if (current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE]) and (course.id not in get_students_courses_id(current_user.id)):
         raise HTTPException(status_code=401, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
 
-    sections = course.sections
+    sections = courses.get_course_sections(course_id)
 
     if search:
         sections = [section for section in sections if search.lower() in section.title.lower()]
@@ -116,7 +116,6 @@ def get_section_by_id(course_id:int ,section_id:int ,current_user:Annotated[User
     student_courses = get_students_courses_id(current_user.id)
     section = courses.get_section_by_id(section_id)
 
-
     if current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE]:
         raise HTTPException(status_code=401, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     
@@ -129,19 +128,20 @@ def get_section_by_id(course_id:int ,section_id:int ,current_user:Annotated[User
     if section is None:
         raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
 
-    if current_user.role == constants.STUDENT_ROLE:
+    if current_user.role == constants.STUDENT_ROLE and course.id in get_students_active_courses(get_current_user.id):
         courses.visit_section(current_user.id, section.id)
     
     if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
-        if check_enrollment_status(current_user.id,course_id) == "1" and courses.change_subscription(constants.SUBSCRIPTION_EXPIRED, current_user.id, course.id) is not None:
+            
+        if check_enrollment_status(current_user.id,course_id) == "1":
             email_certificate(current_user,course.title)
-     
+
     return section
 
 
 @courses_router.post('/{course_id}/reviews')
 def post_review(course_id: int,  user: User = Depends(get_current_user), rating: float = Form(...), description: Optional[str] = Form(None)) -> JSONResponse:
-    if (enrollment := check_enrollment_status(user.id, course_id)) in ['No status', 2]:
+    if (enrollment := check_enrollment_status(user.id, course_id)) in [None, 2]:
         raise HTTPException(status_code=409, detail=f'You must be currently or previously enrolled in course: {course_id} to leave a review, your current enrollment status is: {enrollment}')
     
     left_review = courses.leave_review(user.id, course_id, rating, description)

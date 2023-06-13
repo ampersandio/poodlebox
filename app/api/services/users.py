@@ -47,36 +47,50 @@ def register_teacher(teacher_info: TeacherRegistration) -> None:
 
 
 def view_ad(users_id):
-    '''Generate a random course ad for a user that has a random tag from the 3 most relevant tags for this user'''
-    tags_with_highest_interest=read_query("select distinct tags_id from interests where users_id=? order by relevance desc limit 3",(users_id,))
-    if tags_with_highest_interest==[]:
-        tags_with_highest_interest=read_query("select distinct tags_id from interests group by tags_id order by relevance desc limit 3")
-        if tags_with_highest_interest==[]:
+    """Generate a random course ad for a user that has a random tag from the 3 most relevant tags for this user"""
+    tags_with_highest_interest = read_query(
+        "select distinct tags_id from interests where users_id=? order by relevance desc limit 3",
+        (users_id,),
+    )
+    if tags_with_highest_interest == []:
+        tags_with_highest_interest = read_query(
+            "select distinct tags_id from interests group by tags_id order by relevance desc limit 3"
+        )
+        if tags_with_highest_interest == []:
             return None
-        list_tags=[]
+        list_tags = []
         for x in tags_with_highest_interest:
             list_tags.append(int(x[0]))
-        tag=random.choice(list_tags)
-        courses_with_this_tag=read_query("select group_concat(distinct courses_id) from tags_has_courses where tags_id=?",(tag,))
-        if courses_with_this_tag==[(None,)]:
+        tag = random.choice(list_tags)
+        courses_with_this_tag = read_query(
+            "select group_concat(distinct courses_id) from tags_has_courses where tags_id=?",
+            (tag,),
+        )
+        if courses_with_this_tag == [(None,)]:
             return None
-        list_courses=[int(x) for x in courses_with_this_tag[0][0].split(",")]
-        course=random.choice(list_courses)
-    list_tags=[]
+        list_courses = [int(x) for x in courses_with_this_tag[0][0].split(",")]
+        course = random.choice(list_courses)
+    list_tags = []
     for x in tags_with_highest_interest:
-            list_tags.append(int(x[0]))
-    tag=random.choice(list_tags)
-    courses_with_this_tag=read_query("select group_concat(distinct courses_id) from tags_has_courses where tags_id=? and courses_id not in (select courses_id from users_has_courses where users_id=?)",(tag,users_id))
-    if courses_with_this_tag==[(None,)]:
-        course_data=read_query("select group_concat(distinct courses_id) from tags_has_courses where courses_id not in (select courses_id from users_has_courses where users_id=?)",(users_id,))
-        if course_data==[(None,)]:
+        list_tags.append(int(x[0]))
+    tag = random.choice(list_tags)
+    courses_with_this_tag = read_query(
+        "select group_concat(distinct courses_id) from tags_has_courses where tags_id=? and courses_id not in (select courses_id from users_has_courses where users_id=?)",
+        (tag, users_id),
+    )
+    if courses_with_this_tag == [(None,)]:
+        course_data = read_query(
+            "select group_concat(distinct courses_id) from tags_has_courses where courses_id not in (select courses_id from users_has_courses where users_id=?)",
+            (users_id,),
+        )
+        if course_data == [(None,)]:
             return None
         else:
-            list_courses=[int(x) for x in course_data[0][0].split(",")]
-            course=random.choice(list_courses)
+            list_courses = [int(x) for x in course_data[0][0].split(",")]
+            course = random.choice(list_courses)
             return courses.get_course_by_id(course)
-    list_courses=[int(x) for x in courses_with_this_tag[0][0].split(",")]
-    course=random.choice(list_courses)
+    list_courses = [int(x) for x in courses_with_this_tag[0][0].split(",")]
+    course = random.choice(list_courses)
     return courses.get_course_by_id(course)
 
 

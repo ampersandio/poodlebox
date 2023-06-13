@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Request, Form, HTTPException
+from fastapi import APIRouter, Request, Form, HTTPException, File, UploadFile
+
 from config import settings
 from fastapi.templating import Jinja2Templates
-from api.services.authorization import get_current_user, create_access_token, authenticate_user
-from api.services.courses import get_course_by_id,get_students_courses, get_course_sections
-from api.utils.utils import constants 
+from api.services.authorization import get_current_user, create_access_token, authenticate_user, verify_mail
+from api.services.courses import get_course_by_id,get_students_courses, get_course_sections, get_nice_pending_enrollments
+from api.services.users import get_user
+from api.utils.utils import constants, file_upload
 
+from jose import jwt
 from api.utils.utils import user_registration_mail 
 from mailjet_rest import Client
 
@@ -31,6 +34,7 @@ def get_courses(request: Request, token: str | None  = None, tag:str = None):
     else:
         courses = requests.get(f"{host}/api/courses/", headers=headers)
 
+
     return courses.json()
 
 
@@ -41,6 +45,8 @@ def index(request: Request,tag:str=None):
     
     token = request.cookies.get("token")
 
+    courses = get_courses(request, tag=tag)
+    
     try:
         user = get_current_user(token)
         courses = get_courses(request, token, tag=tag)
@@ -61,15 +67,6 @@ def index(request: Request,tag:str=None):
     return templates.TemplateResponse("index.html", {"request": request, "user": user, "courses": courses,  "most_popular": popular_courses.json(), "message":message} )
 
 
-'''
-@students_router.put("/courses/{course_id}")
-def enroll_or_unenroll_from_course(
-    course_id: int,
-    subscription: Subscription,
-    current_user: User = Depends(get_current_user),
-):
-'''
-
 @frontend_router.get("/courses/{course_id}/enroll")
 def enroll(request:Request, course_id:int):
     host = "http://" + request.headers["host"]
@@ -77,9 +74,7 @@ def enroll(request:Request, course_id:int):
     headers = {}
 
     headers["authorization"] = f"Bearer {token}"
-    payload = {
-        'enroll': True
-    }
+    payload = {'enroll': True}
     
     result = requests.put(f"{host}/api/students/courses/{course_id}", json=payload, headers=headers)
 
@@ -107,17 +102,17 @@ def index(request: Request):
 
     popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
 
-    popular_courses.json()
-
+    pending_courses = get_nice_pending_enrollments(user.id)
+    
     if user.role == constants.TEACHER_ROLE:
-        # enrollments = user.
         courses = [course for course in courses["items"] if course["teacher"]["email"] == user.email] 
     elif user.role == constants.STUDENT_ROLE:
         courses = get_students_courses(user.id)
     else:
         raise HTTPException(constants.COURSE_ACCESS_DENIED_DETAIL)
+    
 
-    return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses,"most_popular": popular_courses.json()} )
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses,"most_popular": popular_courses.json(), "pending_enrollments":pending_courses} )
 
 
 @frontend_router.post("/")
@@ -151,7 +146,7 @@ def course(request: Request,course_id:int):
     user = get_current_user(token)
     course = get_course_by_id(course_id)
     sections = get_course_sections(course_id)
-    student_courses = get_students_courses(user.id)
+    student_courses = [course.id for course in get_students_courses(user.id)]
 
     return templates.TemplateResponse("course.html", {"request": request, "course":course, "sections":sections, "user":user, "student_courses":student_courses})
 
@@ -221,19 +216,15 @@ def register(request: Request, email: str = Form(...), first_name: str = Form(..
     response = requests.post(url, json=data)
 
     status_code = response.status_code
-    # content = response.json()
 
     student = StudentRegistration(email=email, first_name=first_name, last_name=last_name, password=password,
                                  date_of_birth=date_of_birth)
 
-    data = user_registration_mail(student, host)
-
-    mailjet.send.create(data=data)
 
     if status_code == 201:
-        return templates.TemplateResponse("message.html", {"request": request})
+        return templates.TemplateResponse("message.html", {"request": request, "message":"Successfully Registered to Poodlebox!"})
     else:
-        pass
+        return templates.TemplateResponse("message.html", {"request": request, "message":"Something Went Wrong!"})
 
 
 @frontend_router.get("/logout", tags=["Frontend"])
@@ -243,3 +234,124 @@ def logout(request: Request):
     response.delete_cookie(key="token")
     return response
 
+
+@frontend_router.post("/pending_enrollments")
+def judge_enrollment(
+    request: Request,
+    user_id: int = Form(...),
+    course_id: int = Form(...),
+    approved: bool = Form(...),
+):
+    host = "http://" + request.headers["host"]
+    token = request.cookies.get("token")
+    headers = {}
+
+    headers["authorization"] = f"Bearer {token}"
+    payload = {'approved': approved,
+               'user_id':user_id,
+               'course_id':course_id
+               }
+    
+    try:
+        user = get_current_user(token)
+        courses = get_courses(request, token)
+    except:
+        user = None
+        courses = get_courses(request)
+
+    if token:
+        headers["authorization"] = f"Bearer {token}"
+
+    pending_courses = get_nice_pending_enrollments(user.id)
+
+    popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
+    
+    result = requests.put(f"{host}/api/courses/pending_enrollments", data=payload, headers=headers) 
+
+
+    if user.role == constants.TEACHER_ROLE:
+        courses = [course for course in courses["items"] if course["teacher"]["email"] == user.email] 
+    elif user.role == constants.STUDENT_ROLE:
+        courses = get_students_courses(user.id)
+    else:
+        raise HTTPException(constants.COURSE_ACCESS_DENIED_DETAIL)
+    
+
+    if result.status_code == 200:
+        return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses,  "most_popular": popular_courses.json(),"pending_enrollments":pending_courses})
+    else:
+        return templates.TemplateResponse("message.html", {"request": request, "message": "Something Went Wrong"})
+
+
+@frontend_router.post("/course_create")
+def course_create(
+ request: Request,
+    title: str = Form(...),
+    description: str = Form(...),
+    objectives: str = Form(...),
+    premium: bool = Form(None),
+    price: float = Form(None),
+    course_picture: UploadFile = File(None),
+    tags: str = Form(...)
+):
+
+    token = request.cookies.get("token")
+    headers = {}
+    host = "http://" + request.headers["host"]
+
+    headers["authorization"] = f"Bearer {token}"
+    user = get_current_user(token)
+    courses = get_courses(request, token)
+    popular_courses = requests.get(f"{host}/api/courses/popular", headers=headers)
+    pending_courses = get_nice_pending_enrollments(user.id)
+
+    # print(popular_courses)
+    # Form data as a dictionary
+    form_data = {
+        "title": title,
+        "description": description,
+        "objectives": objectives,
+        "premium": premium,
+        "price": price,
+        "tags": tags,
+    }
+
+    courses = get_courses(request, token)
+    
+    if user.role == constants.TEACHER_ROLE:
+        courses = [course for course in courses["items"] if course["teacher"]["email"] == user.email] 
+    elif user.role == constants.STUDENT_ROLE:
+        courses = get_students_courses(user.id)
+    else:
+        raise HTTPException(constants.COURSE_ACCESS_DENIED_DETAIL)
+    
+    file_upload(course_picture, "course_thumbnails", course)
+
+
+    response = requests.post(host + "/api/teachers/courses", data=form_data, headers=headers)
+
+    if response.status_code == 201:
+
+        return templates.TemplateResponse("profile.html", {"request": request, "user":user, "courses":courses,"most_popular":popular_courses.json(), "pending_enrollments":pending_courses})
+    else:
+        return templates.TemplateResponse("message.html", {"request": request, "message": "Something Went Wrong"})
+
+
+
+@frontend_router.get('/token/{token}', tags=['Authentication'])
+def verify_token(request:Request, token:str):
+    '''
+    Endpoint to validate mail account.
+    
+    '''
+
+    user = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+    user = get_user(user["sub"])
+
+    if user is not None:
+        verify_mail(user)
+        response = templates.TemplateResponse("message.html", {"request": request, "message":"Password Verified!"})
+        return response
+    else:
+        response = templates.TemplateResponse("message.html", {"request": request, "message":"Verification Failed"})
+        return response

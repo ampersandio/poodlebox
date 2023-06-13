@@ -2,6 +2,7 @@
 
 {% block content %}
 
+
 <div class="container-fluid d-flex justify-content-between" style="padding:0px!important;">
     <div>
       <h3>{{course.title}}</h3>
@@ -12,7 +13,7 @@
         <button type="button" class="btn btn-primary mt-4">Edit</button>
       {% endif %}
 
-      {% if user.role == "student" and course.id not in student_courses|map(attribute='id') %}
+      {% if user.role == "student" and course.id not in student_courses %}
         <form action="./enroll" method="GET">
         <button type="submit" class="btn btn-primary mt-4">Enroll</button>
         </form>
@@ -36,12 +37,18 @@
 <hr>
 <ul>
 {% for section in  sections %}
+
+{% if course.id in student_courses or user.role == "teacher" %}
+<a style="left:0; display:block!important;" class="un" href="./sections/{{section.id}}">
 <div class="section">
-{% if course.id in user.subscriptions or user.role == "teacher" %}
-<a class="un" href="./sections/{{section.id}}"><li>{{section.title}}</li></a>
+<li>{{section.title}}</li>
+</a>
 {% else %}
-<a class="un" href=""><li>{{section.title}}</li></a>
+<a style="left:0; display:block!important;" class="un" href="">
+<div class="section">
+<li>{{section.title}}</li>
 {% endif %}
+</a>
 </div>
 {% endfor %}
 </ul>

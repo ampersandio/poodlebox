@@ -63,7 +63,7 @@ def edit_profile(new_information: EditTeacherProfile, user: User = Depends(get_c
 
 
 @teachers_router.post("/courses/")
-def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(...),  current_user: User = Depends(get_current_user)):
+def course_create(title: str = Form(...), description: str = Form(...), objectives: str = Form(...), premium: bool = Form(...), tags: list[str] = Form(...), file: UploadFile = File(None), current_user: User = Depends(get_current_user)):
     '''
     Create course with thumbnail attached as a file: Upload = File(...)
     '''
@@ -164,7 +164,7 @@ def edit_section(course_id: int,section_id: int,new_section: SectionCreate,curre
     if course is None:
         raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
-    if section not in sections:
+    if section.id not in [section.id for section in sections]:
         raise HTTPException(status_code=403, detail="This section is not part of this course")
 
     if new_section.content:
@@ -187,9 +187,8 @@ def delete_section(course_id: int,section_id: int,current_user: Annotated[User, 
     section = courses.get_section_by_id(section_id)
     sections = courses.get_course_sections(course_id)
 
-
     if course.teacher.email != current_user.email:
-        raise HTTPException(status=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
+        raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
 
     if section is None:
         raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
@@ -197,8 +196,9 @@ def delete_section(course_id: int,section_id: int,current_user: Annotated[User, 
     if course is None:
         raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
-    if section not in course.sections:
-        raise HTTPException(status=403, detail="This section is not part of this course")
+    if section.id not in [section.id for section in sections]:
+        raise HTTPException(status_code=403, detail="This section is not part of this course")
+
 
     courses.delete_section(section_id)
     return JSONResponse(status_code=204, content={"msg": "Section Deleted Successfully"})
@@ -217,9 +217,11 @@ async def add_content_to_section(course_id:int, section_id:int, title:str = Form
         raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
 
     else:
-
-        link = file_upload(file,"documents",title)
-        content = ContentCreate(title=title, description=description, content_type=content_type, link=link)
+        if file:
+            link = file_upload(file,"documents",title)
+            content = ContentCreate(title=title, description=description, content_type=content_type, link=link)
+        else:
+            content = ContentCreate(title=title, description=description, content_type=content_type)
 
     courses.add_content(section_id, content)
     return JSONResponse(status_code=201, content={"msg": "Content created"})

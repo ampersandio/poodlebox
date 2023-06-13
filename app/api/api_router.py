@@ -18,6 +18,6 @@ api_router.include_router(teachers_router)
 api_router.include_router(calendar_router)
 
 
-@api_router.get("/")
+@api_router.get("/", include_in_schema=False)
 def sub_router():
     return {"this is api_router.py"}
