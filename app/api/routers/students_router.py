@@ -58,7 +58,7 @@ def get_courses_for_student(
     if title:
         result = [x for x in result if title.lower() in x.title.lower()]
     if subscription:
-        result = [x for x in result if subscription.lower() in x.subscription.lower()]
+        result = [x for x in result if subscription.lower() in x.subscription_status.lower()]
     if sort and (sort == "asc" or sort == "desc"):
         if sort_by == "id":
             result = sorted(result, key=lambda r: r.id, reverse=sort == "desc")
@@ -72,6 +72,8 @@ def get_courses_for_student(
 @students_router.get("/profiles")
 def get_student_profile(current_user: User = Depends(get_current_user)):
     """Get the profile of the student"""
+    if current_user.role!='student':
+        raise HTTPException(status_code=403,detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     return get_profile(current_user.id)
 
 
@@ -80,6 +82,8 @@ def change_student_profile(
     edited_info: StudentEdit, current_user: User = Depends(get_current_user)
 ):
     """Change the password of the sudent's profile"""
+    if current_user.role!='student':
+        raise HTTPException(status_code=403,detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     if edited_info.new_password != edited_info.confirm_new_password:
         raise HTTPException(
             status_code=400, detail=constants.PASSWORD_DONT_MATCH

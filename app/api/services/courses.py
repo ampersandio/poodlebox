@@ -189,7 +189,6 @@ def get_section_by_id(section_id: int) -> Section:
         )
     else:
         return None
-
     return section
 
 
@@ -222,7 +221,7 @@ def get_content_type_id(content_type: str) -> int:
         return result[0][0]
     
 
-def insert_content(title: str, description: str, content_type_id: int, section_id: int, link: str | None):
+def insert_content(title: str, description: str, content_type_id: int, section_id: int, link: str | None=None):
     query = "INSERT INTO content (title, description, content_types_id, sections_id, link) VALUES (?, ?, ?, ?, ?);"
     insert_query(query, (title, description, content_type_id, section_id, link))
 
