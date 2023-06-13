@@ -181,7 +181,6 @@ def delete_section(course_id: int,section_id: int,current_user: Annotated[User, 
     section = courses.get_section_by_id(section_id)
     sections = courses.get_course_sections(course_id)
 
-
     if course.teacher.email != current_user.email:
         raise HTTPException(status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
 
@@ -191,8 +190,9 @@ def delete_section(course_id: int,section_id: int,current_user: Annotated[User, 
     if course is None:
         raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
-    if section not in sections:
+    if section.id not in [section.id for section in sections]:
         raise HTTPException(status_code=403, detail="This section is not part of this course")
+
 
     courses.delete_section(section_id)
     return JSONResponse(status_code=204, content={"msg": "Section Deleted Successfully"})
