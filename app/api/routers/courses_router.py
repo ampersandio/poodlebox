@@ -2,10 +2,11 @@ import api.utils.constants as constants
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Form
 from fastapi.responses import JSONResponse
+from mariadb import IntegrityError
 
 from typing import Annotated, Optional
 from api.services import courses
-from api.data.models import User, Section, CourseShow
+from api.data.models import User, Section, CourseShow, CourseEdit
 from fastapi_pagination import Page, paginate
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, PendingEnrollment
 from api.services.authorization import get_current_user, get_oauth2_scheme
@@ -74,6 +75,21 @@ def get_course_by_id(
         raise HTTPException(status_code=402, detail=constants.COURSE_ACCESS_DENIED_DETAIL)
     return result
 
+
+@courses_router.put('/{course_id}')
+def edit_course(course_id: int, new_information: CourseEdit, current_user: User = Depends(get_current_user)) -> JSONResponse:
+    if current_user.role.lower() not in ['teacher', 'admin']:
+        raise HTTPException(status_code=403, detail='You do not have permission to do this')
+    
+    if courses.check_ownership(current_user.id, course_id) == False:
+        raise HTTPException(status_code=403, detail=f'You are not the owner of course with ID:{course_id}')
+    
+    try:
+        courses.edit(course_id, new_information)
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail='Unrecognized tag/s')
+
+    return JSONResponse(status_code=200, content={'msg': f'Course with ID: {course_id} edited successfully'})
 
 @courses_router.get("/{course_id}/sections/", response_model=Page[Section])
 def get_course_sections(course_id: int, current_user: User = Depends(get_current_user), search: str = None, sort_by: str = None) -> Page[Section]:

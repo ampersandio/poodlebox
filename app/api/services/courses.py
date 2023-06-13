@@ -1,4 +1,4 @@
-from api.data.database import read_query, insert_query, update_query, delete_query
+from api.data.database import read_query, insert_query, update_query, delete_query, multiple_query
 import api.utils.constants as constants
 from mariadb import IntegrityError
 from api.data.models import (
@@ -14,7 +14,8 @@ from api.data.models import (
     CourseCreate,
     CourseShow,
     User,
-    PendingEnrollment
+    PendingEnrollment,
+    CourseEdit
 )
 from api.data import database
 
@@ -159,6 +160,27 @@ def create_course(course: CourseCreate, owner):
             "insert into tags_has_courses(tags_id,courses_id) values(?,?)",
             (x, course_id),
         )
+
+
+def edit(course_id: int, new_information: CourseEdit) -> None:
+    '''
+    Edit course, setting new tags, objectives, course picture
+    '''
+    params = [course_id]
+    tag_queries = ''
+    for tag in new_information.tags:
+        tag_queries += 'INSERT INTO tags_has_courses(courses_id, tags_id) VALUES(?, (SELECT id FROM tags WHERE name = ?)); '
+        params.append(course_id)
+        params.append(tag)
+
+    params.append(new_information.objectives)
+    params.append(new_information.course_picture)
+    params.append(course_id)
+
+    multiple_query('DELETE FROM tags_has_courses WHERE courses_id = ?; ' +
+                 tag_queries +
+                 'UPDATE courses SET objectives = ?, course_picture = ? WHERE id = ?',
+                 params)
 
 
 def add_course_photo(course_picture: str, course_id: int):
@@ -401,3 +423,12 @@ def approve_enrollment(user_id: int, course_id: int) -> bool:
 def reject_enrollment(user_id: int, course_id: int) -> bool:
     rejected = delete_query('DELETE FROM users_has_courses WHERE users_id=? AND courses_id=?', (user_id, course_id))
     return bool(rejected)
+
+
+def check_ownership(user_id: int, course_id: int) -> bool:
+    owner_id = read_query('SELECT owner FROM courses WHERE id = ?', (course_id,))[0][0]
+
+    if user_id != owner_id:
+        return False
+    
+    return True

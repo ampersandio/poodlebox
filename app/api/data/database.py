@@ -1,5 +1,6 @@
 from mariadb import connect
 from mariadb.connections import Connection
+import mariadb.constants.CLIENT as CLIENT
 from config import settings
 
 
@@ -18,6 +19,7 @@ def _get_connection() -> Connection:
         password=PASSWORD,
         host=HOST,
         port=PORT,
+        client_flag=CLIENT.MULTI_STATEMENTS | CLIENT.MULTI_RESULTS,
     )
 
 
@@ -44,6 +46,7 @@ def update_query(sql: str, sql_params: tuple = ()) -> list:
         connection.commit()
 
         return cursor.rowcount
+    
 
     
 def delete_query(sql: str, sql_params: tuple = ()) -> list:
@@ -54,3 +57,15 @@ def delete_query(sql: str, sql_params: tuple = ()) -> list:
 
         return cursor.rowcount
 
+
+def multiple_query(statements: str, params: list) -> None:
+    with _get_connection() as connection:
+        cursor = connection.cursor()
+
+        statements = statements.split('; ')
+        param_count = 0
+        for statement in statements:
+            param_count = statement.count('?')
+            cursor.execute(statement, tuple(params[:param_count]))
+            connection.commit()
+            params = params[param_count:]

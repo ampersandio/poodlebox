@@ -37,6 +37,9 @@ def view_profile(user: User = Depends(get_current_user)) -> TeacherProfile:
     '''
     View profile
     '''
+    if user.role.lower() not in ['teacher', 'admin']:
+        raise HTTPException(status_code=403, detail='You are not a teacher')
+    
     profile = TeacherProfile.from_user(user)
     return profile
 
@@ -46,6 +49,9 @@ def edit_profile(new_information: EditTeacherProfile, user: User = Depends(get_c
     '''
     Edit profile
     '''
+    if user.role.lower() not in ['teacher', 'admin']:
+        raise HTTPException(status_code=403, detail='You are not a teacher')
+
     if new_information.new_password != new_information.new_password_again:
         raise HTTPException(status_code=409, detail='Password does not match')
     
