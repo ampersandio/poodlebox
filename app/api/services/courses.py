@@ -302,7 +302,7 @@ def delete_section(section_id: int):
     
     section = get_section_by_id(section_id)
     if section:
-        delete_query("delete from sections where id = ?;", (section_id,))
+        update_query("delete from sections where id = ?;", (section_id,))
     else:
         return None
 

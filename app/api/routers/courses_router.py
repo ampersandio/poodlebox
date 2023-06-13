@@ -9,7 +9,7 @@ from api.data.models import User, Section, CourseShow
 from fastapi_pagination import Page, paginate
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, PendingEnrollment
 from api.services.authorization import get_current_user, get_oauth2_scheme
-from api.services.students import get_students_courses_id, check_enrollment_status, update_interest, check_enrollment_status
+from api.services.students import get_students_courses_id, check_enrollment_status, update_interest, check_enrollment_status, get_students_active_courses
 from api.utils.utils import email_certificate
 from fastapi_pagination import Page,paginate
 
@@ -100,7 +100,6 @@ def get_section_by_id(course_id:int ,section_id:int ,current_user:Annotated[User
     student_courses = get_students_courses_id(current_user.id)
     section = courses.get_section_by_id(section_id)
 
-
     if current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE]:
         raise HTTPException(status_code=401, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
     
@@ -113,16 +112,13 @@ def get_section_by_id(course_id:int ,section_id:int ,current_user:Annotated[User
     if section is None:
         raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
 
-    if current_user.role == constants.STUDENT_ROLE:
+    if current_user.role == constants.STUDENT_ROLE and course.id in get_students_active_courses(get_current_user.id):
         courses.visit_section(current_user.id, section.id)
     
-
     if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
             
         if check_enrollment_status(current_user.id,course_id) == "1":
             email_certificate(current_user,course.title)
-        else:
-            pass
 
     return section
 
