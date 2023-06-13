@@ -9,7 +9,7 @@ from api.data.models import User, Section, CourseShow
 from fastapi_pagination import Page, paginate
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, PendingEnrollment
 from api.services.authorization import get_current_user, get_oauth2_scheme
-from api.services.students import get_students_courses_id, check_enrollment_status, update_interest, check_enrollment_status
+from api.services.students import get_students_courses_id, check_enrollment_status, update_interest, check_enrollment_status, get_students_active_courses
 from api.utils.utils import email_certificate
 from fastapi_pagination import Page,paginate
 
@@ -129,7 +129,7 @@ def get_section_by_id(course_id:int ,section_id:int ,current_user:Annotated[User
 
 @courses_router.post('/{course_id}/reviews')
 def post_review(course_id: int,  user: User = Depends(get_current_user), rating: float = Form(...), description: Optional[str] = Form(None)) -> JSONResponse:
-    if (enrollment := check_enrollment_status(user.id, course_id)) in ['No status', 2]:
+    if (enrollment := check_enrollment_status(user.id, course_id)) in [None, 2]:
         raise HTTPException(status_code=409, detail=f'You must be currently or previously enrolled in course: {course_id} to leave a review, your current enrollment status is: {enrollment}')
     
     left_review = courses.leave_review(user.id, course_id, rating, description)

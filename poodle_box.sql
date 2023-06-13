@@ -166,7 +166,7 @@ CREATE TABLE `users` (
   `role` int(11) NOT NULL,
   `linked_in_profile` varchar(200) DEFAULT NULL,
   `disabled` tinyint(4) NOT NULL,
-  `profile_picture` varchar(200) DEFAULT NULL,
+  `profile_picture` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `fk_users_roles1_idx` (`role`),
