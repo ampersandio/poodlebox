@@ -76,7 +76,7 @@ def get_course_by_id(
 
 
 @courses_router.get("/{course_id}/sections/", response_model=Page[Section])
-def get_course_sections(course_id: int, current_user: User = Depends(get_current_user), search: str = None, sort_by: str = None) -> Page[Section]:
+def get_all_course_sections(course_id: int, current_user: User = Depends(get_current_user), search: str = None, sort_by: str = None) -> Page[Section]:
     """Get all the sections of a particular course with pagination and sorting"""
 
     course = courses.get_course_by_id(course_id)
@@ -84,7 +84,7 @@ def get_course_sections(course_id: int, current_user: User = Depends(get_current
     if (current_user.role not in [constants.TEACHER_ROLE, constants.STUDENT_ROLE]) and (course.id not in get_students_courses_id(current_user.id)):
         raise HTTPException(status_code=401, detail=constants.SECTION_ACCESS_DENIED_DETAIL)
 
-    sections = course.sections
+    sections = courses.get_course_sections(course_id)
 
     if search:
         sections = [section for section in sections if search.lower() in section.title.lower()]
