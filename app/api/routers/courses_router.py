@@ -128,7 +128,7 @@ def get_section_by_id(course_id:int ,section_id:int ,current_user:Annotated[User
     if section is None:
         raise HTTPException(status_code=404, detail=constants.SECTION_NOT_FOUND_DETAIL)
 
-    if current_user.role == constants.STUDENT_ROLE and course.id in get_students_active_courses(get_current_user.id):
+    if current_user.role == constants.STUDENT_ROLE and course.id in get_students_active_courses(current_user.id):
         courses.visit_section(current_user.id, section.id)
     
     if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
