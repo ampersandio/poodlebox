@@ -190,8 +190,9 @@ def delete_section(course_id: int,section_id: int,current_user: Annotated[User, 
     if course is None:
         raise HTTPException(status_code=404, detail=constants.COURSE_NOT_FOUND_DETAIL)
 
-    if section not in sections:
-        raise HTTPException(status=403, detail="This section is not part of this course")
+    if section.id not in [section.id for section in sections]:
+        raise HTTPException(status_code=403, detail="This section is not part of this course")
+
 
     courses.delete_section(section_id)
     return JSONResponse(status_code=204, content={"msg": "Section Deleted Successfully"})
