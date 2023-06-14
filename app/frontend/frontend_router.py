@@ -278,7 +278,9 @@ def judge_enrollment(
     
 
     if result.status_code == 200:
-        return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses,  "most_popular": popular_courses.json(),"pending_enrollments":pending_courses})
+        return templates.TemplateResponse("message.html", {"request": request, "message": "Enrollment Approved"})
+
+        # return templates.TemplateResponse("profile.html", {"request": request, "user": user, "courses": courses,  "most_popular": popular_courses.json(),"pending_enrollments":pending_courses})
     else:
         return templates.TemplateResponse("message.html", {"request": request, "message": "Something Went Wrong"})
 
