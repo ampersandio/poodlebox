@@ -26,7 +26,7 @@ class CourseServiceShould(unittest.TestCase):
         result=courses.get_courses_teacher(db)
         self.assertEqual(expected,result) 
 
-    def test_get_all_coursesAnonymousNoData(self):
+    def test_get_all_coursesTeacherNoData(self):
         db=lambda q:[]
         expected=[]
         result=courses.get_courses_teacher(db)
@@ -40,7 +40,7 @@ class CourseServiceShould(unittest.TestCase):
         result=courses.get_courses_student(2,db)
         self.assertEqual(expected,result) 
 
-    def test_get_all_coursesAnonymousNoData(self):
+    def test_get_all_coursesStudentNoData(self):
         db=lambda q,id:[]
         expected=[]
         result=courses.get_courses_student(2,db)
