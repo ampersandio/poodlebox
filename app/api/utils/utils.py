@@ -249,4 +249,3 @@ def email_certificate(student:User,course_title):
 
     mailjet.send.create(data=message)
     
-    result = mailjet.send.create(data=message)
