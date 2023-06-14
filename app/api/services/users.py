@@ -75,6 +75,7 @@ def view_ad(users_id):
             return None
         list_courses = [int(x) for x in courses_with_this_tag[0][0].split(",")]
         course = random.choice(list_courses)
+        return courses.get_course_by_id(course)
     list_tags = []
     for x in tags_with_highest_interest:
         list_tags.append(int(x[0]))
