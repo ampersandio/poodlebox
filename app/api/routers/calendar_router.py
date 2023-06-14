@@ -209,8 +209,8 @@ def change_event(
         raise HTTPException(
             status_code=403, detail=constants.SECTION_ACCESS_DENIED_DETAIL
         )
-    event = get_event_by_id(event_id)
-    if event is None:
+    event_res = get_event_by_id(event_id)
+    if event_res is None:
         raise HTTPException(status_code=404, detail=constants.EVENT_NOT_FOUND_DETAIL)
     modify_event(event_id, event)
     return JSONResponse(status_code=200, content={"msg": constants.EVENT_CHANGE})
