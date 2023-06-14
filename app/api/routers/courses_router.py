@@ -21,6 +21,9 @@ courses_router = APIRouter(prefix="/courses", tags=["Courses"])
 custom_oauth2_scheme = get_oauth2_scheme(auto_error=False)
 
 
+
+
+
 @courses_router.get("/",response_model=Page[CourseShow])
 def get_all_courses(
     current_user: User | None = Depends(custom_oauth2_scheme),
@@ -77,6 +80,30 @@ def get_course_by_id(
         raise HTTPException(status_code=402, detail=constants.COURSE_ACCESS_DENIED_DETAIL)
     return result
 
+
+@courses_router.put('/pending_enrollments')
+def judge_enrollment(user_id: int = Form(...), course_id: int = Form(...), approved: bool = Form(...), user: User = Depends(get_current_user)) -> JSONResponse:
+    if user.role.lower() != 'admin':
+        owner = courses.get_course_owner(course_id)
+        if owner != user.id:
+            raise HTTPException(status_code=401, detail=f'Only the owner of course: {course_id} can judge enrollments for it')
+
+    if approved:
+        enrolled = courses.approve_enrollment(user_id, course_id)
+        if not enrolled:
+            raise HTTPException(status_code=404, detail=f'No enrollment request found for user: {user_id} in course: {course_id}')
+        
+        update_interest(user_id, course_id)
+        return JSONResponse(status_code=200, content={'msg': f'Enrollment for user: {user_id} in course: {course_id} approved'})
+    
+    if not approved:
+        rejected = courses.reject_enrollment(user_id, course_id)
+        if not rejected:
+            raise HTTPException(status_code=404, detail=f'No enrollment request found for user: {user_id} in course: {course_id}')
+        
+        update_interest(user_id, course_id)
+        return JSONResponse(status_code=200, content={'msg': f'Enrollment for user: {user_id} in course: {course_id} rejected'})
+    
 
 @courses_router.put('/{course_id}')
 def edit_course(course_id: int, new_information: CourseEdit, current_user: User = Depends(get_current_user)) -> JSONResponse:
@@ -154,6 +181,7 @@ def post_review(course_id: int,  user: User = Depends(get_current_user), rating:
     return JSONResponse(status_code=201, content={'msg': 'review created'})
 
 
+
 @courses_router.put('/{course_id}/status')
 def change_course_status(course_id: int, active: bool = Form(...), user: User = Depends(get_current_user)) -> JSONResponse:
     
@@ -191,25 +219,3 @@ def get_pending_enrollments(user: User = Depends(get_current_user)) -> list[Pend
     return pending_enrollments
 
 
-@courses_router.put('/pending_enrollments')
-def judge_enrollment(user_id: int = Form(...), course_id: int = Form(...), approved: bool = Form(...), user: User = Depends(get_current_user)) -> JSONResponse:
-    if user.role.lower() != 'admin':
-        owner = courses.get_course_owner(course_id)
-        if owner != user.id:
-            raise HTTPException(status_code=401, detail=f'Only the owner of course: {course_id} can judge enrollments for it')
-
-    if approved:
-        enrolled = courses.approve_enrollment(user_id, course_id)
-        if not enrolled:
-            raise HTTPException(status_code=404, detail=f'No enrollment request found for user: {user_id} in course: {course_id}')
-        
-        update_interest(user_id, course_id)
-        return JSONResponse(status_code=200, content={'msg': f'Enrollment for user: {user_id} in course: {course_id} approved'})
-    
-    if not approved:
-        rejected = courses.reject_enrollment(user_id, course_id)
-        if not rejected:
-            raise HTTPException(status_code=404, detail=f'No enrollment request found for user: {user_id} in course: {course_id}')
-        
-        update_interest(user_id, course_id)
-        return JSONResponse(status_code=200, content={'msg': f'Enrollment for user: {user_id} in course: {course_id} rejected'})
