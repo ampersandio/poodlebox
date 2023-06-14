@@ -94,16 +94,27 @@ def enrollment_mail(student:Student, course:Course, teacher:TeacherShow):
     
 
 def mail_teachers_report(information:TeachersReport):
+    html = """ """
+
+    for item in information.courses_users_reviews:
+        html += f"<h3>{item.title}</h3> Reviews:"
+        for review in item.users_reviews:
+            html += f'<p>\nfrom: {review.full_name}</p>\n ' + \
+                f'email: {review.email} \n <br>' + \
+                f'subscribtion: {review.subscription} \n <br>' + \
+                f'percent completed: {round(review.completed)} \n <br>' + \
+                f'rating: {review.rating} \n <br>' + \
+                f'review: {review.review} \n \n </p>' 
 
     replacements = {
         '{teacher_name}':information.teacher_name,
-        '{teachers_report}': information,
+        '{teachers_report}': html,
     }
 
     html_template = generate_template("api/utils/mail_templates/teachers_report.html", replacements)
 
     message = generate_message(
-        to_email=information.teacher_email,
+        to_email='nikolaisyl@gmail.com',
         to_name=information.teacher_name,
         subject="Teacher's Report",
         text_part="Dear Teacher",
@@ -111,6 +122,8 @@ def mail_teachers_report(information:TeachersReport):
     )
     
     mailjet.send.create(data=message)
+
+    
 
 
 def teacher_registration_mail(information:TeacherRegistration):
