@@ -54,7 +54,6 @@ def get_students_number_courses_premium(student_id,db=None):
 
 def enroll_in_course(student_id: int, course_id:int, subscription: Subscription, expired, db=None):
     '''Change subscriptions status for a course'''
-    print("Hello")
 
     if db is None:
         db=database.insert_query
