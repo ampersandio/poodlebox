@@ -1,3 +1,5 @@
+from typing import Callable
+
 from api.data.database import read_query, insert_query
 from api.data.models import User, StudentRegistration, TeacherRegistration, EditTeacherProfile
 from pydantic import ValidationError
@@ -5,8 +7,11 @@ import random
 from api.services import courses, authorization
 
 
-def get_user(email: str) -> User | None:
-    user_data = read_query('SELECT * FROM users WHERE email=?', (email,))
+def get_user(email: str, query_func: Callable = None) -> User | None:
+    if query_func == None:
+        query_func = read_query
+
+    user_data = query_func('SELECT * FROM users WHERE email=?', (email,))
 
     if not user_data:
         return None
@@ -94,8 +99,11 @@ def view_ad(users_id):
     return courses.get_course_by_id(course)
 
 
-def get_user_by_id(user_id) -> User | None:
-    user_data = read_query('SELECT * FROM users WHERE id=?;', (user_id,))
+def get_user_by_id(user_id, query_func: Callable = None) -> User | None:
+    if query_func == None:
+        query_func = read_query
+
+    user_data = query_func('SELECT * FROM users WHERE id=?;', (user_id,))
 
     if not user_data:
         return None

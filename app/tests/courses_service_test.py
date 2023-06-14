@@ -82,6 +82,123 @@ class CourseServiceShould(unittest.TestCase):
         expected=CoursesShowStudent.read_from_query_result(*data[0][:10],teacher=owner)
         result=courses.get_student_course_by_id(2,1,db)
         self.assertEqual(expected,result) 
-    
 
- 
+    def test_insertSection_returnsCorrectly(self):
+        fake_query_func = lambda x, y: 5
+        expected = 5
+
+        result = courses.insert_section('', 10, fake_query_func)
+
+        self.assertEqual(result, expected)
+    
+    def test_addCoursePhoto_returnsNone_whenCourseNotFound(self):
+        fake_get_course_by_id_func = lambda x: None
+        expected = None
+
+        result = courses.add_course_photo('', 99, fake_get_course_by_id_func)
+
+        self.assertEqual(result, expected)
+
+    def test_insertContentType_returnsCorrectly(self):
+        fake_query_func = lambda x, y: 5
+        expected = 5
+
+        result = courses.insert_content_type('', fake_query_func)
+
+        self.assertEqual(result, expected)
+
+    def test_deleteSection_returnsNone_whenSectionNotFound(self):
+        fake_get_section_by_id_func = lambda x: None
+        expected = None
+
+        result = courses.delete_section(5, get_section_by_id_func=fake_get_section_by_id_func)
+
+        self.assertEqual(result, expected)
+
+    def test_approveEnrollment_returnsTrue(self):
+        fake_query_func = lambda x, y: True
+        expected = True
+
+        result = courses.approve_enrollment(1, 2, fake_query_func)
+
+        self.assertEqual(result, expected)
+
+    def test_approveEnrollment_returnsFalse(self):
+        fake_query_func = lambda x, y: False
+        expected = False
+
+        result = courses.approve_enrollment(1, 2, fake_query_func)
+
+        self.assertEqual(result, expected)
+
+    def test_rejectEnrollment_returnsTrue(self):
+        fake_query_func = lambda x, y: True
+        expected = True
+
+        result = courses.reject_enrollment(1, 2, fake_query_func)
+
+        self.assertEqual(result, expected)
+
+    def test_rejectEnrollment_returnsFalse(self):
+        fake_query_func = lambda x, y: False
+        expected = False
+
+        result = courses.reject_enrollment(1, 2, fake_query_func)
+
+        self.assertEqual(result, expected)
+
+    def test_checkOwnership_returnsTrue(self):
+        fake_query_func = lambda x, y: [(1,)]
+        expected = True
+
+        result = courses.check_ownership(1, 2, fake_query_func)
+
+        self.assertEqual(result, expected)
+    
+    def test_checkOwnership_returnsFalse(self):
+        fake_query_func = lambda x, y: [(0,)]
+        expected = False
+
+        result = courses.check_ownership(1, 2, fake_query_func)
+
+        self.assertEqual(result, expected)
+    
+    def test_getCourseOwner_returnsCorrectly(self):
+        fake_query_func = lambda x, y: [(1,)]
+        expected = 1
+
+        result = courses.get_course_owner(7, fake_query_func)
+
+        self.assertEqual(result, expected)
+
+    def test_activateCourse_returnsTrue(self):
+        fake_query_func = lambda x, y: True
+        expected = True
+
+        result = courses.activate_course(7, fake_query_func)
+
+        self.assertEqual(result, expected)
+
+    def test_activateCourse_returnsFalse(self):
+        fake_query_func = lambda x, y: False
+        expected = False
+
+        result = courses.activate_course(7, fake_query_func)
+
+        self.assertEqual(result, expected)
+
+    def test_deactivateCourse_returnsTrue(self):
+        fake_query_func = lambda x, y: True
+        expected = True
+
+        result = courses.deactivate_course(7, fake_query_func)
+
+        self.assertEqual(result, expected)
+
+    def test_deactivateCourse_returnsFalse(self):
+        fake_query_func = lambda x, y: False
+        expected = False
+
+        result = courses.deactivate_course(7, fake_query_func)
+
+        self.assertEqual(result, expected)
