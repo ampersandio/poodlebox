@@ -1,6 +1,5 @@
-from datetime import date
-
 import unittest
+from datetime import date
 from api.services import users
 from api.data.models import User
 
@@ -71,7 +70,7 @@ class UsersServiceShould(unittest.TestCase):
             )]
         expected = FAKE_USER1
 
-        result = users.get_user_by_id(FAKE_USER1.id)
+        result = users.get_user_by_id(FAKE_USER1.id, fake_query_func)
 
         self.assertEqual(result, expected)
 
