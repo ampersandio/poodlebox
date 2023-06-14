@@ -33,6 +33,7 @@ def check_enrollment_status(student_id,course_id,db=None):
     '''Check the enrollment status for a course a student's been enrolled in'''
     if db is None:
         db=database.read_query
+        
     data = db(
         "select subscriptions_id from users_has_courses where users_id=? and courses_id=?",
         (student_id, course_id),

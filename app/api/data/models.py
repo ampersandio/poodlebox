@@ -148,6 +148,13 @@ class Course(BaseCourse):
             course_picture=course_picture,
         )
 
+
+class CourseEdit(BaseModel):
+    tags: list[str]
+    objectives: str
+    course_picture: str
+
+
 class CourseShow(BaseCourse):
     id: int
     rating: float | None = None
@@ -347,11 +354,11 @@ class TeacherProfile(BaseModel):
 
 
 class EditTeacherProfile(BaseModel):
-    new_password: str | None
-    new_password_again: str | None
-    phone_number: str | None
-    linked_in_profile: str | None
-    profile_picture: str | None
+    new_password: str 
+    new_password_again: str 
+    phone_number: str 
+    linked_in_profile: str 
+    profile_picture: str 
 
     @classmethod
     def from_user(cls, user: User):

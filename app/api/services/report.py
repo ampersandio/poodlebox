@@ -1,3 +1,5 @@
+from typing import Callable
+
 from api.data.database import read_query
 from api.data.models import (
     User,
@@ -8,9 +10,14 @@ from api.data.models import (
 )
 
 
-def get_teachers_report(teacher: User) -> TeachersReport | None:
-    data = read_query(
-        'SELECT c.course_id, c.title, cr.total_rating, sec.sections_titles, cu.id as user_id, CONCAT(cu.first_name, " ", cu.last_name) as full_name, cu.email, cu.subscriptions_id, cu.role, ROUND((IFNULL(com.completed_sections, 0)/t.sections)*100, 0) as completed_sections, r.rating, r.description AS review FROM (SELECT c.id course_id, c.title FROM courses c JOIN users u ON c.owner = u.id WHERE u.id = ?) AS c '+
+def get_teachers_report(teacher: User, query_func: Callable = None) -> TeachersReport | None:
+    if query_func == None:
+        query_func = read_query
+
+    data = query_func(
+        'SELECT c.course_id, c.title, cr.total_rating, sec.sections_titles, cu.id as user_id, CONCAT(cu.first_name, " ", cu.last_name) as full_name, cu.email, ' +
+        'cu.subscriptions_id, cu.role, ROUND((IFNULL(com.completed_sections, 0)/t.sections)*100, 0) as completed_sections, r.rating, r.description AS review ' +
+        'FROM (SELECT c.id course_id, c.title FROM courses c JOIN users u ON c.owner = u.id WHERE u.id = ?) AS c '+
         'JOIN (SELECT uhc.subscriptions_id, uhc.courses_id, u.id, u.first_name, u.last_name, u.email, u.role FROM users_has_courses uhc JOIN users u ON u.id = uhc.users_id WHERE subscriptions_id != 2) AS cu ON cu.courses_id = c.course_id '+
         'LEFT JOIN (SELECT u.id user_id, r.rating, r.courses_id, r.description FROM users u JOIN reviews r ON u.id = r.users_id) as r ON r.courses_id = c.course_id AND r.user_id = cu.id '+
         'JOIN (SELECT c.id course_id, COUNT(s.id) sections FROM sections s JOIN courses c ON s.courses_id = c.id '+
