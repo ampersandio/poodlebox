@@ -2,14 +2,15 @@ import api.utils.constants as constants
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Form
 from fastapi.responses import JSONResponse
+from mariadb import IntegrityError
 
 from typing import Annotated, Optional
 from api.services import courses
-from api.data.models import User, Section, CourseShow
+from api.data.models import User, Section, CourseShow, CourseEdit
 from fastapi_pagination import Page, paginate
-from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, PendingEnrollment
+from api.data.models import User, PendingEnrollment, Subscription
 from api.services.authorization import get_current_user, get_oauth2_scheme
-from api.services.students import get_students_courses_id, check_enrollment_status, update_interest, check_enrollment_status, get_students_active_courses
+from api.services.students import get_students_courses_id, check_enrollment_status, update_interest, check_enrollment_status, get_students_active_courses,enroll_in_course
 from api.services.certificates import create_certificate
 from api.utils.utils import email_certificate
 from datetime import date
@@ -77,6 +78,21 @@ def get_course_by_id(
     return result
 
 
+@courses_router.put('/{course_id}')
+def edit_course(course_id: int, new_information: CourseEdit, current_user: User = Depends(get_current_user)) -> JSONResponse:
+    if current_user.role.lower() not in ['teacher', 'admin']:
+        raise HTTPException(status_code=403, detail='You do not have permission to do this')
+    
+    if courses.check_ownership(current_user.id, course_id) == False:
+        raise HTTPException(status_code=403, detail=f'You are not the owner of course with ID:{course_id}')
+    
+    try:
+        courses.edit(course_id, new_information)
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail='Unrecognized tag/s')
+
+    return JSONResponse(status_code=200, content={'msg': f'Course with ID: {course_id} edited successfully'})
+
 @courses_router.get("/{course_id}/sections/", response_model=Page[Section])
 def get_all_course_sections(course_id: int, current_user: User = Depends(get_current_user), search: str = None, sort_by: str = None) -> Page[Section]:
     """Get all the sections of a particular course with pagination and sorting"""
@@ -118,10 +134,10 @@ def get_section_by_id(course_id:int ,section_id:int ,current_user:Annotated[User
         courses.visit_section(current_user.id, section.id)
     
     if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
-            
-        if check_enrollment_status(current_user.id,course_id) == "1":
-              create_certificate(current_user.id,course_id,date.today())
-              email_certificate(current_user,course.title)
+        if check_enrollment_status(current_user.id,course_id) == 1:
+            create_certificate(current_user.id,course_id,date.today())
+            enroll_in_course(current_user.id,course_id,Subscription(enroll=False),False)
+            email_certificate(current_user,course.title)
 
     return section
 

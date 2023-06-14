@@ -1,4 +1,5 @@
-from api.data.database import read_query, insert_query, update_query, delete_query
+from api.data.database import read_query, insert_query, update_query, delete_query, multiple_query
+from typing import Callable
 import api.utils.constants as constants
 from mariadb import IntegrityError
 from api.data.models import (
@@ -15,7 +16,8 @@ from api.data.models import (
     CourseShow,
     User,
     PendingEnrollment,
-    NicePendingEnrollment
+    NicePendingEnrollment,
+    CourseEdit
 )
 from api.data import database
 
@@ -162,10 +164,33 @@ def create_course(course: CourseCreate, owner):
         )
 
 
-def add_course_photo(course_picture: str, course_id: int):
-    '''Add a photo for a particular course'''
+def edit(course_id: int, new_information: CourseEdit) -> None:
+    '''
+    Edit course, setting new tags, objectives, course picture
+    '''
+    params = [course_id]
+    tag_queries = ''
+    for tag in new_information.tags:
+        tag_queries += 'INSERT INTO tags_has_courses(courses_id, tags_id) VALUES(?, (SELECT id FROM tags WHERE name = ?)); '
+        params.append(course_id)
+        params.append(tag)
 
-    course = get_course_by_id(course_id)
+    params.append(new_information.objectives)
+    params.append(new_information.course_picture)
+    params.append(course_id)
+
+    multiple_query('DELETE FROM tags_has_courses WHERE courses_id = ?; ' +
+                 tag_queries +
+                 'UPDATE courses SET objectives = ?, course_picture = ? WHERE id = ?',
+                 params)
+
+
+def add_course_photo(course_picture: str, course_id: int, get_course_func: Callable = None):
+    '''Add a photo for a particular course'''
+    if get_course_func == None:
+        get_course_func = get_course_by_id
+
+    course = get_course_func(course_id)
     if course:
         insert_query("update courses set course_picture = ? where id = ?", (course_picture, course_id,))
     else:
@@ -208,9 +233,12 @@ def create_section(course_id: int, section: SectionCreate):
     return get_section_by_id(last_section_id)
 
 
-def insert_section(title: str, course_id: int) -> int:
+def insert_section(title: str, course_id: int, query_func: Callable = None) -> int:
+    if query_func == None:
+        query_func = insert_query
+
     query = "INSERT INTO sections (title, courses_id) VALUES (?, ?);"
-    section_id = insert_query(query, (title, course_id))
+    section_id = query_func(query, (title, course_id))
     return section_id
 
 
@@ -226,9 +254,12 @@ def insert_content(title: str, description: str, content_type_id: int, section_i
     insert_query(query, (title, description, content_type_id, section_id, link))
 
 
-def insert_content_type(content_type: str) -> int:
+def insert_content_type(content_type: str, query_func: Callable = None) -> int:
+    if query_func == None:
+        query_func = insert_query
+
     query = "INSERT INTO content_types (type) VALUES (?);"
-    content_type_id = insert_query(query, (content_type,))
+    content_type_id = query_func(query, (content_type,))
     return content_type_id
 
 
@@ -297,11 +328,16 @@ def get_course_students(course_id: int):
         return None
 
 
-def delete_section(section_id: int):
+def delete_section(section_id: int, query_func: Callable = None, get_section_by_id_func: Callable = None):
+    if query_func == None:
+        query_func = update_query
     
-    section = get_section_by_id(section_id)
+    if get_section_by_id_func == None:
+        get_section_by_id_func = get_section_by_id
+
+    section = get_section_by_id_func(section_id)
     if section:
-        update_query("delete from sections where id = ?;", (section_id,))
+        query_func("delete from sections where id = ?;", (section_id,))
     else:
         return None
 
@@ -375,18 +411,27 @@ def leave_review(user_id: int, course_id: int, rating: float, description: str) 
         return False
     
 
-def deactivate_course(course_id: int) -> bool:
-    updated = update_query('UPDATE courses SET active=0 WHERE id=?', (course_id,))
+def deactivate_course(course_id: int, query_func: Callable = None) -> bool:
+    if query_func == None:
+        query_func = update_query
+
+    updated = query_func('UPDATE courses SET active=0 WHERE id=?', (course_id,))
     return bool(updated)
 
 
-def activate_course(course_id: int) -> bool:
-    updated = update_query('UPDATE courses SET active=1 WHERE id=?', (course_id,))
+def activate_course(course_id: int, query_func: Callable = None) -> bool:
+    if query_func == None:
+        query_func = update_query
+
+    updated = query_func('UPDATE courses SET active=1 WHERE id=?', (course_id,))
     return bool(updated)
 
 
-def get_course_owner(course_id: int) -> int:
-    data = read_query('SELECT owner FROM courses WHERE id=?', (course_id,))
+def get_course_owner(course_id: int, query_func: Callable = None) -> int:
+    if query_func == None:
+        query_func = read_query
+
+    data = query_func('SELECT owner FROM courses WHERE id=?', (course_id,))
     owner = data[0][0]
 
     return owner
@@ -413,11 +458,29 @@ def get_nice_pending_enrollments(owner_id: int) -> list[PendingEnrollment] | Non
     return pending_enrollments
 
 
-def approve_enrollment(user_id: int, course_id: int) -> bool:
-    enrolled = update_query('UPDATE users_has_courses SET subscriptions_id = 1 WHERE users_id=? AND courses_id=?', (user_id, course_id))
+def approve_enrollment(user_id: int, course_id: int, query_func: Callable = None) -> bool:
+    if query_func == None:
+        query_func = update_query
+
+    enrolled = query_func('UPDATE users_has_courses SET subscriptions_id = 1 WHERE users_id=? AND courses_id=?', (user_id, course_id))
     return bool(enrolled)
 
 
-def reject_enrollment(user_id: int, course_id: int) -> bool:
-    rejected = delete_query('DELETE FROM users_has_courses WHERE users_id=? AND courses_id=?', (user_id, course_id))
+def reject_enrollment(user_id: int, course_id: int, query_func: Callable = None) -> bool:
+    if query_func == None:
+        query_func = delete_query
+
+    rejected = query_func('DELETE FROM users_has_courses WHERE users_id=? AND courses_id=?', (user_id, course_id))
     return bool(rejected)
+
+
+def check_ownership(user_id: int, course_id: int, query_func: Callable = None) -> bool:
+    if query_func == None:
+        query_func = read_query
+
+    owner_id = query_func('SELECT owner FROM courses WHERE id = ?', (course_id,))[0][0]
+
+    if user_id != owner_id:
+        return False
+    
+    return True
