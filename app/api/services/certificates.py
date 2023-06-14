@@ -7,8 +7,8 @@ from api.data.models import Certificate
 def create_certificate(student_id, course_id, date,db=None):
     """Create a certificate for a particular course"""
     if db is None:
-        db=database.read_query
-    certificate_id = uuid.uuid1()
+        db=database.insert_query
+    certificate_id = str(uuid.uuid1())
     db(
         "insert into certificates(id,users_id,courses_id,issued_date) values(?,?,?,?)",
         (certificate_id, student_id, course_id, date),

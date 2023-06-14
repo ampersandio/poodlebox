@@ -11,7 +11,9 @@ from fastapi_pagination import Page, paginate
 from api.data.models import User, CourseCreate, SectionCreate, ContentCreate, PendingEnrollment
 from api.services.authorization import get_current_user, get_oauth2_scheme
 from api.services.students import get_students_courses_id, check_enrollment_status, update_interest, check_enrollment_status, get_students_active_courses
+from api.services.certificates import create_certificate
 from api.utils.utils import email_certificate
+from datetime import date
 from fastapi_pagination import Page,paginate
 
 courses_router = APIRouter(prefix="/courses", tags=["Courses"])
@@ -134,7 +136,8 @@ def get_section_by_id(course_id:int ,section_id:int ,current_user:Annotated[User
     if current_user.role == constants.STUDENT_ROLE and courses.n_visited_sections(current_user.id, course.id) == courses.n_sections_by_course_id(course.id):
             
         if check_enrollment_status(current_user.id,course_id) == "1":
-            email_certificate(current_user,course.title)
+              create_certificate(current_user.id,course_id,date.today())
+              email_certificate(current_user,course.title)
 
     return section
 
