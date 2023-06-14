@@ -300,7 +300,6 @@ def get_course_students(course_id: int):
 def delete_section(section_id: int):
     
     section = get_section_by_id(section_id)
-
     if section:
         update_query("delete from sections where id = ?;", (section_id,))
     else:
