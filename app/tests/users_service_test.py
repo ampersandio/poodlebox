@@ -1,7 +1,7 @@
 import unittest
 from datetime import date
-from api.services import users
-from api.data.models import User
+from app.api.services import users
+from app.api.data.models import User
 
 
 FAKE_USER1 = User(
@@ -63,7 +63,7 @@ class UsersServiceShould(unittest.TestCase):
             FAKE_USER1.date_of_birth,
             FAKE_USER1.verified_email,
             FAKE_USER1.approved,
-            FAKE_USER1.role,
+            2,
             FAKE_USER1.linked_in_profile,
             FAKE_USER1.disabled,
             FAKE_USER1.profile_picture
